@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<section class="auth-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card auth-card shadow-lg">
+                    <div class="card-body p-4 p-sm-5">
+                        <div class="text-center mb-5">
+                            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="auth-logo mb-4" style="width: 80px;">
+                            <h2 class="auth-title mb-3">Bienvenue</h2>
+                            <p class="text-muted">Connectez-vous pour accéder à votre espace</p>
+                        </div>
+
+                        {% if error %}
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            </div>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <div class="alert alert-info">
+                                Vous êtes connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>
+                                <a href="{{ path('app_logout') }}" class="float-end btn btn-sm btn-light">
+                                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                                </a>
+                            </div>
+                        {% else %}
+                            <form method="post" class="needs-validation" novalidate>
+                                <div class="mb-4">
+                                    <label for="inputUsername" class="form-label">
+                                        <i class="fas fa-user me-1"></i> Nom d'utilisateur
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        value="{{ last_username }}" 
+                                        name="username" 
+                                        id="inputUsername" 
+                                        class="form-control form-control-lg"
+                                        placeholder="Entrez votre nom d'utilisateur"
+                                        required
+                                        autofocus
+                                    >
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="inputPassword" class="form-label">
+                                        <i class="fas fa-lock me-1"></i> Mot de passe
+                                    </label>
+                                    <input 
+                                        type="password" 
+                                        name="password" 
+                                        id="inputPassword" 
+                                        class="form-control form-control-lg"
+                                        placeholder="••••••••"
+                                        required
+                                    >
+                                </div>
+
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                <div class="d-grid mb-4">
+                                    <button class="btn btn-primary btn-lg" type="submit">
+                                        <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+                                    </button>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <a href="{{ path('app_register') }}" class="text-decoration-none">
+                                        <i class="fas fa-user-plus me-1"></i> Créer un compte
+                                    </a>
+                                    <span class="mx-2">•</span>
+                                    <a href="{{ path('app_forgot_password_request') }}" class="text-decoration-none">
+                                        <i class="fas fa-key me-1"></i> Mot de passe oublié ?
+                                    </a>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
