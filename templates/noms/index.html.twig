@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Noms index{% endblock %}
+
+{% block body %}
+    <h1>Noms index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Designation</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for nom in noms %}
+            <tr>
+                <td>{{ nom.id }}</td>
+                <td>{{ nom.designation }}</td>
+                <td>{{ nom.createdAt ? nom.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ nom.updatedAt ? nom.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ nom.slug }}</td>
+                <td>
+                    <a href="{{ path('app_noms_show', {'id': nom.id}) }}">show</a>
+                    <a href="{{ path('app_noms_edit', {'id': nom.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_noms_new') }}">Create new</a>
+{% endblock %}

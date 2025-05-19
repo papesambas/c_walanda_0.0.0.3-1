@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ninas{% endblock %}
+
+{% block body %}
+    <h1>Ninas</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ nina.id }}</td>
+            </tr>
+            <tr>
+                <th>Numero</th>
+                <td>{{ nina.numero }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ nina.createdAt ? nina.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ nina.updatedAt ? nina.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ nina.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_ninas_index') }}">back to list</a>
+
+    <a href="{{ path('app_ninas_edit', {'id': nina.id}) }}">edit</a>
+
+    {{ include('ninas/_delete_form.html.twig') }}
+{% endblock %}

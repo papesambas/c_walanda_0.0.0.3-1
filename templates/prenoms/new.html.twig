@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Prenoms{% endblock %}
+
+{% block body %}
+    <h1>Create new Prenoms</h1>
+
+    {{ include('prenoms/_form.html.twig') }}
+
+    <a href="{{ path('app_prenoms_index') }}">back to list</a>
+{% endblock %}

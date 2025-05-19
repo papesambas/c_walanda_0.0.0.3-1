@@ -15,6 +15,10 @@ trait DesignationTrait
         minMessage: 'designation must be at least {{ limit }} characters long.',
         maxMessage: 'designation cannot be longer than {{ limit }} characters.'
     )]
+    #[Assert\Regex(
+        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        message: 'The designation must contain only letters, spaces, apostrophes or hyphens.'
+    )]
     private ?string $designation = null;
 
     public function getDesignation(): ?string

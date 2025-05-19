@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Meres{% endblock %}
+
+{% block body %}
+    <h1>Edit Meres</h1>
+
+    {{ include('meres/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_meres_index') }}">back to list</a>
+
+    {{ include('meres/_delete_form.html.twig') }}
+{% endblock %}

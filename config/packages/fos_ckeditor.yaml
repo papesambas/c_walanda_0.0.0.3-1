@@ -1,0 +1,65 @@
+# Documentation : https://symfony.com/doc/current/bundles/FOSCKEditorBundle/index.html
+
+twig:
+    form_themes:
+        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'
+
+fos_ck_editor:
+    default_config: custom  # Configuration utilisée par défaut
+    configs:
+        # Configuration par défaut (français)
+        default:
+            language: 'fr'  # Langue française
+            toolbar: standard  # Barre d'outils standard
+            uiColor: '#AADC6E'  # Couleur de l'interface
+            extraPlugins: 'image2,widget,uploadimage'  # Plugins supplémentaires
+            removePlugins: 'elementspath'  # Désactive le chemin des éléments
+            filebrowserUploadUrl: '/file-manager/upload'  # URL pour l'upload de fichiers
+
+        # Configuration pour l'anglais
+        english:
+            toolbar: standard
+            language: 'en'
+            uiColor: '#FFFFFF'
+
+        # Configuration avancée personnalisée
+        custom:
+            language: 'fr'
+            # Barre d'outils organisée en groupes
+            toolbar:
+                # Première ligne
+                - ['Bold', 'Italic', 'Underline', 'Strike', '-', 'Subscript', 'Superscript']
+                - ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']
+                - ['Link', 'Unlink', 'Image']
+                
+                # Groupes nommés
+                - { name: "document", items: ["Save", "NewPage", "Preview", "Print", "-", "Templates"] }
+                - { name: "clipboard", items: ["Cut", "Copy", "Paste", "ImageButton"] }
+                - { name: "editing", groups: ["find", "selection"] }
+                - { name: "forms", items: ["Form", "ImageButton"] }
+                - { name: "basicstyles", items: ["Bold", "Italic", "Underline", "CopyFormatting"] }
+                
+                # Formatage avancé
+                - { 
+                    name: "paragraph", 
+                    items: [
+                        "NumberedList", "BulletedList", "-", 
+                        "Outdent", "Indent", "-", 
+                        "JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock", "-", 
+                        "BidiLtr", "BidiRtl", "Language"
+                    ] 
+                  }
+                - { name: "links", items: ["Link", "Unlink", "Anchor"] }
+                - { name: "insert", items: ["Image", "Table", "HorizontalRule", "SpecialChar", "PageBreak"] }
+                - { name: "styles", items: ["Styles", "Format", "Font", "FontSize"] }
+                - { name: "colors", items: ["TextColor", "BGColor"] }
+                - { name: "tools", items: ["Maximize", "ShowBlocks"] }
+            
+            # Options supplémentaires
+            uiColor: '#9AB8F3'
+            extraPlugins: 'justify,colorbutton,font'
+            contentsCss: ['/css/ckeditor_styles.css']  # Fichier CSS personnalisé
+            
+            # Configuration de l'explorateur de fichiers
+            filebrowserBrowseRoute: elfinder
+            filebrowserBrowseRouteParameters: []

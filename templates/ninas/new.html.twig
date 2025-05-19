@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ninas{% endblock %}
+
+{% block body %}
+    <h1>Create new Ninas</h1>
+
+    {{ include('ninas/_form.html.twig') }}
+
+    <a href="{{ path('app_ninas_index') }}">back to list</a>
+{% endblock %}

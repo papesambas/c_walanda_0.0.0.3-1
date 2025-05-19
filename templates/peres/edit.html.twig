@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Peres{% endblock %}
+
+{% block body %}
+    <h1>Edit Peres</h1>
+
+    {{ include('peres/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_peres_index') }}">back to list</a>
+
+    {{ include('peres/_delete_form.html.twig') }}
+{% endblock %}

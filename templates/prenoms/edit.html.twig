@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Prenoms{% endblock %}
+
+{% block body %}
+    <h1>Edit Prenoms</h1>
+
+    {{ include('prenoms/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_prenoms_index') }}">back to list</a>
+
+    {{ include('prenoms/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,42 @@
+<div class="flex-shrink-0 py-3 bg-opacity-25 mx-4 my-4 h-100" style="width:150px;">
+    <a href="" class="dflex align-items-center pb-3 mb-3 link-dark text-decoration-none">
+        <span class="fs-5 fw-semibold text-dark">Sous menu</span>
+    </a>
+    <ul
+        class="navbar-nav me-auto mb-2 mb-lg-0 ">
+        {# <li class="nav-item">
+        																											<a class="nav-link text-dark" href="{{path('app_blog')}}">Blog</a>
+        																										</li>#}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Mon Profil
+            </a>
+            <ul class="dropdown-menu  text-dark" aria-labelledby="navbarDropdown">
+                <li>
+                    <a class="dropdown-item " href="{{ path('app_profile-edit', {'username': users.username}) }}">Modifier le profil</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ path('app_pass_edit', {'username': users.username}) }}">Modifier le mot de passe</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </li>
+                </ul>
+
+            </li>
+            <li class="nav-item pb-2">
+                <a class="dropdown-item" href="{{ path('app_author_publication-edit', {'username': users.username}) }}">Mes Publication</a>
+            </li>
+            <li>
+                <hr class="dropdown-divider"></li>
+                <li class="nav-item pb-2">
+                    <a class="dropdown-item" href="{{ path('app_author_publication_Comments-edit', {'username': users.username}) }}">les Remarques</a>
+                </li>
+                <li class="nav-item pb-2">
+                    <a class="dropdown-item" href="{{ path('app_author_Comments-edit', {'username': users.username}) }}">Mes Remarques</a>
+                </li>
+
+            </ul>
+        </div>

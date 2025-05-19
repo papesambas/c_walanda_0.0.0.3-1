@@ -1,0 +1,97 @@
+/* Styles de base pour TOUS les TomSelect */
+.tom-select .ts-wrapper,
+.tom-select .ts-dropdown {
+    font-family: 'Arial', sans-serif;
+    border-radius: 4px;
+}
+
+.tom-select .ts-dropdown {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tom-option {
+    padding: 8px 12px;
+    transition: background 0.2s;
+}
+
+/* Style pour les boutons de suppression */
+.remove {
+    margin-left: 8px;
+    color: #999;
+    cursor: pointer;
+}
+
+.remove:hover {
+    color: #d33;
+}
+
+/* Style pour les items sélectionnés */
+.tom-selected-item {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+/* Styles spécifiques pour portionSize */
+.portion-option.small {
+    color: green;
+}
+
+.portion-option.large {
+    font-weight: bold;
+}
+
+/*body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}*/
+
+.card {
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background-color: #1c2c44;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    background-color: #375480;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.input-group-text {
+    background-color: transparent;
+    border-right: none;
+}
+
+.input-with-icon {
+    border-left: none;
+}
+
+.password-toggle {
+    cursor: pointer;
+    background-color: transparent;
+    border-left: none;
+}

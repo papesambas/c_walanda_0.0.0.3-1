@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Meres{% endblock %}
+
+{% block body %}
+    <h1>Create new Meres</h1>
+
+    {{ include('meres/_form.html.twig') }}
+
+    <a href="{{ path('app_meres_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Ninas{% endblock %}
+
+{% block body %}
+    <h1>Edit Ninas</h1>
+
+    {{ include('ninas/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_ninas_index') }}">back to list</a>
+
+    {{ include('ninas/_delete_form.html.twig') }}
+{% endblock %}

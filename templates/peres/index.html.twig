@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Peres index{% endblock %}
+
+{% block body %}
+    <h1>Peres index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pere in peres %}
+            <tr>
+                <td>{{ pere.id }}</td>
+                <td>{{ pere.email }}</td>
+                <td>
+                    <a href="{{ path('app_peres_show', {'id': pere.id}) }}">show</a>
+                    <a href="{{ path('app_peres_edit', {'id': pere.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_peres_new') }}">Create new</a>
+{% endblock %}

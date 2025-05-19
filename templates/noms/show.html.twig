@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Noms{% endblock %}
+
+{% block body %}
+    <h1>Noms</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ nom.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ nom.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ nom.createdAt ? nom.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ nom.updatedAt ? nom.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ nom.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_noms_index') }}">back to list</a>
+
+    <a href="{{ path('app_noms_edit', {'id': nom.id}) }}">edit</a>
+
+    {{ include('noms/_delete_form.html.twig') }}
+{% endblock %}

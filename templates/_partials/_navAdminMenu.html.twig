@@ -1,0 +1,69 @@
+<nav class="navbar navbar-expand-lg bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand text-light fw-bolder fst-italic" href="{{ path('app_home') }}">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse  justify-content-end" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                {% if is_granted('ROLE_ADMIN') %}
+                <li class="nav-item">
+                    <a class="nav-link active text-white fw-bolder fst-italic" aria-current="page"
+                        href="">Tableau de Bord</a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item  fw-bolder fst-italic">
+                    <a class="nav-link text-white fst-italic" href="{{ path('app_blog') }}">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fst-italic" aria-current="page" href="#">
+                        Mon compte</strong>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white fst-italic" href="{{path('app_parents_new_eleve')}}">Inscription</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Gestion des élèves
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ path('app_eleves_index')}}">Liste des élèves</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Gestion de Classe</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#">Gestion du comportement</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fst-italic" href="{{path('app_notes')}}">Gestion des Notes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fst-italic" href="{{ path('app_finances') }}">Finances</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white fst-italic" href="{{ path('app_logout') }}">
+                        <span class="text-danger">
+                            Déconnexion :
+                            <i class="fas fa-sign-out fa-spin"></i>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

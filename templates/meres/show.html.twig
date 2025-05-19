@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Meres{% endblock %}
+
+{% block body %}
+    <h1>Meres</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ mere.id }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ mere.email }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_meres_index') }}">back to list</a>
+
+    <a href="{{ path('app_meres_edit', {'id': mere.id}) }}">edit</a>
+
+    {{ include('meres/_delete_form.html.twig') }}
+{% endblock %}

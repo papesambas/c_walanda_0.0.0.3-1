@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ninas index{% endblock %}
+
+{% block body %}
+    <h1>Ninas index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Numero</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for nina in ninas %}
+            <tr>
+                <td>{{ nina.id }}</td>
+                <td>{{ nina.numero }}</td>
+                <td>{{ nina.createdAt ? nina.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ nina.updatedAt ? nina.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ nina.slug }}</td>
+                <td>
+                    <a href="{{ path('app_ninas_show', {'id': nina.id}) }}">show</a>
+                    <a href="{{ path('app_ninas_edit', {'id': nina.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_ninas_new') }}">Create new</a>
+{% endblock %}

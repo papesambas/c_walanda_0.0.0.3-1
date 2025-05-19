@@ -1,0 +1,67 @@
+# Documentation on how to configure the bundle can be found at: https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
+liip_imagine:
+    # valid drivers options include "gd" or "gmagick" or "imagick"
+    driver: "gd"
+    resolvers :
+        default :
+            web_path : ~
+
+    twig:
+        mode:             lazy
+
+    filter_sets :
+        cache : ~
+
+        # the name of the "filter set"
+        vignette :
+
+            # adjust the image quality to 75%
+            quality : 85
+
+            # list of transformations to apply (the "filters")
+            filters :
+
+                # create a thumbnail: set size to 120x90 and use the "outbound" mode
+                # to crop the image when the size ratio of the input differs
+                thumbnail  : { size : [70, 60], mode : outbound, allow_upscale: true }
+
+                # create a 2px black border: center the thumbnail on a black background
+                # 4px larger to create a 2px border around the final image
+                background : { size : [71, 61], position : center, color : '#000000' }
+
+        photo :
+            # adjust the image quality to 75%
+            quality : 85
+            # list of transformations to apply (the "filters")
+            filters :
+                # create a thumbnail: set size to 120x90 and use the "outbound" mode
+                # to crop the image when the size ratio of the input differs
+                thumbnail  : { size : [180, 240], mode : outbound, allow_upscale: true }
+                # create a 2px black border: center the thumbnail on a black background
+                # 4px larger to create a 2px border around the final image
+                background : { size : [182, 242], position : center, color : '#000000' }
+
+        photo_identite :
+            # adjust the image quality to 75%
+            quality : 85
+            # list of transformations to apply (the "filters")
+            filters :
+                # create a thumbnail: set size to 120x90 and use the "outbound" mode
+                # to crop the image when the size ratio of the input differs
+                thumbnail  : { size : [400, 500], mode : outbound, allow_upscale: true }
+                # create a 2px black border: center the thumbnail on a black background
+                # 4px larger to create a 2px border around the final image
+                background : { size : [401, 501], position : center, color : '#000000' }
+
+        photo_identite_gr_format :
+            # adjust the image quality to 75%
+            quality : 85
+            # list of transformations to apply (the "filters")
+            filters :
+                # create a thumbnail: set size to 120x90 and use the "outbound" mode
+                # to crop the image when the size ratio of the input differs
+                thumbnail  : { size : [340, 300], mode : outbound, allow_upscale: true }
+                # create a 2px black border: center the thumbnail on a black background
+                # 4px larger to create a 2px border around the final image
+                background : { size : [342, 302], position : center, color : '#000000' }
+                

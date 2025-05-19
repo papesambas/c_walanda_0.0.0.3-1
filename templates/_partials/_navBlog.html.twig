@@ -1,0 +1,96 @@
+<nav class="navbar navbar-expand-lg bg-primary">
+    <div
+        class="container-fluid ps-4">
+        {# {% if not is_granted('IS_AUTHENTICATED_FULLY') %} #}
+        <a class="navbar-brand text-white fw-bolder fst-italic" href="{{ path('app_home') }}">
+            <span class="fs-5 text-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door-fill" viewbox="0 0 16 16">
+                    <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5z"/>
+                </svg>
+            </span>Acceuil</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {#{% endif %}#}
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ps-5">
+
+                {% if is_granted('ROLE_INSCRIPTION') %}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Mon Blog
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ path('admin') }}">Tableau de bord</a>
+                            </li>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <li>
+                                    <a class="dropdown-item" href="#">Menu</a>
+                                </li>
+                                {# <li><hr class="dropdown-divider"></li> #}
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Ajouter
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="#">Publication</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">Devoirs</a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="#">Page</a>
+                            </li>
+                            {# <li><hr class="dropdown-divider"></li> #}
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-1 border-bottom">
+        <a href="{{ path('app_blog') }}" class="d-flex align-content-center mb-2 me-md-auto text-dark text-decoration-none">
+            <span class="fs-5">Retour à mon blog</span>
+        </a>
+
+        {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ path('app_register') }}">S'inscrire</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_login') }}">Se connecter</a>
+                </li>
+            </ul>
+        {% else %}
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_devoirs') }}">Nos dévoirs</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_messages') }}">Messagerie</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href="#">
+                        <strong>Mon compte</strong>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a>
+                </li>
+            </ul>
+        {% endif %}
+
+    </header>
+</div>

@@ -9,6 +9,12 @@ use App\Entity\Trait\EntityTrackingTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
@@ -37,15 +43,75 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(
+        message: 'Entrez un mot de passe S.V.P'
+    )]
+    #[Assert\Length(
+        min: 6,
+        minMessage: 'le mot de passe doit avoir au moins {{ limit }} caractères',
+        max: 255,
+        maxMessage: 'le mot de passe doit avoir au plus {{ limit }} caractères'
+    )]
+
     private ?string $password = null;
 
     #[ORM\Column(length: 60)]
+    #[Assert\Regex(
+        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        message: 'Le nom ne doit contenir que des lettres, des espaces, des apostrophes ou des traits d\'union.'
+    )]
+    #[Assert\Length(
+        min: 2,
+        minMessage: 'le nom doit avoir au moins {{ limit }} caractères',
+        max: 60,
+        maxMessage: 'le nom doit avoir au plus {{ limit }} caractères'
+    )]
+    #[Assert\NotBlank(
+        message: 'Entrez un nom S.V.P'
+    )]
+    #[Assert\NotNull(
+        message: 'le Nom ne peut pas être nul'
+    )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 75)]
+    #[Assert\Regex(
+        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        message: 'Le prénom ne doit contenir que des lettres, des espaces, des apostrophes ou des traits d\'union.'
+    )]
+    #[Assert\Length(
+        min: 2,
+        minMessage: 'le prénom doit avoir au moins {{ limit }} caractères',
+        max: 70,
+        maxMessage: 'le prénom doit avoir au plus {{ limit }} caractères'
+    )]
+    #[Assert\NotBlank(
+        message: 'Entrez un prénom S.V.P'
+    )]
+    #[Assert\NotNull(
+        message: 'le Prénom ne peut pas être nul'
+    )]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(
+        message: 'Entrez un email S.V.P'
+    )]
+    #[Assert\NotNull(
+        message: 'l\'email ne peut pas être nul'
+    )]
+    #[Assert\Email(
+        message: 'L\'adresse email "{{ value }}" n\'est pas une adresse email valide.',
+        mode: 'strict'
+    )]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'l\'email doit avoir au plus {{ limit }} caractères'
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",
+        message: 'L\'adresse email "{{ value }}" n\'est pas une adresse email valide.'
+    )]
     private ?string $email = null;
 
     #[ORM\Column]

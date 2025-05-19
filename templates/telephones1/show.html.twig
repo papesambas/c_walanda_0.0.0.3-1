@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Telephones1{% endblock %}
+
+{% block body %}
+    <h1>Telephones1</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ telephones1.id }}</td>
+            </tr>
+            <tr>
+                <th>Numero</th>
+                <td>{{ telephones1.numero }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ telephones1.createdAt ? telephones1.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ telephones1.updatedAt ? telephones1.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ telephones1.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_telephones1_index') }}">back to list</a>
+
+    <a href="{{ path('app_telephones1_edit', {'id': telephones1.id}) }}">edit</a>
+
+    {{ include('telephones1/_delete_form.html.twig') }}
+{% endblock %}

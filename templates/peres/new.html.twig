@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Peres{% endblock %}
+
+{% block body %}
+    <h1>Create new Peres</h1>
+
+    {{ include('peres/_form.html.twig') }}
+
+    <a href="{{ path('app_peres_index') }}">back to list</a>
+{% endblock %}
