@@ -56,6 +56,11 @@ services:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Meres'}
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Meres'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\ParentsEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Parents'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Parents'}    # add more service definitions when explicit configuration is needed
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

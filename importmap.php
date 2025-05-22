@@ -37,9 +37,11 @@ return [
     ],
     'jquery' => [
         'version' => '3.7.1',
+        'url' => 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js'
     ],
-    'tom-select' => [
+        'tom-select' => [
         'version' => '2.4.3',
+        'url' => 'https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js'
     ],
     '@orchidjs/sifter' => [
         'version' => '1.1.0',
@@ -54,5 +56,19 @@ return [
     'tom-select/dist/css/tom-select.default.css' => [
         'version' => '2.4.3',
         'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.bootstrap5.min.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+        'url' => 'https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css'
+    ],
+    'select2' => [
+        'version' => '4.1.0-rc.0',
+        'url' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'
+    ],
+    'select2/dist/css/select2.min.css' => [
+        'version' => '4.1.0-rc.0',
+        'type' => 'css',
+        'url' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
     ],
 ];

@@ -2,16 +2,18 @@
 
 namespace App\Form;
 
-use App\Entity\Ninas;
 use App\Entity\Noms;
+use App\Entity\Ninas;
 use App\Entity\Peres;
 use App\Entity\Prenoms;
 use App\Entity\Professions;
 use App\Entity\Telephones1;
 use App\Entity\Telephones2;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PeresForm extends AbstractType
@@ -19,10 +21,21 @@ class PeresForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
             ->add('nom', EntityType::class, [
+                'label' => 'Nom',
                 'class' => Noms::class,
-                'choice_label' => 'id',
+                'placeholder' => 'Entrer ou Choisir un Nom',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('n')
+                        ->orderBy('n.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'select-nomfamille',
+                    'allow-clear' => 'true', // Permet de vider la sélection
+                ],
+                'required' => false,
+                'error_bubbling' => false,
             ])
             ->add('prenom', EntityType::class, [
                 'class' => Prenoms::class,
@@ -44,6 +57,7 @@ class PeresForm extends AbstractType
                 'class' => Ninas::class,
                 'choice_label' => 'id',
             ])
+            ->add('email')
         ;
     }
 

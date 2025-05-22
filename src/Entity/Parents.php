@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\ParentsRepository;
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Repository\ParentsRepository;
+use App\Entity\Trait\EntityTrackingTrait;
 
 #[ORM\Entity(repositoryClass: ParentsRepository::class)]
 class Parents
 {
+    use CreatedAtTrait;
+    use SlugTrait;
+    use EntityTrackingTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,4 +55,5 @@ class Parents
 
         return $this;
     }
+
 }
