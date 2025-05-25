@@ -80,48 +80,36 @@ final class NomsController extends AbstractController
         return $this->redirectToRoute('app_noms_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/noms/search', name: 'noms_search', methods: ['GET'])]
+    #[Route('/search', name: 'app_noms_search', methods: ['GET'])]
     public function search(Request $request, NomsRepository $repo): JsonResponse
     {
         $term = $request->query->get('term', '');
-        $resultats = $repo->createQueryBuilder('n')
+        $results = $repo->createQueryBuilder('n')
             ->where('n.designation LIKE :term')
             ->setParameter('term', '%' . $term . '%')
+            ->orderBy('n.designation', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
 
-        $data = array_map(fn($n) => [
-            'id' => $n->getId(),
-            'text' => $n->getNom()
-        ], $resultats);
+        $data = array_map(fn(Noms $nom) => [
+            'id'   => $nom->getId(),
+            'text' => $nom->getDesignation(),
+        ], $results);
 
         return $this->json($data);
     }
 
-    #[Route('/noms/ajout/ajax', name: 'noms_ajout_ajax', methods: ['POST'])]
-public function ajoutAjax(Request $request, EntityManagerInterface $em, NomsRepository $repo): JsonResponse
-{
-    $donnees = json_decode($request->getContent(), true);
-    $nomTexte = $donnees['nom'] ?? '';
+    #[Route('/create/{label}', name: 'app_noms_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $nom = new Noms();
+        $nom->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($nom);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $nom->getId();
 
-    if (!$nomTexte) {
-        return $this->json(['error' => 'Nom invalide'], 400);
+        return new JsonResponse(['id' => $id]);
     }
-
-    $existant = $repo->findOneBy(['designation' => $nomTexte]);
-
-    if ($existant) {
-        return $this->json(['id' => $existant->getId()]);
-    }
-
-    $entite = new Noms();
-    $entite->setDesignation($nomTexte);
-    $em->persist($entite);
-    $em->flush();
-
-    return $this->json(['id' => $entite->getId()]);
-}
-
-
 }

@@ -9,13 +9,11 @@ import './bootstrap.js';
 // Configuration globale
 import 'jquery';
 import $ from 'jquery';
-import 'select2';
 import TomSelect from 'tom-select';
 
 // Export pour utilisation globale si nécessaire
 window.$ = $;
 window.jQuery = $;
-window.Select2 = $.fn.select2;
 window.TomSelect = TomSelect;
 
 // Importations communes
@@ -25,14 +23,13 @@ import '@popperjs/core'; // Import de Popper.js (requis par Bootstrap)
 
 import * as bootstrap from 'bootstrap'; // Importation complète de Bootstrap
 
-import 'select2/dist/css/select2.min.css';
 
 
 //import './styles/app.css';
 //import './styles/scss/app.css'; // Importation du fichier SCSS principal
 import './styles/app.scss';
 import './scripts/register.js'; // Importation du fichier JavaScript d'enregistrement
-import './scripts/select2.js'; // Importation du fichier JavaScript de Tom Select
+import './scripts/tom-select-nom.js'; // Importation du fichier JavaScript de Tom Select
 //import './scripts/test.js'; // Importation du fichier JavaScript de test
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 

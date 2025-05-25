@@ -15,24 +15,34 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PeresForm extends AbstractType
 {
+    private UrlGeneratorInterface $urlGenerator;
+
+    public function __construct(UrlGeneratorInterface $urlGenerator)
+    {
+        $this->urlGenerator = $urlGenerator;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('nom', EntityType::class, [
                 'label' => 'Nom',
                 'class' => Noms::class,
-                'placeholder' => 'Entrer ou Choisir un Nom',
+                'placeholder' => 'Sélectionnez ou Choisir un Nom',
                 'choice_label' => 'designation',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('n')
                         ->orderBy('n.designation', 'ASC');
                 },
                 'attr' => [
-                    'class' => 'select-nomfamille',
-                    'allow-clear' => 'true', // Permet de vider la sélection
+                    'class' => 'form-control tomselect-nom',
+                    //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
+                    //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
+                    'data-search-url' => '/noms/search',
+                    'data-create-url' => '/noms/create',
                 ],
                 'required' => false,
                 'error_bubbling' => false,
