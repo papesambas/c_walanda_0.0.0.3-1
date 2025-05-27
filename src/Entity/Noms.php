@@ -78,12 +78,9 @@ class Noms
 
     public function setDesignation(string $designation): static
     {
-        $designation = trim($designation); // Supprime les espaces inutiles
-        $designation = mb_strtolower($designation, 'UTF-8');
-        $designation = mb_strtoupper(mb_substr($designation, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($designation, 1, null, 'UTF-8');
-
-        $this->designation = $designation;
-
+        $designation = trim($designation);
+        $designation = preg_replace('/\s+/', ' ', $designation); // Normalise les espaces
+        $this->designation = mb_strtoupper($designation, 'UTF-8');
         return $this;
     }
 

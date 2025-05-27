@@ -6,10 +6,11 @@ use App\Entity\Prenoms;
 use App\Form\PrenomsForm;
 use App\Repository\PrenomsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/prenoms')]
 final class PrenomsController extends AbstractController
@@ -71,11 +72,24 @@ final class PrenomsController extends AbstractController
     #[Route('/{id}', name: 'app_prenoms_delete', methods: ['POST'])]
     public function delete(Request $request, Prenoms $prenom, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$prenom->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $prenom->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($prenom);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_prenoms_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/create/{label}', name: 'app_prenoms_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $prenom = new Prenoms();
+        $prenom->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($prenom);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $prenom->getId();
+
+        return new JsonResponse(['id' => $id]);
     }
 }

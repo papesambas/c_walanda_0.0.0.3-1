@@ -72,4 +72,5 @@ class NomsEntityListener
         $slug = mb_strtolower($nom->getDesignation() . '' . $nom->getId() , 'UTF-8');
         return $this->slugger->slug($slug)->toString();
     }
+
 }

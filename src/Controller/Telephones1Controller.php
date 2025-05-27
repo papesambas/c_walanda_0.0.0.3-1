@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Telephones1;
 use App\Form\Telephones1Form;
-use App\Repository\Telephones1Repository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Telephones1Repository;
+use App\Repository\Telephones2Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/telephones1')]
 final class Telephones1Controller extends AbstractController
@@ -71,11 +73,36 @@ final class Telephones1Controller extends AbstractController
     #[Route('/{id}', name: 'app_telephones1_delete', methods: ['POST'])]
     public function delete(Request $request, Telephones1 $telephones1, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$telephones1->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $telephones1->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($telephones1);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_telephones1_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/create/{label}', name: 'app_telephone1s_create', methods: ['POST'])]
+    public function ajoutAjax(
+        string $label,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Telephones2Repository $telephones2Repository
+    ): Response {
+        $numero = $label; // Décoder l'URL
+        //$telephone1 = $telephones1Repository->findOneBy(['numero' => $numero]);
+        $telephone2 = $telephones2Repository->findOneByNumero($numero);
+
+        if ($telephone2) {
+            return new JsonResponse(['error' => 'Le numéro existe déjà'], Response::HTTP_CONFLICT);
+        }
+        // Création
+
+        $telephone1 = new Telephones1();
+        $telephone1->setNumero($numero);
+
+        $entityManager->persist($telephone1);
+        $entityManager->flush();
+
+        return new JsonResponse(['id' => $telephone1->getId()]);
     }
 }

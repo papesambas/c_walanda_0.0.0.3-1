@@ -1,10 +1,10 @@
 import TomSelect from 'tom-select';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const selectElement = document.querySelector('.tomselect-nom');
+    const selectElement = document.querySelector('.tomselect-prenom');
     if (!selectElement) return;
 
-    // Définir la regex pour la validation des noms
+    // Définir la regex pour la validation des prenoms
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
     const tomselect = new TomSelect(selectElement, {
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch(`/noms/create/${encodeURIComponent(cleanedInput)}`, {
+            fetch(`/prenoms/create/${encodeURIComponent(cleanedInput)}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

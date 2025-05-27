@@ -35,7 +35,7 @@ class Telephones1
         maxMessage: 'le numéro doit avoir au plus {{ limit }} caractères'
     )]
     #[Assert\Regex(
-        pattern: "/^(?:(?:\+223|00223)[2567]\d{8}|(?:\+(?!223)\d{1,3}|00(?!223)\d{1,3})\d{6,12})$/",
+        pattern: "/^(?:(?:\+223|00223)[2567]\d{7}|(?:(?:\+(?!223)|00(?!223))\d{1,3}\d{6,12}))$/",
         message: 'le numéro de téléphone est invalide'
     )]
 

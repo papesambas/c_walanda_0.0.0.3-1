@@ -1,11 +1,11 @@
 import TomSelect from 'tom-select';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const selectElement = document.querySelector('.tomselect-nom');
+    const selectElement = document.querySelector('.tomselect-telephone2');
     if (!selectElement) return;
 
-    // Définir la regex pour la validation des noms
-    const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
+    // Définir la regex pour la validation des telephone2s
+    const nameRegex = /^(?:(?:\+223|00223)[2567]\d{7}|(?:(?:\+(?!223)|00(?!223))\d{1,3}\d{6,12}))$/;
 
     const tomselect = new TomSelect(selectElement, {
         plugins: ['remove_button'],
@@ -23,9 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch(`/noms/create/${encodeURIComponent(cleanedInput)}`, {
+            fetch(`/telephones2/create/${encodeURIComponent(cleanedInput)}`, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json', // Ajout crucial
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }

@@ -1,11 +1,11 @@
 import TomSelect from 'tom-select';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const selectElement = document.querySelector('.tomselect-nom');
+    const selectElement = document.querySelector('.tomselect-nina');
     if (!selectElement) return;
 
-    // Définir la regex pour la validation des noms
-    const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
+    // Définir la regex pour la validation des ninas
+    const nameRegex = /^(?=[A-Z0-9]{13} [A-Z]$)(?!(?:[^A-Z]*[A-Z]){6,})[A-Z0-9]{13} [A-Z]$/;
 
     const tomselect = new TomSelect(selectElement, {
         plugins: ['remove_button'],
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch(`/noms/create/${encodeURIComponent(cleanedInput)}`, {
+            fetch(`/ninas/create/${encodeURIComponent(cleanedInput)}`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

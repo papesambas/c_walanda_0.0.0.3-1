@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Professions;
 use App\Form\ProfessionsForm;
-use App\Repository\ProfessionsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\ProfessionsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/professions')]
 final class ProfessionsController extends AbstractController
@@ -77,5 +78,18 @@ final class ProfessionsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_professions_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+        #[Route('/create/{label}', name: 'app_professions_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $profession = new Professions();
+        $profession->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($profession);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $profession->getId();
+
+        return new JsonResponse(['id' => $id]);
     }
 }

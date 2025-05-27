@@ -16,6 +16,21 @@ class Telephones1Repository extends ServiceEntityRepository
         parent::__construct($registry, Telephones1::class);
     }
 
+    /**
+     * Summary of findOneByNumero
+     * @param mixed $label
+     */
+    public function findOneByNumero($label): ?Telephones1
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.numero = :val')
+            ->setParameter('val', $label)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+
     //    /**
     //     * @return Telephones1[] Returns an array of Telephones1 objects
     //     */
