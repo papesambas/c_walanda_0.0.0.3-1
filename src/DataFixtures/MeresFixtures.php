@@ -39,6 +39,7 @@ class MeresFixtures extends Fixture implements DependentFixtureInterface
             // Profession aléatoire (références profession_1 à profession_75)
             $professionRef = $this->getReference('profession_' . random_int(1, 75), Professions::class);
             $mere->setProfession($professionRef);
+            $mere->setEmail($faker->email);
 
             // Téléphone 1 obligatoire (unique)
             do {
@@ -82,6 +83,7 @@ class MeresFixtures extends Fixture implements DependentFixtureInterface
             $manager->persist($mere);
             $this->addReference('mere_' . $i, $mere);
         }
+
 
         $manager->flush();
     }

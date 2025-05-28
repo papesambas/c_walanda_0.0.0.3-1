@@ -1,4 +1,6 @@
-{{ form_start(form) }}
+{{ form_start(form, {
+    'attr': { 'id': 'peres_form' }
+}) }}
 <meta name="csrf-token" content="{{ csrf_token('app_noms_create') }}">
     {{ form_widget(form) }}
     <button class="btn">{{ button_label|default('Save') }}</button>

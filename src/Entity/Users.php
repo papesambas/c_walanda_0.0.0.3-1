@@ -94,12 +94,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(
-        message: 'Entrez un email S.V.P'
-    )]
-    #[Assert\NotNull(
-        message: 'l\'email ne peut pas être nul'
-    )]
     #[Assert\Email(
         message: 'L\'adresse email "{{ value }}" n\'est pas une adresse email valide.',
         mode: 'strict'
@@ -122,6 +116,12 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Peres $pere = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Meres $mere = null;
 
     public function getId(): ?int
     {
@@ -225,7 +225,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
@@ -264,6 +264,30 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getPere(): ?Peres
+    {
+        return $this->pere;
+    }
+
+    public function setPere(?Peres $pere): static
+    {
+        $this->pere = $pere;
+
+        return $this;
+    }
+
+    public function getMere(): ?Meres
+    {
+        return $this->mere;
+    }
+
+    public function setMere(?Meres $mere): static
+    {
+        $this->mere = $mere;
 
         return $this;
     }

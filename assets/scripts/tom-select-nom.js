@@ -14,6 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
         labelField: 'text',
         searchField: 'text',
         maxItems: 1,
+        
+        maxOptions: 10,
+        load: function (query, callback) {
+            if (!query.length) {
+                return callback();
+            }
+            fetch(`/noms/search?term=${encodeURIComponent(query)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // Si la réponse n'est pas OK, on signale un échec
+                        return callback();
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Données au format [{id, text}, …]
+                    callback(data);
+                })
+                .catch(() => {
+                    // En cas d'erreur réseau ou parsing
+                    callback();
+                });
+        },
         create: function (input, callback) {
             const cleanedInput = input.trim();
 

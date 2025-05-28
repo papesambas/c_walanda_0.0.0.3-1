@@ -32,13 +32,21 @@ class PeresFixtures extends Fixture implements DependentFixtureInterface
             $prenomRef = $this->getReference('prenom_m_' . random_int(0, 24), Prenoms::class);
             $pere->setPrenom($prenomRef);
 
-            // Nom aléatoire (références nom_1 à nom_50)
-            $nomRef = $this->getReference('nom_' . random_int(1, 50), Noms::class);
+            $idx = random_int(0, 60);
+            $key = 'nom_' . $idx;
+
+            if (!$this->hasReference($key, Noms::class)) {
+                // Si la référence n'existe pas, cela signifie que NomsFixtures n'a pas créé cette référence.
+                throw new \LogicException("Référence manquante : $key — assurez-vous que NomsFixtures ait bien créé nom_0 à nom_60");
+            }
+
+            $nomRef = $this->getReference($key, Noms::class);
             $pere->setNom($nomRef);
 
             // Profession aléatoire (références profession_1 à profession_75)
             $professionRef = $this->getReference('profession_' . random_int(1, 75), Professions::class);
             $pere->setProfession($professionRef);
+            $pere->setEmail($faker->email);
 
             // Téléphone 1 obligatoire (unique)
             do {
@@ -82,6 +90,7 @@ class PeresFixtures extends Fixture implements DependentFixtureInterface
             $manager->persist($pere);
             $this->addReference('pere_' . $i, $pere);
         }
+
 
         $manager->flush();
     }

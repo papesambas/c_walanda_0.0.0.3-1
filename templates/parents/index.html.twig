@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Parents index{% endblock %}
+
+{% block body %}
+    <h1>Parents index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for parent in parents %}
+            <tr>
+                <td>{{ parent.id }}</td>
+                <td>{{ parent.createdAt ? parent.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ parent.updatedAt ? parent.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ parent.slug }}</td>
+                <td>
+                    <a href="{{ path('app_parents_show', {'id': parent.id}) }}">show</a>
+                    <a href="{{ path('app_parents_edit', {'id': parent.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_parents_new') }}">Create new</a>
+{% endblock %}

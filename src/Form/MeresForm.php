@@ -39,6 +39,7 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/noms/search',
                     'data-create-url' => '/noms/create',
+                    'tabindex' => '1', //1er champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -72,6 +73,7 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/prenoms/search',
                     'data-create-url' => '/prenoms/create',
+                    'tabindex' => '2', //2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -105,6 +107,7 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/professions/search',
                     'data-create-url' => '/professions/create',
+                    'tabindex' => '3', //3ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -138,6 +141,7 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/telephones1/search',
                     'data-create-url' => '/telephones1/create',
+                    'tabindex' => '4', //4ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -171,6 +175,7 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/telephones2/search',
                     'data-create-url' => '/telephones2/create',
+                    'tabindex' => '5', //5ème champ focus
                 ],
                 'required' => false,
                 'error_bubbling' => false,
@@ -189,28 +194,29 @@ class MeresForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/ninas/search',
                     'data-create-url' => '/ninas/create',
+                    'tabindex' => '6', //6ème champ focus
                 ],
                 'required' => false,
                 'error_bubbling' => false,
                 'help' => 'la saisie en majuscule est obligatoire.',
             ])
-
-            ->add('email',EmailType::class, [
-                'label' => 'Email',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Entrez votre email',
-                ],
+            ->add('email', EmailType::class, [
+                'label'       => 'Email',
+                'required'    => false,
                 'constraints' => [
                     new Length([
-                        'max' => 180,
+                        'max'        => 180,
                         'maxMessage' => 'L\'email ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
                         'message' => 'L\'email doit être valide.',
                     ]),
+                ],
+                'attr' => [
+                    'class'       => 'form-control',
+                    'placeholder' => 'Entrez votre email',
+                    'tabindex'    => '7',    // Positionne ce champ en 7ᵉ au focus
                 ],
             ])
         ;

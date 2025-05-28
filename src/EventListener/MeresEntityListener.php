@@ -4,22 +4,28 @@ namespace App\EventListener;
 
 use LogicException;
 use App\Entity\Meres;
+use App\Entity\Users;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Symfony\Bundle\SecurityBundle\Security;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class MeresEntityListener
 {
+    private array $newUsers = [];
     private $security;
     private $slugger;
     private $tokenStorage;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(Security $security, SluggerInterface $slugger, TokenStorageInterface $tokenStorage)
+    public function __construct(Security $security, SluggerInterface $slugger, TokenStorageInterface $tokenStorage, UserPasswordHasherInterface $passwordHasher)
     {
         $this->security = $security;
         $this->slugger = $slugger;
         $this->tokenStorage = $tokenStorage;
+        $this->passwordHasher = $passwordHasher;
     }
 
     public function prePersist(Meres $mere, LifecycleEventArgs $arg): void
@@ -50,9 +56,47 @@ class MeresEntityListener
         }
     }
 
-        public function postPersist(Meres $mere, LifecycleEventArgs $args): void
+    public function postPersist(Meres $mere, LifecycleEventArgs $args): void
     {
-        // Exécuté après l'enregistrement
+        // Création d’un utilisateur en mémoire (non encore persisté)
+        $user = new Users();
+        $user->setMere($mere)
+            ->setNom($mere->getNom()->getDesignation())
+            ->setPrenom($mere->getPrenom()->getDesignation())
+            ->setUsername($mere->getFullname() . '_' . $mere->getId())
+            ->setRoles(['ROLE_PARENT'])
+            ->setEmail($mere->getEmail() )
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setUpdatedAt(new \DateTimeImmutable())
+            ->setCreatedBy($mere->getCreatedBy())
+            ->setUpdatedBy($mere->getUpdatedBy());
+
+        // Hash du mot de passe
+        $hashedPassword = $this->passwordHasher->hashPassword($user, 'password'); // remplace 'password' par logique réelle
+        $user->setPassword($hashedPassword);
+
+        // On stocke l’utilisateur pour le postFlush
+        $this->newUsers[] = $user;
+    }
+
+    /**
+     * Après le flush principal : on peut persister les Users en toute sécurité
+     */
+    public function postFlush(PostFlushEventArgs $args): void
+    {
+        if (empty($this->newUsers)) {
+            return;
+        }
+
+        $em = $args->getObjectManager();
+
+        foreach ($this->newUsers as $user) {
+            $em->persist($user);
+        }
+
+        $this->newUsers = []; // on vide pour éviter les doublons
+
+        $em->flush(); // ✅ On peut faire le flush ici sans effet de bord
     }
 
     public function postUpdate(Meres $mere, LifecycleEventArgs $args): void

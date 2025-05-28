@@ -16,6 +16,52 @@ class PeresRepository extends ServiceEntityRepository
         parent::__construct($registry, Peres::class);
     }
 
+    /**
+     * Summary of save
+     * @param \App\Entity\Peres $entity
+     * @param bool $flush
+     * @return void
+     */
+    public function save(Peres $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    /**
+     * Summary of remove
+     * @param \App\Entity\Peres $entity
+     * @param bool $flush
+     * @return void
+     */
+    public function remove(Peres $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+        public function findTop10(): array
+        {
+            return $this->createQueryBuilder('p')
+                ->select('p', 'pr', 'te')
+                ->innerJoin('p.profession', 'pr')
+                ->innerJoin('p.telephone1', 'te')
+                ->where('p.nom IS NOT NULL')
+                ->andWhere('p.prenom IS NOT NULL')
+                ->orderBy('p.nom', 'ASC')
+                ->addOrderBy('p.prenom', 'ASC')
+                ->setMaxResults(10)
+                ->getQuery()
+                ->getResult()
+            ;
+        }
+
     //    /**
     //     * @return Peres[] Returns an array of Peres objects
     //     */

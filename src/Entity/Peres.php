@@ -65,9 +65,16 @@ class Peres
     #[ORM\OneToMany(targetEntity: Parents::class, mappedBy: 'pere')]
     private Collection $parents;
 
+    /**
+     * @var Collection<int, Users>
+     */
+    #[ORM\OneToMany(targetEntity: Users::class, mappedBy: 'pere')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,7 +87,7 @@ class Peres
         return $this->nom;
     }
 
-    public function setNom(?Noms $nom): static
+    public function setNom( $nom): static
     {
         $this->nom = $nom;
 
@@ -200,6 +207,36 @@ class Peres
             // set the owning side to null (unless already changed)
             if ($parent->getPere() === $this) {
                 $parent->setPere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Users>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(Users $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setPere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(Users $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getPere() === $this) {
+                $user->setPere(null);
             }
         }
 

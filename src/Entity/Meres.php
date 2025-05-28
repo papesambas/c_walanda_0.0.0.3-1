@@ -58,9 +58,16 @@ class Meres
     #[ORM\OneToMany(targetEntity: Parents::class, mappedBy: 'mere')]
     private Collection $parents;
 
+    /**
+     * @var Collection<int, Users>
+     */
+    #[ORM\OneToMany(targetEntity: Users::class, mappedBy: 'mere')]
+    private Collection $users;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +199,36 @@ class Meres
             // set the owning side to null (unless already changed)
             if ($parent->getMere() === $this) {
                 $parent->setMere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Users>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(Users $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setMere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(Users $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getMere() === $this) {
+                $user->setMere(null);
             }
         }
 
