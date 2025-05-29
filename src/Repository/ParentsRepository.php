@@ -16,6 +16,38 @@ class ParentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Parents::class);
     }
 
+    public function save(Parents $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+    public function remove(Parents $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+        public function findForAll(): array
+        {
+            return $this->createQueryBuilder('p')
+                ->select('p', 'pe', 'me')
+                ->leftJoin('p.pere', 'pe')
+                ->leftJoin('p.mere', 'me')
+                ->orderBy('pe.nom', 'ASC')
+                ->addOrderBy('pe.prenom', 'ASC')
+                ->addOrderBy('me.nom', 'ASC')
+                ->addOrderBy('me.prenom', 'ASC')
+                ->getQuery()
+                ->getResult()
+            ;
+        }
+
     //    /**
     //     * @return Parents[] Returns an array of Parents objects
     //     */

@@ -56,7 +56,7 @@ class Ninas
 
         public function __toString()
     {
-        return $this->numero ?? '';
+        return $this->numero ?? 'pas de numéro Nina';
     }
 
 

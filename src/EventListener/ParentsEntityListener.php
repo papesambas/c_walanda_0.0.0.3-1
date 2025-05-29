@@ -28,7 +28,8 @@ class ParentsEntityListener
         $user = $token ? $token->getUser() : null;
 
         $parents->setCreatedAt(new \DateTimeImmutable('now'))
-            ->setSlug($this->getParentSlug($parents));
+            ->setSlug($this->getParentSlug($parents))
+            ->setFullname($this->getParentFullname($parents));
 
         if ($user) {
             $parents->setCreatedBy($user);
@@ -41,7 +42,8 @@ class ParentsEntityListener
         $user = $token ? $token->getUser() : null;
 
         $parents->setUpdatedAt(new \DateTimeImmutable('now'))
-            ->setSlug($this->getParentSlug($parents));
+            ->setSlug($this->getParentSlug($parents))
+            ->setFullname($this->getParentFullname($parents));
 
         if ($user) {
             $parents->setUpdatedBy($user);
@@ -71,5 +73,14 @@ class ParentsEntityListener
     {
         $slug = mb_strtolower($parents->getPere()->getFullname() . '' . $parents->getMere()->getFullname() , 'UTF-8');
         return $this->slugger->slug($slug)->toString();
+    }
+
+    private function getParentFullname(Parents $parents): string
+    {
+        $fullname = trim($parents->getPere()->getFullname() . ' ' . $parents->getMere()->getFullname());
+        if (empty($fullname)) {
+            throw new LogicException('Le nom complet du parent ne peut pas être vide.');
+        }
+        return $fullname;
     }
 }

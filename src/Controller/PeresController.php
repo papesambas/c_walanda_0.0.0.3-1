@@ -53,6 +53,7 @@ final class PeresController extends AbstractController
     #[Route('/{id}/edit', name: 'app_peres_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Peres $pere, EntityManagerInterface $entityManager): Response
     {
+        dump($pere);
         $form = $this->createForm(PeresForm::class, $pere);
         $form->handleRequest($request);
 

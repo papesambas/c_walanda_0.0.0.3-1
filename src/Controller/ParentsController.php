@@ -18,7 +18,7 @@ final class ParentsController extends AbstractController
     public function index(ParentsRepository $parentsRepository): Response
     {
         return $this->render('parents/index.html.twig', [
-            'parents' => $parentsRepository->findAll(),
+            'parents' => $parentsRepository->findForAll(),
         ]);
     }
 

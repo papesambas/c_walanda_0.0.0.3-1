@@ -53,6 +53,7 @@ final class MeresController extends AbstractController
     #[Route('/{id}/edit', name: 'app_meres_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Meres $mere, EntityManagerInterface $entityManager): Response
     {
+        dump($mere);
         $form = $this->createForm(MeresForm::class, $mere);
         $form->handleRequest($request);
 

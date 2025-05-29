@@ -16,28 +16,11 @@ class ParentsForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
+            ->add('pere', PeresForm::class, [
+                'label' => 'père',
             ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('slug')
-            ->add('pere', EntityType::class, [
-                'class' => Peres::class,
-                'choice_label' => 'id',
-            ])
-            ->add('mere', EntityType::class, [
-                'class' => Meres::class,
-                'choice_label' => 'id',
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
-            ->add('updatedBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
+            ->add('mere', MeresForm::class, [
+                'label' => 'mère',
             ])
         ;
     }

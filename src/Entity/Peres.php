@@ -44,10 +44,11 @@ class Peres
     private ?Professions $profession = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'pere_telephone1_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
     private ?Telephones1 $telephone1 = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, name: 'pere_telephone2_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
     private ?Telephones2 $telephone2 = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
@@ -75,6 +76,11 @@ class Peres
     {
         $this->parents = new ArrayCollection();
         $this->users = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->fullname ?? '';
     }
 
     public function getId(): ?int

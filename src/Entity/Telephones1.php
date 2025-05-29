@@ -55,7 +55,7 @@ class Telephones1
 
     public function __toString()
     {
-        return $this->numero ?? '';
+        return $this->numero ?? 'pas de numéro de téléphone';
     }
     public function getNumero(): ?string
     {
