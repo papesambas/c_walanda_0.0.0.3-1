@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enseignements{% endblock %}
+
+{% block body %}
+    <h1>Enseignements</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ enseignement.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ enseignement.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ enseignement.createdAt ? enseignement.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ enseignement.updatedAt ? enseignement.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ enseignement.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_enseignements_index') }}">back to list</a>
+
+    <a href="{{ path('app_enseignements_edit', {'id': enseignement.id}) }}">edit</a>
+
+    {{ include('enseignements/_delete_form.html.twig') }}
+{% endblock %}

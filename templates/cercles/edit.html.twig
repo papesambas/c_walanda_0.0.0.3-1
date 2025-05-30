@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Cercles{% endblock %}
+
+{% block body %}
+    <h1>Edit Cercles</h1>
+
+    {{ include('cercles/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_cercles_index') }}">back to list</a>
+
+    {{ include('cercles/_delete_form.html.twig') }}
+{% endblock %}

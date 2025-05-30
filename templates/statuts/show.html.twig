@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statuts{% endblock %}
+
+{% block body %}
+    <h1>Statuts</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ statut.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ statut.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ statut.createdAt ? statut.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ statut.updatedAt ? statut.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ statut.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_statuts_index') }}">back to list</a>
+
+    <a href="{{ path('app_statuts_edit', {'id': statut.id}) }}">edit</a>
+
+    {{ include('statuts/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit LieuNaissances{% endblock %}
+
+{% block body %}
+    <h1>Edit LieuNaissances</h1>
+
+    {{ include('lieu_naissances/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_lieu_naissances_index') }}">back to list</a>
+
+    {{ include('lieu_naissances/_delete_form.html.twig') }}
+{% endblock %}

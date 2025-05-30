@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Cercles{% endblock %}
+
+{% block body %}
+    <h1>Create new Cercles</h1>
+
+    {{ include('cercles/_form.html.twig') }}
+
+    <a href="{{ path('app_cercles_index') }}">back to list</a>
+{% endblock %}

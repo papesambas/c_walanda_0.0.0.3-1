@@ -1,0 +1,254 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Lieux de Naissance{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+    }
+
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1a252f);
+        color: white;
+        padding: 3rem 1rem;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+    }
+
+    .stat-card {
+        background: white;
+        border-left: 5px solid var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .table thead {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+    }
+
+    .location-badge {
+        background-color: #e9f7fe;
+        color: #31708f;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header-section text-center">
+    <h1 class="display-5 fw-bold"><i class="bi bi-geo-alt-fill me-2"></i>Gestion des Lieux de Naissance</h1>
+    <p class="lead">Liste complète des lieux de naissance enregistrés dans le système</p>
+    <a href="{{ path('app_lieu_naissances_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter un Lieu
+    </a>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Total Lieux</h6>
+                <div class="stat-number">{{ lieu_naissances|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Communes</h6>
+                <div class="stat-number">
+                    {% set communes = [] %}
+                    {% for lieu in lieu_naissances %}
+                    {% if lieu.commune and lieu.commune.id not in communes|map(c => c.id) %}
+                    {% set communes = communes|merge([lieu.commune]) %}
+                    {% endif %}
+                    {% endfor %}
+                    {{ communes|length }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Cercles</h6>
+                <div class="stat-number">
+                    {% set cercles = [] %}
+                    {% for lieu in lieu_naissances %}
+                    {% if lieu.commune.cercle and lieu.commune.cercle.id not in cercles|map(c => c.id) %}
+                    {% set cercles = cercles|merge([lieu.commune.cercle]) %}
+                    {% endif %}
+                    {% endfor %}
+                    {{ cercles|length }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Régions</h6>
+                <div class="stat-number">
+                    {% set regions = [] %}
+                    {% for lieu in lieu_naissances %}
+                    {% if lieu.commune.cercle.region and lieu.commune.cercle.region.id not in regions|map(r => r.id) %}
+                    {% set regions = regions|merge([lieu.commune.cercle.region]) %}
+                    {% endif %}
+                    {% endfor %}
+                    {{ regions|length }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list me-2"></i>Liste des Lieux de Naissance</h5>
+            <div class="input-group w-50">
+                <input type="text" class="form-control" placeholder="Rechercher un lieu..." id="searchInput">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if lieu_naissances is not empty %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Quartier</th>
+                            <th>Commune</th>
+                            <th>Cercle</th>
+                            <th>Région</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lieu in lieu_naissances %}
+                        <tr>
+                            <td class="fw-bold">#{{ lieu.id }}</td>
+                            <td>
+                                <span class="location-badge text-body">{{ lieu.designation }}</span>
+                            </td>
+                            <td>
+                                {% if lieu.commune %}
+                                <a href="{{ path('app_communes_show', {'id': lieu.commune.id}) }}"
+                                    class="text-decoration-none text-body fw-medium d-inline-flex align-items-center">
+                                    <i class="bi bi-building me-1"></i>
+                                    {{ lieu.commune }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if lieu.commune.cercle %}
+                                <a href="{{ path('app_cercles_show', {'id': lieu.commune.cercle.id}) }}"
+                                    class="text-decoration-none text-body fw-medium d-inline-flex align-items-center">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    {{ lieu.commune.cercle }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Aucun</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if lieu.commune.cercle.region %}
+                                <a href="{{ path('app_regions_show', {'id': lieu.commune.cercle.region.id}) }}"
+                                    class="text-decoration-none text-succes fw-medium d-inline-flex align-items-center">
+                                    <i class="bi bi-map me-1"></i>
+                                    {{ lieu.commune.cercle.region }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ path('app_lieu_naissances_show', {'id': lieu.id}) }}"
+                                    class="btn btn-sm btn-outline-primary me-1" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_lieu_naissances_edit', {'id': lieu.id}) }}"
+                                    class="btn btn-sm btn-outline-success me-1" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state my-4">
+                <i class="bi bi-geo-alt display-4 text-muted"></i>
+                <h4 class="mt-3 text-muted">Aucun lieu de naissance enregistré</h4>
+                <a href="{{ path('app_lieu_naissances_new') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter un lieu
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialisation des tooltips et recherche
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        tooltipTriggerList.map(tooltipTriggerEl => {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Recherche
+        const searchInput = document.getElementById('searchInput')
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const filter = this.value.toLowerCase()
+                const rows = document.querySelectorAll('tbody tr')
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase()
+                    row.style.display = text.includes(filter) ? '' : 'none'
+                })
+            })
+        }
+    })
+</script>
+{% endblock %}

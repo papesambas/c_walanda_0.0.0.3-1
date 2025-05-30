@@ -1,0 +1,328 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Régions{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --card-color-1: linear-gradient(135deg, #3498db, #1a5276);
+        --card-color-2: linear-gradient(135deg, #2ecc71, #27ae60);
+        --card-color-3: linear-gradient(135deg, #9b59b6, #8e44ad);
+        --card-border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1a252f);
+        color: white;
+        padding: 3rem 1rem;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+    }
+
+    .stat-card {
+        background: white;
+        border-left: 5px solid var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+    }
+
+    /* Styles pour les cartes de régions */
+    .region-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+        border: var(--card-border);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .region-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .region-card-header {
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+
+    .region-card-header i {
+        font-size: 2.5rem;
+        opacity: 0.2;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+
+    .region-card-body {
+        padding: 1.5rem;
+        background: white;
+    }
+
+    .stats-badge {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .stats-badge i {
+        margin-right: 0.3rem;
+        font-size: 0.9rem;
+    }
+
+    .region-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .region-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metadata {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header-section text-center">
+    <h1 class="display-5 fw-bold"><i class="bi bi-globe2 me-2"></i>Gestion des Régions</h1>
+    <p class="lead">Liste complète des régions administratives enregistrées dans le système</p>
+    <a href="{{ path('app_regions_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter une Région
+    </a>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Total Régions</h6>
+                <div class="stat-number">{{ regions|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Cercles</h6>
+                <div class="stat-number">
+                    {% set totalCercles = 0 %}
+                    {% for region in regions %}
+                        {% set totalCercles = totalCercles + region.cercles|length %}
+                    {% endfor %}
+                    {{ totalCercles }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Communes</h6>
+                <div class="stat-number">
+                    {% set totalCommunes = 0 %}
+                    {% for region in regions %}
+                        {% for cercle in region.cercles %}
+                            {% set totalCommunes = totalCommunes + cercle.communes|length %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ totalCommunes }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Lieux</h6>
+                <div class="stat-number">
+                    {% set totalLieux = 0 %}
+                    {% for region in regions %}
+                        {% for cercle in region.cercles %}
+                            {% for commune in cercle.communes %}
+                                {% set totalLieux = totalLieux + commune.lieuNaissances|length %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ totalLieux }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-grid me-2"></i>Liste des Régions</h5>
+            <div class="input-group w-50">
+                <input type="text" class="form-control" placeholder="Rechercher une région..." id="searchInput">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+    {% if regions is not empty %}
+    <div class="grid-container">
+        {% for region in regions %}
+            {% set colorIndex = loop.index0 % 3 %}
+            {% set cardGradients = [
+                'var(--card-color-1)',
+                'var(--card-color-2)',
+                'var(--card-color-3)'
+            ] %}
+            
+            <div class="region-card card shadow-sm">
+                <div class="region-card-header" style="background: {{ cardGradients[colorIndex] }}">
+                    <i class="bi bi-globe2"></i>
+                    <h3 class="region-title">{{ region.designation }}</h3>
+                </div>
+                
+                <div class="region-card-body">
+                    <div class="mb-3">
+                        <span class="stats-badge">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ region.cercles|length }} cercles
+                        </span>
+                        
+                        <span class="stats-badge">
+                            <i class="bi bi-building"></i>
+                            {% set totalCommunes = 0 %}
+                            {% for cercle in region.cercles %}
+                                {% set totalCommunes = totalCommunes + cercle.communes|length %}
+                            {% endfor %}
+                            {{ totalCommunes }} communes
+                        </span>
+                        
+                        <span class="stats-badge">
+                            <i class="bi bi-pin-map"></i>
+                            {% set totalLieux = 0 %}
+                            {% for cercle in region.cercles %}
+                                {% for commune in cercle.communes %}
+                                    {% set totalLieux = totalLieux + commune.lieuNaissances|length %}
+                                {% endfor %}
+                            {% endfor %}
+                            {{ totalLieux }} lieux
+                        </span>
+                    </div>
+                    
+                    <div class="metadata mb-3">
+                        <div>
+                            <i class="bi bi-calendar me-1"></i>
+                            Créé le {{ region.createdAt|date('d/m/Y') }}
+                        </div>
+                        {% if region.updatedAt %}
+                            <div class="mt-1">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Modifié le {{ region.updatedAt|date('d/m/Y') }}
+                            </div>
+                        {% endif %}
+                        <div class="mt-1">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            Slug : {{ region.slug }}
+                        </div>
+                    </div>
+                    
+                    <div class="region-actions">
+                        <a href="{{ path('app_regions_show', {'id': region.id}) }}" 
+                           class="btn btn-sm btn-outline-primary" 
+                           title="Voir détails">
+                            <i class="bi bi-eye me-1"></i>Détails
+                        </a>
+                        <a href="{{ path('app_regions_edit', {'id': region.id}) }}" 
+                           class="btn btn-sm btn-outline-success" 
+                           title="Modifier">
+                            <i class="bi bi-pencil me-1"></i>Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty-state my-4">
+            <i class="bi bi-globe2 display-4 text-muted"></i>
+            <h4 class="mt-3 text-muted">Aucune région enregistrée</h4>
+            <a href="{{ path('app_regions_new') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter une région
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialisation des tooltips et recherche
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        tooltipTriggerList.map(tooltipTriggerEl => {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Recherche
+        const searchInput = document.getElementById('searchInput')
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const filter = this.value.toLowerCase()
+                const cards = document.querySelectorAll('.region-card')
+                
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase()
+                    card.style.display = text.includes(filter) ? '' : 'none'
+                })
+            })
+        }
+    })
+</script>
+{% endblock %}

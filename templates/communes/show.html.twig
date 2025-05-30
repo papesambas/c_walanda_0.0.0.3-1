@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Communes{% endblock %}
+
+{% block body %}
+    <h1>Communes</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ commune.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ commune.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ commune.createdAt ? commune.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ commune.updatedAt ? commune.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ commune.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_communes_index') }}">back to list</a>
+
+    <a href="{{ path('app_communes_edit', {'id': commune.id}) }}">edit</a>
+
+    {{ include('communes/_delete_form.html.twig') }}
+{% endblock %}

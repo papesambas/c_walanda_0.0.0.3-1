@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cercles{% endblock %}
+
+{% block body %}
+    <h1>Cercles</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ cercle.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ cercle.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ cercle.createdAt ? cercle.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ cercle.updatedAt ? cercle.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ cercle.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_cercles_index') }}">back to list</a>
+
+    <a href="{{ path('app_cercles_edit', {'id': cercle.id}) }}">edit</a>
+
+    {{ include('cercles/_delete_form.html.twig') }}
+{% endblock %}

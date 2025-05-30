@@ -1,0 +1,280 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Statuts{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --card-color-1: linear-gradient(135deg, #3498db, #1a5276);
+        --card-color-2: linear-gradient(135deg, #2ecc71, #27ae60);
+        --card-color-3: linear-gradient(135deg, #9b59b6, #8e44ad);
+        --card-border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1a252f);
+        color: white;
+        padding: 3rem 1rem;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+    }
+
+    .stat-card {
+        background: white;
+        border-left: 5px solid var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+    }
+
+    /* Styles pour les cartes de statuts */
+    .status-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+        border: var(--card-border);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-card-header {
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+
+    .status-card-header i {
+        font-size: 2.5rem;
+        opacity: 0.2;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+
+    .status-card-body {
+        padding: 1.5rem;
+        background: white;
+    }
+
+    .status-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metadata {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .status-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header-section text-center">
+    <h1 class="display-5 fw-bold"><i class="bi bi-patch-check me-2"></i>Gestion des Statuts</h1>
+    <p class="lead">Liste complète des statuts enregistrés dans le système</p>
+    <a href="{{ path('app_statuts_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter un Statut
+    </a>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Total Statuts</h6>
+                <div class="stat-number">{{ statuts|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Statuts Actifs</h6>
+                <div class="stat-number">{{ statuts|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Dernier ajout</h6>
+                <div class="stat-number">
+                    {% if statuts|length > 0 %}
+                        {{ statuts|last.createdAt|date('d/m/Y') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-card-checklist me-2"></i>Liste des Statuts</h5>
+            <div class="input-group w-50">
+                <input type="text" class="form-control" placeholder="Rechercher un statut..." id="searchInput">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+    {% if statuts is not empty %}
+    <div class="grid-container">
+        {% for statut in statuts %}
+            {% set colorIndex = loop.index0 % 3 %}
+            {% set cardGradients = [
+                'var(--card-color-1)',
+                'var(--card-color-2)',
+                'var(--card-color-3)'
+            ] %}
+            
+            <div class="status-card card shadow-sm">
+                <div class="status-card-header" style="background: {{ cardGradients[colorIndex] }}">
+                    <i class="bi bi-patch-check"></i>
+                    <h3 class="status-title">{{ statut.designation }}</h3>
+                </div>
+                
+                <div class="status-card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="status-badge bg-light text-dark">
+                            <i class="bi bi-hash me-1"></i>ID : {{ statut.id }}
+                        </span>
+                        
+                        {% if statut.isActive %}
+                            <span class="status-badge bg-success text-white">
+                                <i class="bi bi-check-circle me-1"></i>Actif
+                            </span>
+                        {% else %}
+                            <span class="status-badge bg-secondary text-white">
+                                <i class="bi bi-x-circle me-1"></i>Inactif
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="metadata">
+                        <div>
+                            <i class="bi bi-calendar me-1"></i>
+                            Créé le : {{ statut.createdAt ? statut.createdAt|date('d/m/Y') : 'N/A' }}
+                        </div>
+                        {% if statut.updatedAt %}
+                            <div class="mt-1">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Modifié le : {{ statut.updatedAt|date('d/m/Y') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="status-actions">
+                        <a href="{{ path('app_statuts_show', {'id': statut.id}) }}" 
+                           class="btn btn-sm btn-outline-primary" 
+                           title="Voir détails">
+                            <i class="bi bi-eye me-1"></i>Détails
+                        </a>
+                        <a href="{{ path('app_statuts_edit', {'id': statut.id}) }}" 
+                           class="btn btn-sm btn-outline-success" 
+                           title="Modifier">
+                            <i class="bi bi-pencil me-1"></i>Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty-state my-4">
+            <i class="bi bi-patch-check display-4 text-muted"></i>
+            <h4 class="mt-3 text-muted">Aucun statut enregistré</h4>
+            <a href="{{ path('app_statuts_new') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un statut
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialisation des tooltips et recherche
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        tooltipTriggerList.map(tooltipTriggerEl => {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Recherche
+        const searchInput = document.getElementById('searchInput')
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const filter = this.value.toLowerCase()
+                const cards = document.querySelectorAll('.status-card')
+                
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase()
+                    card.style.display = text.includes(filter) ? '' : 'none'
+                })
+            })
+        }
+    })
+</script>
+{% endblock %}

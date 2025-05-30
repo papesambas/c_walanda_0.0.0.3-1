@@ -1,0 +1,305 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Cercles{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --card-color-1: linear-gradient(135deg, #3498db, #1a5276);
+        --card-color-2: linear-gradient(135deg, #2ecc71, #27ae60);
+        --card-color-3: linear-gradient(135deg, #9b59b6, #8e44ad);
+        --card-border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1a252f);
+        color: white;
+        padding: 3rem 1rem;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+    }
+
+    .stat-card {
+        background: white;
+        border-left: 5px solid var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+    }
+
+    /* Styles pour les cartes de cercles */
+    .circle-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+        border: var(--card-border);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .circle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .circle-card-header {
+        padding: 1.5rem;
+        color: white;
+        position: relative;
+    }
+
+    .circle-card-header i {
+        font-size: 2.5rem;
+        opacity: 0.2;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+
+    .circle-card-body {
+        padding: 1.5rem;
+        background: white;
+    }
+
+    .region-badge {
+        background-color: #e9f7fe;
+        color: #31708f;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-badge {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .stats-badge i {
+        margin-right: 0.3rem;
+        font-size: 0.9rem;
+    }
+
+    .circle-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .cercle-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header-section text-center">
+    <h1 class="display-5 fw-bold"><i class="bi bi-geo-fill me-2"></i>Gestion des Cercles</h1>
+    <p class="lead">Liste complète des cercles administratifs enregistrés dans le système</p>
+    <a href="{{ path('app_cercles_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter un Cercle
+    </a>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Total Cercles</h6>
+                <div class="stat-number">{{ cercles|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Régions</h6>
+                <div class="stat-number">
+                    {% set regions = [] %}
+                    {% for cercle in cercles %}
+                        {% if cercle.region and cercle.region.id not in regions|map(r => r.id) %}
+                            {% set regions = regions|merge([cercle.region]) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ regions|length }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Communes</h6>
+                <div class="stat-number">
+                    {% set totalCommunes = 0 %}
+                    {% for cercle in cercles %}
+                        {% set totalCommunes = totalCommunes + cercle.communes|length %}
+                    {% endfor %}
+                    {{ totalCommunes }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-grid me-2"></i>Liste des Cercles</h5>
+            <div class="input-group w-50">
+                <input type="text" class="form-control" placeholder="Rechercher un cercle..." id="searchInput">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+    {% if cercles is not empty %}
+    <div class="grid-container">
+        {% for cercle in cercles %}
+            {% set colorIndex = loop.index0 % 3 %}
+            {% set cardGradients = [
+                'var(--card-color-1)',
+                'var(--card-color-2)',
+                'var(--card-color-3)'
+            ] %}
+            
+            <div class="circle-card card shadow-sm">
+                <div class="circle-card-header" style="background: {{ cardGradients[colorIndex] }}">
+                    <i class="bi bi-geo-alt"></i>
+                    <h3 class="cercle-title">{{ cercle.designation }}</h3>
+                </div>
+                
+                <div class="circle-card-body">
+                    {% if cercle.region %}
+                        <div class="region-badge">
+                            <i class="bi bi-map me-1"></i>
+                            {{ cercle.region.designation }}
+                        </div>
+                    {% else %}
+                        <span class="text-muted">Aucune région associée</span>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <span class="stats-badge">
+                            <i class="bi bi-building"></i>
+                            {{ cercle.communes|length }} communes
+                        </span>
+                        
+                        <span class="stats-badge">
+                            <i class="bi bi-people"></i>
+                            {{ cercle.communes|reduce((total, commune) => total + commune.lieuNaissances|length, 0) }} lieux
+                        </span>
+                    </div>
+                    
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-calendar me-1"></i>
+                        Créé le {{ cercle.createdAt|date('d/m/Y') }}
+                        {% if cercle.updatedAt %}
+                            <span class="ms-2">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Modifié le {{ cercle.updatedAt|date('d/m/Y') }}
+                            </span>
+                        {% endif %}
+                    </p>
+                    
+                    <div class="circle-actions">
+                        <a href="{{ path('app_cercles_show', {'id': cercle.id}) }}" 
+                           class="btn btn-sm btn-outline-primary" 
+                           title="Voir détails">
+                            <i class="bi bi-eye me-1"></i>Détails
+                        </a>
+                        <a href="{{ path('app_cercles_edit', {'id': cercle.id}) }}" 
+                           class="btn btn-sm btn-outline-success" 
+                           title="Modifier">
+                            <i class="bi bi-pencil me-1"></i>Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty-state my-4">
+            <i class="bi bi-geo-alt display-4 text-muted"></i>
+            <h4 class="mt-3 text-muted">Aucun cercle enregistré</h4>
+            <a href="{{ path('app_cercles_new') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un cercle
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialisation des tooltips et recherche
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        tooltipTriggerList.map(tooltipTriggerEl => {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Recherche
+        const searchInput = document.getElementById('searchInput')
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const filter = this.value.toLowerCase()
+                const cards = document.querySelectorAll('.circle-card')
+                
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase()
+                    card.style.display = text.includes(filter) ? '' : 'none'
+                })
+            })
+        }
+    })
+</script>
+{% endblock %}

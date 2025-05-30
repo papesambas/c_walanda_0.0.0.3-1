@@ -1,0 +1,228 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Communes{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+    }
+
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1a252f);
+        color: white;
+        padding: 3rem 1rem;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+        background-color: var(--secondary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-color);
+    }
+
+    .stat-card {
+        background: white;
+        border-left: 5px solid var(--secondary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .table thead {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+    }
+
+    .commune-badge {
+        background-color: #e9f7fe;
+        color: #31708f;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="header-section text-center">
+    <h1 class="display-5 fw-bold"><i class="bi bi-buildings-fill me-2"></i>Gestion des Communes</h1>
+    <p class="lead">Liste complète des communes enregistrées dans le système</p>
+    <a href="{{ path('app_communes_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter une Commune
+    </a>
+</div>
+
+<div class="container mb-5">
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Total Communes</h6>
+                <div class="stat-number">{{ communes|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Cercles</h6>
+                <div class="stat-number">
+                    {% set cercles = [] %}
+                    {% for commune in communes %}
+                        {% if commune.cercle and commune.cercle.id not in cercles|map(c => c.id) %}
+                            {% set cercles = cercles|merge([commune.cercle]) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ cercles|length }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Régions</h6>
+                <div class="stat-number">
+                    {% set regions = [] %}
+                    {% for commune in communes %}
+                        {% if commune.cercle.region and commune.cercle.region.id not in regions|map(r => r.id) %}
+                            {% set regions = regions|merge([commune.cercle.region]) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ regions|length }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list me-2"></i>Liste des Communes</h5>
+            <div class="input-group w-50">
+                <input type="text" class="form-control" placeholder="Rechercher une commune..." id="searchInput">
+                <button class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if communes is not empty %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-white bg-primary">ID</th>
+                            <th class="text-white bg-primary">Commune</th>
+                            <th class="text-white bg-primary">Cercle</th>
+                            <th class="text-white bg-primary">Région</th>
+                            <th class="text-white bg-primary text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commune in communes %}
+                        <tr>
+                            <td class="fw-bold">#{{ commune.id }}</td>
+                            <td>
+                                <span class="commune-badge">{{ commune.designation }}</span>
+                            </td>
+                            <td>
+                                {% if commune.cercle %}
+                                <a href="{{ path('app_cercles_show', {'id': commune.cercle.id}) }}"
+                                    class="text-decoration-none text-body fw-medium d-inline-flex align-items-center">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    {{ commune.cercle }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Aucun</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if commune.cercle.region %}
+                                <a href="{{ path('app_regions_show', {'id': commune.cercle.region.id}) }}"
+                                    class="text-decoration-none text-success fw-medium d-inline-flex align-items-center">
+                                    <i class="bi bi-map me-1"></i>
+                                    {{ commune.cercle.region }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ path('app_communes_show', {'id': commune.id}) }}"
+                                    class="btn btn-sm btn-outline-primary me-1" title="Voir détails">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_communes_edit', {'id': commune.id}) }}"
+                                    class="btn btn-sm btn-outline-success me-1" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state my-4">
+                <i class="bi bi-buildings display-4 text-muted"></i>
+                <h4 class="mt-3 text-muted">Aucune commune enregistrée</h4>
+                <a href="{{ path('app_communes_new') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter une commune
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialisation des tooltips et recherche
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        tooltipTriggerList.map(tooltipTriggerEl => {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Recherche
+        const searchInput = document.getElementById('searchInput')
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const filter = this.value.toLowerCase()
+                const rows = document.querySelectorAll('tbody tr')
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase()
+                    row.style.display = text.includes(filter) ? '' : 'none'
+                })
+            })
+        }
+    })
+</script>
+{% endblock %}

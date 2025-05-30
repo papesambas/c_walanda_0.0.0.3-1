@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Communes{% endblock %}
+
+{% block body %}
+    <h1>Edit Communes</h1>
+
+    {{ include('communes/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_communes_index') }}">back to list</a>
+
+    {{ include('communes/_delete_form.html.twig') }}
+{% endblock %}
