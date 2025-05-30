@@ -15,6 +15,13 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    # Définition du cache avec tags
+    cache.app.tags:
+        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+        arguments: ['@cache.app']
+
+    # Alias pour l'injection
+    Symfony\Contracts\Cache\TagAwareCacheInterface: '@cache.app.tags'
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -24,6 +31,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Service\PeresCacheService:
+        arguments:
+            $appVersion: '%kernel.environment%' # Ou une version spécifique
     App\EventListener\NinasEntityListener:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Ninas'}

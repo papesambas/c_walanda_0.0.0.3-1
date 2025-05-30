@@ -46,6 +46,25 @@ class PeresRepository extends ServiceEntityRepository
         }
     }
 
+            public function findForAll(): array
+        {
+            return $this->createQueryBuilder('p')
+                ->select('p','n','pre', 'pr', 'te','te2')
+                ->leftJoin('p.nom', 'n')
+                ->leftJoin('p.prenom', 'pre')
+                ->leftJoin('p.profession', 'pr')
+                ->leftJoin('p.telephone1', 'te')
+                ->leftJoin('p.telephone2', 'te2')
+                ->where('p.nom IS NOT NULL')
+                ->andWhere('p.prenom IS NOT NULL')
+                ->orderBy('n.designation', 'ASC')
+                ->addOrderBy('pre.designation', 'ASC')
+                ->getQuery()
+                ->getResult()
+            ;
+        }
+
+
         public function findTop10(): array
         {
             return $this->createQueryBuilder('p')

@@ -37,12 +37,8 @@ class Meres
     private ?Professions $profession = null;
 
     #[ORM\OneToOne(inversedBy: 'meres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true, name: 'mere_telephone1_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
+    #[ORM\JoinColumn(nullable: false)]
     private ?Telephones1 $telephone1 = null;
-
-    #[ORM\OneToOne(inversedBy: 'meres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true, name: 'mere_telephone2_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
-    private ?telephones2 $telephone2 = null;
 
     #[ORM\OneToOne(inversedBy: 'meres', cascade: ['persist', 'remove'])]
     private ?Ninas $nina = null;
@@ -65,15 +61,13 @@ class Meres
     #[ORM\OneToMany(targetEntity: Users::class, mappedBy: 'mere')]
     private Collection $users;
 
+    #[ORM\ManyToOne(inversedBy: 'meres', cascade: ['persist'])]
+    private ?Telephones2 $telephone2 = null;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
         $this->users = new ArrayCollection();
-    }
-
-    public function __toString(): string
-    {
-        return $this->fullname ?? '';
     }
 
     public function getId(): ?int
@@ -125,18 +119,6 @@ class Meres
     public function setTelephone1(Telephones1 $telephone1): static
     {
         $this->telephone1 = $telephone1;
-
-        return $this;
-    }
-
-    public function getTelephone2(): ?telephones2
-    {
-        return $this->telephone2;
-    }
-
-    public function setTelephone2(?telephones2 $telephone2): static
-    {
-        $this->telephone2 = $telephone2;
 
         return $this;
     }
@@ -237,6 +219,18 @@ class Meres
                 $user->setMere(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTelephone2(): ?Telephones2
+    {
+        return $this->telephone2;
+    }
+
+    public function setTelephone2(?Telephones2 $telephone2): static
+    {
+        $this->telephone2 = $telephone2;
 
         return $this;
     }

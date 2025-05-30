@@ -33,20 +33,36 @@ class ParentsRepository extends ServiceEntityRepository
         }
     }
 
-        public function findForAll(): array
-        {
-            return $this->createQueryBuilder('p')
-                ->select('p', 'pe', 'me')
-                ->leftJoin('p.pere', 'pe')
-                ->leftJoin('p.mere', 'me')
-                ->orderBy('pe.nom', 'ASC')
-                ->addOrderBy('pe.prenom', 'ASC')
-                ->addOrderBy('me.nom', 'ASC')
-                ->addOrderBy('me.prenom', 'ASC')
-                ->getQuery()
-                ->getResult()
-            ;
-        }
+    public function findForAll(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p', 'pe', 'me','n', 'pre', 'pro', 'te')
+            ->leftJoin('p.pere', 'pe')
+            ->addSelect('pe')
+            ->leftJoin('pe.nom', 'n')
+            ->leftJoin('pe.prenom', 'pre')
+            ->leftJoin('pe.profession', 'pro')
+            ->leftJoin('pe.telephone1', 'te')
+            ->addSelect('n', 'pre', 'pro', 'te')
+            ->leftJoin('p.mere', 'me')
+            ->addSelect('me')
+            ->leftJoin('me.nom', 'n1')
+            ->leftJoin('me.prenom', 'pre1')
+            ->leftJoin('me.profession', 'pro1')
+            ->leftJoin('me.telephone1', 'te1')
+            ->addSelect('n1', 'pre1', 'pro1', 'te1')
+            ->where('p.pere IS NOT NULL')
+            ->andWhere('p.mere IS NOT NULL')
+            ->orderBy('n.designation', 'ASC')
+            ->addOrderBy('pre.designation', 'ASC')
+            ->addOrderBy('n1.designation', 'ASC')
+            ->addOrderBy('pre1.designation', 'ASC')
+            ->getQuery()
+            ->getResult();
+        ;
+    }
+
+
 
     //    /**
     //     * @return Parents[] Returns an array of Parents objects

@@ -139,8 +139,8 @@ class PeresForm extends AbstractType
                 'placeholder' => 'Sélectionnez ou Choisir un numéro de téléphone',
                 'choice_label' => 'numero',
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.numero', 'ASC');
+                    return $er->createQueryBuilder('t1')
+                        ->orderBy('t1.numero', 'ASC');
                 },
                 'attr' => [
                     'class' => 'form-control tomselect-telephone1',
@@ -173,8 +173,8 @@ class PeresForm extends AbstractType
                 'placeholder' => 'Sélectionnez ou Choisir un numéro de téléphone',
                 'choice_label' => 'numero',
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.numero', 'ASC');
+                    return $er->createQueryBuilder('t2')
+                        ->orderBy('t2.numero', 'ASC');
                 },
                 'attr' => [
                     'class' => 'form-control tomselect-telephone2',

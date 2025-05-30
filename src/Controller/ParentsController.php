@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Parents;
 use App\Form\ParentsForm;
 use App\Repository\ParentsRepository;
+use App\Service\ParentsCacheService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,12 +16,19 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ParentsController extends AbstractController
 {
     #[Route(name: 'app_parents_index', methods: ['GET'])]
-    public function index(ParentsRepository $parentsRepository): Response
+    public function index(ParentsCacheService $cacheService): Response
     {
+        // Invalider la cache (au choix)
+        // $cacheService->invalidateCache();
+        //$cacheService->clearParentsList();
+
+        $parents = $cacheService->getParentsList();
+        dump($parents); // Pour débogage, à retirer en production
         return $this->render('parents/index.html.twig', [
-            'parents' => $parentsRepository->findForAll(),
+            'parents' => $parents,
         ]);
     }
+
 
     #[Route('/new', name: 'app_parents_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -51,13 +59,14 @@ final class ParentsController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_parents_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Parents $parent, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Parents $parent, EntityManagerInterface $entityManager, ParentsCacheService $parentsCacheService): Response
     {
         $form = $this->createForm(ParentsForm::class, $parent);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            $parentsCacheService->invalidateCache();
 
             return $this->redirectToRoute('app_parents_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -71,7 +80,7 @@ final class ParentsController extends AbstractController
     #[Route('/{id}', name: 'app_parents_delete', methods: ['POST'])]
     public function delete(Request $request, Parents $parent, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$parent->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $parent->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($parent);
             $entityManager->flush();
         }

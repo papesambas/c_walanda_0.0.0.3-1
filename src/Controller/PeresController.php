@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Peres;
 use App\Form\PeresForm;
 use App\Repository\PeresRepository;
+use App\Service\PeresCacheService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PeresController extends AbstractController
 {
     #[Route(name: 'app_peres_index', methods: ['GET'])]
-    public function index(PeresRepository $peresRepository): Response
+    public function index(PeresCacheService $peresCacheService): Response
     {
+        $peres = $peresCacheService->getPeresList();
         return $this->render('peres/index.html.twig', [
-            'peres' => $peresRepository->findAll(),
+            'peres' => $peres,
         ]);
     }
 
@@ -51,14 +53,14 @@ final class PeresController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_peres_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Peres $pere, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Peres $pere, EntityManagerInterface $entityManager, PeresCacheService $peresCacheService ): Response
     {
-        dump($pere);
         $form = $this->createForm(PeresForm::class, $pere);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            $peresCacheService->invalidateCache();
 
             return $this->redirectToRoute('app_peres_index', [], Response::HTTP_SEE_OTHER);
         }

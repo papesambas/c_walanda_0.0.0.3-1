@@ -16,6 +16,25 @@ class MeresRepository extends ServiceEntityRepository
         parent::__construct($registry, Meres::class);
     }
 
+    public function findForAll(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->select('m','n','pre', 'pr', 'te', 'te2')
+            ->leftJoin('m.nom', 'n')
+            ->leftJoin('m.prenom', 'pre')
+            ->leftJoin('m.profession', 'pr')
+            ->leftJoin('m.telephone1', 'te')
+            ->leftJoin('m.telephone2', 'te2')
+            ->where('m.nom IS NOT NULL')
+            ->andWhere('m.prenom IS NOT NULL')
+            ->orderBy('n.designation', 'ASC')
+            ->addOrderBy('pre.designation', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
     //    /**
     //     * @return Meres[] Returns an array of Meres objects
     //     */

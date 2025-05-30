@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\Telephones2Repository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Trait\CreatedAtTrait;
@@ -39,15 +41,22 @@ class Telephones2
     )]
     private ?string $numero = null;
 
-    #[ORM\OneToOne(mappedBy: 'telephone2', cascade: ['persist', 'remove'])]
-    private ?Peres $peres = null;
+    /**
+     * @var Collection<int, Peres>
+     */
+    #[ORM\OneToMany(targetEntity: Peres::class, mappedBy: 'telephone2')]
+    private Collection $peres;
 
-    #[ORM\OneToOne(mappedBy: 'telephone2', cascade: ['persist', 'remove'])]
-    private ?Meres $meres = null;
+    /**
+     * @var Collection<int, Meres>
+     */
+    #[ORM\OneToMany(targetEntity: Meres::class, mappedBy: 'telephone2')]
+    private Collection $meres;
 
-        public function __toString()
+    public function __construct()
     {
-        return $this->numero ?? 'pas de numéro de téléphone';
+        $this->peres = new ArrayCollection();
+        $this->meres = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,47 +76,64 @@ class Telephones2
         return $this;
     }
 
-    public function getPeres(): ?Peres
+    /**
+     * @return Collection<int, Peres>
+     */
+    public function getPeres(): Collection
     {
         return $this->peres;
     }
 
-    public function setPeres(?Peres $peres): static
+    public function addPere(Peres $pere): static
     {
-        // unset the owning side of the relation if necessary
-        if ($peres === null && $this->peres !== null) {
-            $this->peres->setTelephone2(null);
+        if (!$this->peres->contains($pere)) {
+            $this->peres->add($pere);
+            $pere->setTelephone2($this);
         }
-
-        // set the owning side of the relation if necessary
-        if ($peres !== null && $peres->getTelephone2() !== $this) {
-            $peres->setTelephone2($this);
-        }
-
-        $this->peres = $peres;
 
         return $this;
     }
 
-    public function getMeres(): ?Meres
+    public function removePere(Peres $pere): static
+    {
+        if ($this->peres->removeElement($pere)) {
+            // set the owning side to null (unless already changed)
+            if ($pere->getTelephone2() === $this) {
+                $pere->setTelephone2(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Meres>
+     */
+    public function getMeres(): Collection
     {
         return $this->meres;
     }
 
-    public function setMeres(?Meres $meres): static
+    public function addMere(Meres $mere): static
     {
-        // unset the owning side of the relation if necessary
-        if ($meres === null && $this->meres !== null) {
-            $this->meres->setTelephone2(null);
+        if (!$this->meres->contains($mere)) {
+            $this->meres->add($mere);
+            $mere->setTelephone2($this);
         }
-
-        // set the owning side of the relation if necessary
-        if ($meres !== null && $meres->getTelephone2() !== $this) {
-            $meres->setTelephone2($this);
-        }
-
-        $this->meres = $meres;
 
         return $this;
     }
+
+    public function removeMere(Meres $mere): static
+    {
+        if ($this->meres->removeElement($mere)) {
+            // set the owning side to null (unless already changed)
+            if ($mere->getTelephone2() === $this) {
+                $mere->setTelephone2(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

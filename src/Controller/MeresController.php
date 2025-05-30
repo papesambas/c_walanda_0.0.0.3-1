@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Meres;
 use App\Form\MeresForm;
 use App\Repository\MeresRepository;
+use App\Service\MeresCacheService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class MeresController extends AbstractController
 {
     #[Route(name: 'app_meres_index', methods: ['GET'])]
-    public function index(MeresRepository $meresRepository): Response
+    public function index(MeresCacheService $meresCacheService): Response
     {
         return $this->render('meres/index.html.twig', [
-            'meres' => $meresRepository->findAll(),
+            'meres' => $meresCacheService->getMeresList(),
         ]);
     }
 
@@ -51,7 +52,7 @@ final class MeresController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_meres_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Meres $mere, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Meres $mere, EntityManagerInterface $entityManager, MeresCacheService $meresCacheService): Response
     {
         dump($mere);
         $form = $this->createForm(MeresForm::class, $mere);
@@ -59,6 +60,7 @@ final class MeresController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            $meresCacheService->invalidateCache();
 
             return $this->redirectToRoute('app_meres_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -72,7 +74,7 @@ final class MeresController extends AbstractController
     #[Route('/{id}', name: 'app_meres_delete', methods: ['POST'])]
     public function delete(Request $request, Meres $mere, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$mere->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $mere->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($mere);
             $entityManager->flush();
         }

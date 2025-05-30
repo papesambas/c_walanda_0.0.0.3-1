@@ -44,12 +44,8 @@ class Peres
     private ?Professions $profession = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false, name: 'pere_telephone1_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
+    #[ORM\JoinColumn(nullable: false)]
     private ?Telephones1 $telephone1 = null;
-
-    #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true, name: 'pere_telephone2_id', referencedColumnName: 'id')] // <-- colonne propre à Meres
-    private ?Telephones2 $telephone2 = null;
 
     #[ORM\OneToOne(inversedBy: 'peres', cascade: ['persist', 'remove'])]
     private ?Ninas $nina = null;
@@ -72,15 +68,13 @@ class Peres
     #[ORM\OneToMany(targetEntity: Users::class, mappedBy: 'pere')]
     private Collection $users;
 
+    #[ORM\ManyToOne(inversedBy: 'peres', cascade: ['persist'])] 
+    private ?Telephones2 $telephone2 = null;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
         $this->users = new ArrayCollection();
-    }
-
-    public function __toString(): string
-    {
-        return $this->fullname ?? '';
     }
 
     public function getId(): ?int
@@ -93,7 +87,7 @@ class Peres
         return $this->nom;
     }
 
-    public function setNom( $nom): static
+    public function setNom($nom): static
     {
         $this->nom = $nom;
 
@@ -133,18 +127,6 @@ class Peres
     public function setTelephone1(Telephones1 $telephone1): static
     {
         $this->telephone1 = $telephone1;
-
-        return $this;
-    }
-
-    public function getTelephone2(): ?Telephones2
-    {
-        return $this->telephone2;
-    }
-
-    public function setTelephone2(?Telephones2 $telephone2): static
-    {
-        $this->telephone2 = $telephone2;
 
         return $this;
     }
@@ -245,6 +227,18 @@ class Peres
                 $user->setPere(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTelephone2(): ?Telephones2
+    {
+        return $this->telephone2;
+    }
+
+    public function setTelephone2(?Telephones2 $telephone2): static
+    {
+        $this->telephone2 = $telephone2;
 
         return $this;
     }
