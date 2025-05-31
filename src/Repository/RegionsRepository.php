@@ -16,6 +16,20 @@ class RegionsRepository extends ServiceEntityRepository
         parent::__construct($registry, Regions::class);
     }
 
+    /**
+     * Summary of findAllIds
+     * @return array
+     */
+    public function findAllIds(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r.id')
+            ->getQuery()
+            ->getScalarResult();
+    }
+
+
+
     //    /**
     //     * @return Regions[] Returns an array of Regions objects
     //     */

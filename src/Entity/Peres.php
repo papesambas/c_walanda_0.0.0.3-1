@@ -77,6 +77,11 @@ class Peres
         $this->users = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->fullname ?? 'Père inconnu';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

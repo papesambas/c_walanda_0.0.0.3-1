@@ -2,19 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Cercles;
 use App\Entity\Communes;
 use App\Form\CommunesForm;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/communes')]
 final class CommunesController extends AbstractController
 {
-    #[Route(name: 'app_communes_index', methods: ['GET'])]
+    #[Route('/communes',name: 'app_communes_index', methods: ['GET'])]
     public function index(CommunesRepository $communesRepository): Response
     {
         return $this->render('communes/index.html.twig', [
@@ -22,7 +23,7 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_communes_new', methods: ['GET', 'POST'])]
+    #[Route('/communes/new', name: 'app_communes_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $commune = new Communes();
@@ -42,7 +43,7 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_communes_show', methods: ['GET'])]
+    #[Route('/communes/{id}', name: 'app_communes_show', methods: ['GET'])]
     public function show(Communes $commune): Response
     {
         return $this->render('communes/show.html.twig', [
@@ -50,7 +51,7 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_communes_edit', methods: ['GET', 'POST'])]
+    #[Route('/communes/{id}/edit', name: 'app_communes_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Communes $commune, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CommunesForm::class, $commune);
@@ -68,14 +69,62 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_communes_delete', methods: ['POST'])]
+    #[Route('/communes/{id}', name: 'app_communes_delete', methods: ['POST'])]
     public function delete(Request $request, Communes $commune, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$commune->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $commune->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($commune);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_communes_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/communes/create', name: 'app_communes_create', methods: ['POST'])]
+    public function createCommune(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $label = $data['label'] ?? '';
+        $cercleId = $data['cercle_id'] ?? null;
+
+        // Validation
+        $label = trim(strip_tags($label));
+        if (empty($label)) {
+            return new JsonResponse(['error' => 'Le nom de la commune est requis'], 400);
+        }
+
+        if (empty($cercleId)) {
+            return new JsonResponse(['error' => 'Le cercle est requis'], 400);
+        }
+
+        // Récupération du cercle
+        $cercle = $entityManager->getRepository(Cercles::class)->find($cercleId);
+        if (!$cercle) {
+            return new JsonResponse(['error' => 'Cercle introuvable'], 404);
+        }
+
+        // Création de la commune
+        $commune = new Communes();
+        $commune->setDesignation($label);
+        $commune->setCercle($cercle);
+
+        $entityManager->persist($commune);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'id' => $commune->getId(),
+            'text' => $label
+        ]);
+    }
+
+    #[Route('/communes/search', name: 'app_communes_search', methods: ['GET'])]
+    public function searchCommunes(Request $request, CommunesRepository $repository): JsonResponse
+    {
+        $term = $request->query->get('term', '');
+        $cercleId = $request->query->get('cercle_id');
+
+        $results = $repository->search($term, $cercleId);
+
+        return $this->json($results);
     }
 }

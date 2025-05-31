@@ -6,10 +6,11 @@ use App\Entity\Statuts;
 use App\Form\StatutsForm;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/statuts')]
 final class StatutsController extends AbstractController
@@ -77,5 +78,36 @@ final class StatutsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_statuts_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+        #[Route('/create/{label}', name: 'app_statuts_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $statut = new Statuts();
+        $statut->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($statut);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $statut->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_statuts_search', methods: ['GET'])]
+    public function searchStatuts(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(Statuts::class)
+            ->createQueryBuilder('n')
+            ->where('n.designation LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
     }
 }

@@ -70,6 +70,11 @@ class Meres
         $this->users = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->fullname ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

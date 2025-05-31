@@ -44,6 +44,11 @@ class LieuNaissances
     )]
     private ?Communes $commune = null;
 
+    public function __toString(): string
+    {
+        return $this->designation ?? 'Lieu de naissance sans désignation';
+    }
+    
     public function getId(): ?int
     {
         return $this->id;

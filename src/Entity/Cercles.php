@@ -33,17 +33,13 @@ class Cercles
         maxMessage: 'La désignation ne peut pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        pattern: "/^[a-zA-ZÀ-ÿ\s\-']+$/",
         message: 'La désignation ne doit contenir que des lettres, des espaces, des apostrophes ou des tirets.'
     )]
     private ?string $designation = null;
 
     #[ORM\ManyToOne(inversedBy: 'cercles')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\Valid(
-        groups: ['Default', 'cercles_region'],
-        message: 'La région associée doit être valide.'
-    )]
     private ?Regions $region = null;
 
     /**

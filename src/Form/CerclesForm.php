@@ -21,30 +21,40 @@ class CerclesForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('designation', TextType::class, [
-                'label' => 'Cercle',
+            ->add('designation', EntityType::class, [
+                'class' => Cercles::class,
+                'choice_label' => 'designation',
+                'placeholder' => 'Sélectionnez ou Entrez un Cercle',
+                /*'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        //->where('c.designation IS NULL')
+                        ->orderBy('c.designation', 'ASC');
+                },*/
                 'attr' => [
-                    'placeholder' => 'Entrez la designation du cercle',
-                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 tomselect-cercle',
-                    'minlength' => 2,
-                    'maxlength' => 255,
+                    'class' => 'form-control tomselect-cercle',
+                    //'data-search-url'  => $this->urlGenerator->generate('app_regions_search'),
+                    //'data-create-url'  => $this->urlGenerator->generate('app_regions_create'),
+                    'data-search-url' => '/cercles/search',
+                    'data-create-url' => '/cercles/create',
+                    'data-cercle-target'=> 'true',
+                    'tabindex' => '1',    // 1er champ focus
                 ],
-                'label_attr' => ['class' => 'block mb-2 text-sm font-medium text-gray-700'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'La designation ne peut pas être vide.',
+                        'message' => 'La Désignation ne peut pas être vide.',
                     ]),
-                    new NotNull([
-                        'message' => 'La designation ne peut pas être nul.',
+                    new Length([
+                        'min' => 2,
+                        'max' => 60,
+                        'minMessage' => 'La Désignation doit comporter au moins {{ limit }} caractères.',
+                        'maxMessage' => 'La Désignation ne peut pas dépasser {{ limit }} caractères.',
                     ]),
-                    new Regex(
-                        [
-                            'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
-                            'message' => 'La designation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
-                        ]
-                    ),
+                    new Regex([
+                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'message' => 'La Désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
+                    ]),
                 ],
-                'required' => true,
+                'required' => false,
                 'error_bubbling' => false,
             ])
             ->add('region', EntityType::class, [

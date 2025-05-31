@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use App\Entity\LieuNaissances;
 use App\Form\LieuNaissancesForm;
-use App\Repository\LieuNaissancesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\LieuNaissancesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/lieu/naissances')]
 final class LieuNaissancesController extends AbstractController
@@ -77,5 +78,36 @@ final class LieuNaissancesController extends AbstractController
         }
 
         return $this->redirectToRoute('app_lieu_naissances_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+        #[Route('/create/{label}', name: 'app_lieu_naissances_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $lieu = new LieuNaissances();
+        $lieu->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($lieu);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $lieu->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_lieu_naissances_search', methods: ['GET'])]
+    public function searchLieuNaissances(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(LieuNaissances::class)
+            ->createQueryBuilder('n')
+            ->where('n.designation LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
     }
 }

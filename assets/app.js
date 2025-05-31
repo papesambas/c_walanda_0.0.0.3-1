@@ -36,7 +36,11 @@ import './scripts/tom-select-profession.js'; // Importation du fichier JavaScrip
 import './scripts/tom-select-telephone1.js'; // Importation du fichier JavaScript de Tom Select pour les numéros de téléphone
 import './scripts/tom-select-telephone2.js'; // Importation du fichier JavaScript de Tom Select pour les numéros de téléphone secondaires
 import './scripts/tom-select-nina.js'; // Importation du fichier JavaScript de Tom Select pour les NINA
-
+import './scripts/tom-select-region.js'; // Importation du fichier JavaScript de Tom Select pour les régions
+import './scripts/tom-select-commune.js'; // Importation du fichier JavaScript de Tom Select pour les communes
+import './scripts/tom-select-statut.js'; // Importation du fichier JavaScript de Tom Select pour les statuts
+import './scripts/tom-select-lieu-naissance.js'; // Importation du fichier JavaScript de Tom Select pour les lieux de naissance
+import './scripts/tom-select-cercle.js'; // Importation du fichier JavaScript de Tom Select pour les cercles
 //import './scripts/test.js'; // Importation du fichier JavaScript de test
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 
