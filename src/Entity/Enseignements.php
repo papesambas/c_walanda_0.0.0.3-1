@@ -42,9 +42,28 @@ class Enseignements
     #[Assert\Valid]
     private Collection $statut;
 
+    /**
+     * @var Collection<int, Etablissements>
+     */
+    #[ORM\OneToMany(targetEntity: Etablissements::class, mappedBy: 'enseignement')]
+    private Collection $etablissements;
+
+    /**
+     * @var Collection<int, Cycles>
+     */
+    #[ORM\ManyToMany(targetEntity: Cycles::class, mappedBy: 'enseignement')]
+    private Collection $cycles;
+
     public function __construct()
     {
         $this->statut = new ArrayCollection();
+        $this->etablissements = new ArrayCollection();
+        $this->cycles = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->designation ?? '';
     }
 
     public function getId(): ?int
@@ -84,6 +103,63 @@ class Enseignements
     public function removeStatut(statuts $statut): static
     {
         $this->statut->removeElement($statut);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Etablissements>
+     */
+    public function getEtablissements(): Collection
+    {
+        return $this->etablissements;
+    }
+
+    public function addEtablissement(Etablissements $etablissement): static
+    {
+        if (!$this->etablissements->contains($etablissement)) {
+            $this->etablissements->add($etablissement);
+            $etablissement->setEnseignement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEtablissement(Etablissements $etablissement): static
+    {
+        if ($this->etablissements->removeElement($etablissement)) {
+            // set the owning side to null (unless already changed)
+            if ($etablissement->getEnseignement() === $this) {
+                $etablissement->setEnseignement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cycles>
+     */
+    public function getCycles(): Collection
+    {
+        return $this->cycles;
+    }
+
+    public function addCycle(Cycles $cycle): static
+    {
+        if (!$this->cycles->contains($cycle)) {
+            $this->cycles->add($cycle);
+            $cycle->addEnseignement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCycle(Cycles $cycle): static
+    {
+        if ($this->cycles->removeElement($cycle)) {
+            $cycle->removeEnseignement($this);
+        }
 
         return $this;
     }

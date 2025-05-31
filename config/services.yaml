@@ -100,5 +100,26 @@ services:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Enseignements'}
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Enseignements'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\CyclesEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Cycles'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Cycles'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\NiveauxEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Niveaux'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Niveaux'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\EtablissementsEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Etablissements'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Etablissements'}    # add more service definitions when explicit configuration is needed
+                - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Etablissements' }
+                - { name: 'doctrine.event_listener', event: 'postFlush' } 
+    App\EventListener\UsersEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Users'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Users'}    # add more service definitions when explicit configuration is needed
+                #- { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Users' }
+                #- { name: 'doctrine.event_listener', event: 'postFlush' } 
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

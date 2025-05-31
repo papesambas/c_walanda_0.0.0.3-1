@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cycles{% endblock %}
+
+{% block body %}
+    <h1>Cycles</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ cycle.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ cycle.designation }}</td>
+            </tr>
+            <tr>
+                <th>Effectif</th>
+                <td>{{ cycle.effectif }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ cycle.createdAt ? cycle.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ cycle.updatedAt ? cycle.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ cycle.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_cycles_index') }}">back to list</a>
+
+    <a href="{{ path('app_cycles_edit', {'id': cycle.id}) }}">edit</a>
+
+    {{ include('cycles/_delete_form.html.twig') }}
+{% endblock %}

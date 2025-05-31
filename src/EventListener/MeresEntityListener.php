@@ -69,6 +69,7 @@ class MeresEntityListener
             ->setCreatedAt(new \DateTimeImmutable())
             ->setUpdatedAt(new \DateTimeImmutable())
             ->setCreatedBy($mere->getCreatedBy())
+            ->setSlug($this->slugger->slug($mere->getFullname())->toString(). '-' . $mere->getId())
             ->setUpdatedBy($mere->getUpdatedBy());
 
         // Hash du mot de passe

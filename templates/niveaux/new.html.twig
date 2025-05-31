@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Niveaux{% endblock %}
+
+{% block body %}
+    <h1>Create new Niveaux</h1>
+
+    {{ include('niveaux/_form.html.twig') }}
+
+    <a href="{{ path('app_niveaux_index') }}">back to list</a>
+{% endblock %}

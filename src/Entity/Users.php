@@ -2,19 +2,22 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UsersRepository;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\EntityTrackingTrait;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
@@ -25,6 +28,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use CreatedAtTrait;
     use EntityTrackingTrait;
+    use SlugTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -122,6 +126,20 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Meres $mere = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Etablissements $etablissement = null;
+
+    /**
+     * @var Collection<int, Etablissements>
+     */
+    #[ORM\ManyToMany(targetEntity: Etablissements::class, mappedBy: 'superUsers')]
+    private Collection $etablissements;
+
+    public function __construct()
+    {
+        $this->etablissements = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -288,6 +306,49 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setMere(?Meres $mere): static
     {
         $this->mere = $mere;
+
+        return $this;
+    }
+    public function __toString(): string
+    {
+        return $this->getUsername() ?: 'Utilisateur sans nom';
+    }
+
+    public function getEtablissement(): ?Etablissements
+    {
+        return $this->etablissement;
+    }
+
+    public function setEtablissement(?Etablissements $etablissement): static
+    {
+        $this->etablissement = $etablissement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Etablissements>
+     */
+    public function getEtablissements(): Collection
+    {
+        return $this->etablissements;
+    }
+
+    public function addEtablissement(Etablissements $etablissement): static
+    {
+        if (!$this->etablissements->contains($etablissement)) {
+            $this->etablissements->add($etablissement);
+            $etablissement->addSuperUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEtablissement(Etablissements $etablissement): static
+    {
+        if ($this->etablissements->removeElement($etablissement)) {
+            $etablissement->removeSuperUser($this);
+        }
 
         return $this;
     }

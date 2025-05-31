@@ -69,6 +69,7 @@ class PeresEntityListener
             ->setCreatedAt(new \DateTimeImmutable())
             ->setUpdatedAt(new \DateTimeImmutable())
             ->setCreatedBy($pere->getCreatedBy())
+            ->setSlug($this->slugger->slug($pere->getFullname())->toString(). '-' . $pere->getId())
             ->setUpdatedBy($pere->getUpdatedBy());
 
         // Hash du mot de passe

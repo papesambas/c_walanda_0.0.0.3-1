@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Niveaux{% endblock %}
+
+{% block body %}
+    <h1>Edit Niveaux</h1>
+
+    {{ include('niveaux/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_niveaux_index') }}">back to list</a>
+
+    {{ include('niveaux/_delete_form.html.twig') }}
+{% endblock %}

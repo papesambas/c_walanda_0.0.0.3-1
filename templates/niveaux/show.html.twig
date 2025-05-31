@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Niveaux{% endblock %}
+
+{% block body %}
+    <h1>Niveaux</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ niveau.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ niveau.designation }}</td>
+            </tr>
+            <tr>
+                <th>Effectif</th>
+                <td>{{ niveau.effectif }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ niveau.createdAt ? niveau.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ niveau.updatedAt ? niveau.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ niveau.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_niveaux_index') }}">back to list</a>
+
+    <a href="{{ path('app_niveaux_edit', {'id': niveau.id}) }}">edit</a>
+
+    {{ include('niveaux/_delete_form.html.twig') }}
+{% endblock %}
