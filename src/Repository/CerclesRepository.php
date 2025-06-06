@@ -16,39 +16,22 @@ class CerclesRepository extends ServiceEntityRepository
         parent::__construct($registry, Cercles::class);
     }
 
-    public function save(Cercles $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(Cercles $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function search(string $query, ?int $regionId = null): array
+    // CerclesRepository.php
+public function findByRegionAndDesignation(int $regionId, ?string $term = null): array
 {
     $qb = $this->createQueryBuilder('c')
-        ->select('c.id', 'c.designation AS text')
-        ->where('c.designation LIKE :query')
-        ->setParameter('query', '%' . $query . '%')
-        ->orderBy('c.designation', 'ASC')
-        ->setMaxResults(10);
+        ->where('c.region = :regionId')
+        ->setParameter('regionId', $regionId);
 
-    if ($regionId) {
-        $qb->andWhere('c.region = :regionId')
-           ->setParameter('regionId', $regionId);
+    if ($term) {
+        $qb->andWhere('c.designation LIKE :term')
+            ->setParameter('term', '%' . $term . '%');
     }
 
-    return $qb->getQuery()->getArrayResult();
+    return $qb->orderBy('c.designation', 'ASC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
 }
 
     //    /**
