@@ -40,7 +40,7 @@ class CommunesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_regions_create'),
                     'data-search-url' => '/communes/search',
                     'data-create-url' => '/communes/create',
-                    'data-commune-target'=> 'true',
+                    'data-commune-target' => 'true',
                     'tabindex' => '1',    // 1er champ focus
                 ],
                 'constraints' => [
@@ -83,7 +83,7 @@ class CommunesForm extends AbstractType
             ])
         ;
 
-                $builder->get('region')->addEventListener(
+        $builder->get('region')->addEventListener(
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
                 $form = $event->getForm();
@@ -92,69 +92,69 @@ class CommunesForm extends AbstractType
             }
         );
         $builder->addEventListener(
-    FormEvents::PRE_SET_DATA,
-    function (FormEvent $event) {
-        $form = $event->getForm();
-        $data = $event->getData();
-        
-        // Vérifier si l'entité Communes existe
-        $cercle = $data ? $data->getCercle() : null;
-        
-        // Récupérer la région via le cercle si disponible
-        $region = $cercle ? $cercle->getRegion() : null;
-        
-        // Recréer dynamiquement le champ 'region' avec la valeur initiale
-        $form->add('region', EntityType::class, [
-            'class' => Regions::class,
-            'choice_label' => 'designation',
-            'mapped' => false,
-            'placeholder' => 'Sélectionnez ou Choisir une région',
-            'data' => $region, // ✅ PRÉ-REMPLISSAGE
-            'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('r')
-                    ->orderBy('r.designation', 'ASC');
-            },
-            'attr' => [
-                'class' => 'form-control tomselect-region',
-                'data-search-url' => '/regions/search',
-                'data-create-url' => '/regions/create',
-                'tabindex' => '1',
-            ],
-            'constraints' => [
-                new NotBlank([
-                    'message' => 'La Désignation ne peut pas être vide.',
-                ]),
-                new Length([
-                    'min' => 2,
-                    'max' => 60,
-                    'minMessage' => 'La Désignation doit comporter au moins {{ limit }} caractères.',
-                    'maxMessage' => 'La Désignation ne peut pas dépasser {{ limit }} caractères.',
-                ]),
-                new Regex([
-                    'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
-                    'message' => 'La Désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
-                ]),
-            ],
-            'required' => false,
-            'error_bubbling' => false,
-        ]);
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                $data = $event->getData();
 
-        // Ajouter le champ cercle dépendant de la région
-        $this->addCercleField($form, $region);
+                // Vérifier si l'entité Communes existe
+                $cercle = $data ? $data->getCercle() : null;
 
-        // (Facultatif) debug
-        // dump($cercle, $region, $form->get('region'));
-    }
-);
+                // Récupérer la région via le cercle si disponible
+                $region = $cercle ? $cercle->getRegion() : null;
 
+                // Recréer dynamiquement le champ 'region' avec la valeur initiale
+                $form->add('region', EntityType::class, [
+                    'class' => Regions::class,
+                    'choice_label' => 'designation',
+                    'mapped' => false,
+                    'placeholder' => 'Sélectionnez ou Choisir une région',
+                    'data' => $region, // ✅ PRÉ-REMPLISSAGE
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('r')
+                            ->orderBy('r.designation', 'ASC');
+                    },
+                    'attr' => [
+                        'class' => 'form-control tomselect-region',
+                        'data-search-url' => '/regions/search',
+                        'data-create-url' => '/regions/create',
+                        'tabindex' => '1',
+                    ],
+                    'constraints' => [
+                        new NotBlank([
+                            'message' => 'La Désignation ne peut pas être vide.',
+                        ]),
+                        new Length([
+                            'min' => 2,
+                            'max' => 60,
+                            'minMessage' => 'La Désignation doit comporter au moins {{ limit }} caractères.',
+                            'maxMessage' => 'La Désignation ne peut pas dépasser {{ limit }} caractères.',
+                        ]),
+                        new Regex([
+                            'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                            'message' => 'La Désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
+                        ]),
+                    ],
+                    'required' => false,
+                    'error_bubbling' => false,
+                ]);
+
+                // Ajouter le champ cercle dépendant de la région
+                $this->addCercleField($form, $region);
+
+                // (Facultatif) debug
+                // dump($cercle, $region, $form->get('region'));
+            }
+        );
     }
 
     public function addCercleField(FormInterface $form, ?Regions $regions)
     {
         $builder = $form->getConfig()->getFormFactory()->createNamedBuilder(
-            'cercle', EntityType::class,
+            'cercle',
+            EntityType::class,
             null,
-             [
+            [
                 'class' => Cercles::class,
                 'choice_label' => 'designation',
                 'placeholder' => 'Sélectionnez ou Choisir un Cercle',

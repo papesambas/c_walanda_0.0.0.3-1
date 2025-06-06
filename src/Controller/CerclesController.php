@@ -133,42 +133,4 @@ final class CerclesController extends AbstractController
         return $this->redirectToRoute('app_cercles_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    
-    /*#[Route('/create', name: 'app_cercles_create', methods: ['POST'])]
-    /*public function createCercle(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    /*{
-        $data = json_decode($request->getContent(), true);
-        $label = $data['label'] ?? '';
-        $regionId = $data['region_id'] ?? null;
-
-        // Validation
-        $label = trim(strip_tags($label));
-        if (empty($label)) {
-            return new JsonResponse(['error' => 'Le nom de la cercle est requis'], 400);
-        }
-
-        if (empty($regionId)) {
-            return new JsonResponse(['error' => 'Le region est requis'], 400);
-        }
-
-        // Récupération du region
-        $region = $entityManager->getRepository(Regions::class)->find($regionId);
-        if (!$region) {
-            return new JsonResponse(['error' => 'Region introuvable'], 404);
-        }
-
-        // Création de la cercle
-        $cercle = new Cercles();
-        $cercle->setDesignation($label);
-        $cercle->setRegion($region);
-
-        $entityManager->persist($cercle);
-        $entityManager->flush();
-
-        return new JsonResponse([
-            'id' => $cercle->getId(),
-            'text' => $label
-        ]);
-    }*/
-
 }

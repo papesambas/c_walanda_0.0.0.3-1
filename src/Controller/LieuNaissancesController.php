@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\LieuNaissances;
 use App\Form\LieuNaissancesForm;
+use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\LieuNaissancesRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +44,57 @@ final class LieuNaissancesController extends AbstractController
         ]);
     }
 
+            #[Route('/create', name: 'app_lieu_naissances_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $em, CommunesRepository $communesRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || empty($data['designation']) || empty($data['commune_id'])) {
+            return new JsonResponse(['error' => 'Invalid data'], 400);
+        }
+
+        $commune = $communesRepository->find($data['commune_id']);
+        if (!$commune) {
+            return new JsonResponse(['error' => 'Commune not found'], 404);
+        }
+
+        $lieu = new LieuNaissances();
+        $lieu->setDesignation($data['designation']);
+        $lieu->setCommune($commune);
+
+        $em->persist($lieu);
+        $em->flush();
+
+        return new JsonResponse([
+            'id' => $lieu->getId(),
+            'text' => $lieu->getDesignation()
+        ], 201);
+    }
+
+    #[Route('/search', name: 'app_lieu_naissance_search', methods: ['GET'])]
+    public function searchCercles(
+        Request $request,
+        LieuNaissancesRepository $lieuNaissancesRepository
+    ): JsonResponse {
+        $term = $request->query->get('term', '');
+        $communeId = $request->query->get('commune_id');
+
+        if (!$communeId) {
+            return new JsonResponse([]);
+        }
+
+        $lieux = $lieuNaissancesRepository->findByCercleAndDesignation($communeId, $term);
+
+        $results = array_map(function ($lieu) {
+            return [
+                'id' => $lieu->getId(),
+                'text' => $lieu->getDesignation()
+            ];
+        }, $lieux);
+
+        return new JsonResponse($results);
+    }
+
     #[Route('/{id}', name: 'app_lieu_naissances_show', methods: ['GET'])]
     public function show(LieuNaissances $lieuNaissance): Response
     {
@@ -78,36 +130,5 @@ final class LieuNaissancesController extends AbstractController
         }
 
         return $this->redirectToRoute('app_lieu_naissances_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-        #[Route('/create/{label}', name: 'app_lieu_naissances_create', methods: ['POST'])]
-    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $lieu = new LieuNaissances();
-        $lieu->setDesignation(trim(strip_tags($label)));
-        $entityManager->persist($lieu);
-        $entityManager->flush();
-        //on récupère l'Id qui a été créé
-        $id = $lieu->getId();
-
-        return new JsonResponse(['id' => $id]);
-    }
-
-    #[Route('/search', name: 'api_lieu_naissances_search', methods: ['GET'])]
-    public function searchLieuNaissances(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $term = $request->query->get('term');
-        $results = $em->getRepository(LieuNaissances::class)
-            ->createQueryBuilder('n')
-            ->where('n.designation LIKE :term')
-            ->setParameter('term', '%'.$term.'%')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
-
-        return $this->json(array_map(fn($n) => [
-            'id' => $n->getId(),
-            'text' => $n->getDesignation()
-        ], $results));
     }
 }
