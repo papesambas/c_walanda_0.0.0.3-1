@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Communes;
 use App\Form\CommunesForm;
+use App\Repository\CerclesRepository;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/communes')]
 final class CommunesController extends AbstractController
@@ -40,6 +42,57 @@ final class CommunesController extends AbstractController
             'commune' => $commune,
             'form' => $form,
         ]);
+    }
+
+        #[Route('/create', name: 'app_communes_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $em, CerclesRepository $cerclesRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || empty($data['designation']) || empty($data['cercle_id'])) {
+            return new JsonResponse(['error' => 'Invalid data'], 400);
+        }
+
+        $cercle = $cerclesRepository->find($data['cercle_id']);
+        if (!$cercle) {
+            return new JsonResponse(['error' => 'Region not found'], 404);
+        }
+
+        $commune = new Communes();
+        $commune->setDesignation($data['designation']);
+        $commune->setCercle($cercle);
+
+        $em->persist($commune);
+        $em->flush();
+
+        return new JsonResponse([
+            'id' => $commune->getId(),
+            'text' => $commune->getDesignation()
+        ], 201);
+    }
+
+    #[Route('/search', name: 'app_communes_search', methods: ['GET'])]
+    public function searchCercles(
+        Request $request,
+        CommunesRepository $communesRepository
+    ): JsonResponse {
+        $term = $request->query->get('term', '');
+        $cercleId = $request->query->get('cercle_id');
+
+        if (!$cercleId) {
+            return new JsonResponse([]);
+        }
+
+        $communes = $communesRepository->findByCercleAndDesignation($cercleId, $term);
+
+        $results = array_map(function ($commune) {
+            return [
+                'id' => $commune->getId(),
+                'text' => $commune->getDesignation()
+            ];
+        }, $communes);
+
+        return new JsonResponse($results);
     }
 
     #[Route('/{id}', name: 'app_communes_show', methods: ['GET'])]

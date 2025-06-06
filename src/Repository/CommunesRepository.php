@@ -16,6 +16,24 @@ class CommunesRepository extends ServiceEntityRepository
         parent::__construct($registry, Communes::class);
     }
 
+    public function findByCercleAndDesignation(int $cercleId, ?string $term = null): array
+{
+    $qb = $this->createQueryBuilder('c')
+        ->where('c.cercle = :cercleId')
+        ->setParameter('cercleId', $cercleId);
+
+    if ($term) {
+        $qb->andWhere('c.designation LIKE :term')
+            ->setParameter('term', '%' . $term . '%');
+    }
+
+    return $qb->orderBy('c.designation', 'ASC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+}
+
+
     //    /**
     //     * @return Communes[] Returns an array of Communes objects
     //     */

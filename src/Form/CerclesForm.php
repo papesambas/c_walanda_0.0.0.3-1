@@ -63,21 +63,6 @@ class CerclesForm extends AbstractType
                     'data-create-url' => '/regions/create',
                     'tabindex' => '1',    // 1er champ focus
                 ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'La Désignation ne peut pas être vide.',
-                    ]),
-                    new Length([
-                        'min' => 2,
-                        'max' => 60,
-                        'minMessage' => 'La Désignation doit comporter au moins {{ limit }} caractères.',
-                        'maxMessage' => 'La Désignation ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
-                    new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
-                        'message' => 'La Désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
-                    ]),
-                ],
                 'required' => false,
                 'error_bubbling' => false,
             ])

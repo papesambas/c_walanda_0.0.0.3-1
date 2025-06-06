@@ -16,6 +16,24 @@ class CerclesRepository extends ServiceEntityRepository
         parent::__construct($registry, Cercles::class);
     }
 
+    // CerclesRepository.php
+public function findByRegionAndDesignation(int $regionId, ?string $term = null): array
+{
+    $qb = $this->createQueryBuilder('c')
+        ->where('c.region = :regionId')
+        ->setParameter('regionId', $regionId);
+
+    if ($term) {
+        $qb->andWhere('c.designation LIKE :term')
+            ->setParameter('term', '%' . $term . '%');
+    }
+
+    return $qb->orderBy('c.designation', 'ASC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+}
+
     //    /**
     //     * @return Cercles[] Returns an array of Cercles objects
     //     */
