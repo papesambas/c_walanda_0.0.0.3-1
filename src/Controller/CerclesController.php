@@ -14,9 +14,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/cercles')]
 final class CerclesController extends AbstractController
 {
-    #[Route('/cercles',name: 'app_cercles_index', methods: ['GET'])]
+    #[Route('',name: 'app_cercles_index', methods: ['GET'])]
     public function index(CerclesRepository $cerclesRepository): Response
     {
         return $this->render('cercles/index.html.twig', [
@@ -24,7 +25,7 @@ final class CerclesController extends AbstractController
         ]);
     }
 
-    #[Route('/cercles/new', name: 'app_cercles_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_cercles_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $cercle = new Cercles();
@@ -72,7 +73,7 @@ final class CerclesController extends AbstractController
     }
 
     #[Route('/search', name: 'app_cercles_search', methods: ['GET'])]
-    public function searchRegions(
+    public function searchCercles(
         Request $request,
         CerclesRepository $cerclesRepository
     ): JsonResponse {
@@ -95,7 +96,7 @@ final class CerclesController extends AbstractController
         return new JsonResponse($results);
     }
 
-    #[Route('/cercles/{id}', name: 'app_cercles_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_cercles_show', methods: ['GET'])]
     public function show(Cercles $cercle): Response
     {
         return $this->render('cercles/show.html.twig', [
@@ -103,7 +104,7 @@ final class CerclesController extends AbstractController
         ]);
     }
 
-    #[Route('/cercles/{id}/edit', name: 'app_cercles_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_cercles_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Cercles $cercle, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CerclesForm::class, $cercle);
@@ -121,7 +122,7 @@ final class CerclesController extends AbstractController
         ]);
     }
 
-    #[Route('/cercles/{id}', name: 'app_cercles_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_cercles_delete', methods: ['POST'])]
     public function delete(Request $request, Cercles $cercle, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $cercle->getId(), $request->getPayload()->getString('_token'))) {
@@ -132,9 +133,10 @@ final class CerclesController extends AbstractController
         return $this->redirectToRoute('app_cercles_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/cercles/create', name: 'app_cercles_create', methods: ['POST'])]
-    public function createCercle(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
+    
+    /*#[Route('/create', name: 'app_cercles_create', methods: ['POST'])]
+    /*public function createCercle(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    /*{
         $data = json_decode($request->getContent(), true);
         $label = $data['label'] ?? '';
         $regionId = $data['region_id'] ?? null;
@@ -167,16 +169,6 @@ final class CerclesController extends AbstractController
             'id' => $cercle->getId(),
             'text' => $label
         ]);
-    }
+    }*/
 
-    #[Route('/cercles/search', name: 'app_cercles_search', methods: ['GET'])]
-    public function searchCercles(Request $request, CerclesRepository $repository): JsonResponse
-    {
-        $term = $request->query->get('term', '');
-        $regionId = $request->query->get('region_id');
-
-        $results = $repository->search($term, $regionId);
-
-        return $this->json($results);
-    }
 }
