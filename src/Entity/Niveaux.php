@@ -6,6 +6,8 @@ use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\EntityTrackingTrait;
 use App\Entity\Trait\SlugTrait;
 use App\Repository\NiveauxRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -40,6 +42,17 @@ class Niveaux
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: 'Le cycle ne peut pas être nul.')]
     private ?Cycles $cycle = null;
+
+    /**
+     * @var Collection<int, Classes>
+     */
+    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'niveau')]
+    private Collection $classes;
+
+    public function __construct()
+    {
+        $this->classes = new ArrayCollection();
+    }
 
     public function __toString(): string
     {
@@ -98,6 +111,36 @@ class Niveaux
     public function setCycle(?Cycles $cycle): static
     {
         $this->cycle = $cycle;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Classes>
+     */
+    public function getClasses(): Collection
+    {
+        return $this->classes;
+    }
+
+    public function addClass(Classes $class): static
+    {
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
+            $class->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClass(Classes $class): static
+    {
+        if ($this->classes->removeElement($class)) {
+            // set the owning side to null (unless already changed)
+            if ($class->getNiveau() === $this) {
+                $class->setNiveau(null);
+            }
+        }
 
         return $this;
     }

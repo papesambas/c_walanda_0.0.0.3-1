@@ -44,9 +44,16 @@ class Statuts
     #[ORM\Column]
     private ?bool $isActive = true;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'statut')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->enseignement = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -106,6 +113,36 @@ class Statuts
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setStatut($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getStatut() === $this) {
+                $elefe->setStatut(null);
+            }
+        }
 
         return $this;
     }

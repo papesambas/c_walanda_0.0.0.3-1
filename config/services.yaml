@@ -120,6 +120,16 @@ services:
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Users'}    # add more service definitions when explicit configuration is needed
                 #- { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Users' }
                 #- { name: 'doctrine.event_listener', event: 'postFlush' } 
+    App\EventListener\ElevesEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Eleves'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Eleves'}    # add more service definitions when explicit configuration is needed
+                - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Eleves' }
+                - { name: 'doctrine.event_listener', event: 'postFlush' } 
+    App\EventListener\ClassesEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Classes'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Classes'}    # add more service definitions when explicit configuration is needed
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

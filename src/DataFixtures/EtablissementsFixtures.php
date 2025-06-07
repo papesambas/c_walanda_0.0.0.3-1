@@ -91,6 +91,7 @@ class EtablissementsFixtures extends Fixture implements DependentFixtureInterfac
             ->setEffectif($effectif);
 
         $manager->persist($etablissement);
+        $this->addReference('etablissement_' . strtoupper($designation), $etablissement);
     }
 
     private function getRandomFormeJuridique(array $formeJuridiques, \Faker\Generator $faker): string

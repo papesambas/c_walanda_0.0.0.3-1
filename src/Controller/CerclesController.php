@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Regions;
 use App\Entity\Cercles;
+use App\Entity\Regions;
 use App\Form\CerclesForm;
-use App\Repository\RegionsRepository;
+use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
+use App\Repository\ClassesRepository;
+use App\Repository\RegionsRepository;
+use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -97,10 +100,25 @@ final class CerclesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_cercles_show', methods: ['GET'])]
-    public function show(Cercles $cercle): Response
-    {
+    public function show(Cercles $cercle, Request $request,ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndCercle($fullname,  $cercle,$etablissements,$classeId, $statutId,);
+
         return $this->render('cercles/show.html.twig', [
             'cercle' => $cercle,
+            'eleves' => $eleves,
+            'classes' => $classesRepository->findAll(),
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\LieuNaissances;
 use App\Form\LieuNaissancesForm;
+use App\Repository\ElevesRepository;
+use App\Repository\ClassesRepository;
+use App\Repository\StatutsRepository;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\LieuNaissancesRepository;
@@ -83,7 +86,7 @@ final class LieuNaissancesController extends AbstractController
             return new JsonResponse([]);
         }
 
-        $lieux = $lieuNaissancesRepository->findByCercleAndDesignation($communeId, $term);
+        $lieux = $lieuNaissancesRepository->findByCommuneAndDesignation($communeId, $term);
 
         $results = array_map(function ($lieu) {
             return [
@@ -96,10 +99,25 @@ final class LieuNaissancesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_lieu_naissances_show', methods: ['GET'])]
-    public function show(LieuNaissances $lieuNaissance): Response
-    {
+    public function show(LieuNaissances $lieuNaissance, Request $request,ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndLieuNaissance($fullname,  $lieuNaissance,$etablissements,$classeId, $statutId,);
+
         return $this->render('lieu_naissances/show.html.twig', [
             'lieu_naissance' => $lieuNaissance,
+            'eleves' => $eleves,
+            'classes' => $classesRepository->findAll(),
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

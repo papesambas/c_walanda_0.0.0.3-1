@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Regions;
 use App\Form\RegionsForm;
+use App\Repository\ElevesRepository;
+use App\Repository\ClassesRepository;
 use App\Repository\RegionsRepository;
+use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,10 +47,25 @@ final class RegionsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_regions_show', methods: ['GET'])]
-    public function show(Regions $region): Response
-    {
-        return $this->render('regions/show.html.twig', [
+    public function show(Regions $region, Request $request,ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndRegion($fullname,  $region,$etablissements,$classeId, $statutId,);
+
+        return $this->render('cercles/show.html.twig', [
             'region' => $region,
+            'eleves' => $eleves,
+            'classes' => $classesRepository->findAll(),
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

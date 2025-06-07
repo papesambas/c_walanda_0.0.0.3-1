@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Eleves{% endblock %}
+
+{% block body %}
+    <h1>Eleves</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ elefe.id }}</td>
+            </tr>
+            <tr>
+                <th>Sexe</th>
+                <td>{{ elefe.sexe }}</td>
+            </tr>
+            <tr>
+                <th>DateNaissance</th>
+                <td>{{ elefe.dateNaissance ? elefe.dateNaissance|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateActe</th>
+                <td>{{ elefe.dateActe ? elefe.dateActe|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>NumeroActe</th>
+                <td>{{ elefe.numeroActe }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ elefe.email }}</td>
+            </tr>
+            <tr>
+                <th>Niveau</th>
+                <td>{{ elefe.niveau }}</td>
+            </tr>
+            <tr>
+                <th>IsActif</th>
+                <td>{{ elefe.isActif ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsAdmis</th>
+                <td>{{ elefe.isAdmis ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>IsAllowed</th>
+                <td>{{ elefe.isAllowed ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Fullname</th>
+                <td>{{ elefe.fullname }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ elefe.createdAt ? elefe.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ elefe.updatedAt ? elefe.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ elefe.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_eleves_index') }}">back to list</a>
+
+    <a href="{{ path('app_eleves_edit', {'id': elefe.id}) }}">edit</a>
+
+    {{ include('eleves/_delete_form.html.twig') }}
+{% endblock %}

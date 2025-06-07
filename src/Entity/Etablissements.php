@@ -244,10 +244,24 @@ class Etablissements
     #[ORM\ManyToMany(targetEntity: Users::class, inversedBy: 'etablissements')]
     private Collection $superUsers;
 
+    /**
+     * @var Collection<int, Classes>
+     */
+    #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'etablissement', orphanRemoval: true)]
+    private Collection $classes;
+
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'etablissement')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->superUsers = new ArrayCollection();
+        $this->classes = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -524,6 +538,66 @@ class Etablissements
     public function removeSuperUser(Users $superUser): static
     {
         $this->superUsers->removeElement($superUser);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Classes>
+     */
+    public function getClasses(): Collection
+    {
+        return $this->classes;
+    }
+
+    public function addClass(Classes $class): static
+    {
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
+            $class->setEtablissement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClass(Classes $class): static
+    {
+        if ($this->classes->removeElement($class)) {
+            // set the owning side to null (unless already changed)
+            if ($class->getEtablissement() === $this) {
+                $class->setEtablissement(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setEtablissement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getEtablissement() === $this) {
+                $elefe->setEtablissement(null);
+            }
+        }
 
         return $this;
     }

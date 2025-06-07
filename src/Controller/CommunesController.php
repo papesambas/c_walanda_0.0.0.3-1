@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\Cercles;
 use App\Entity\Communes;
 use App\Form\CommunesForm;
+use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
+use App\Repository\ClassesRepository;
+use App\Repository\StatutsRepository;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -98,10 +101,25 @@ final class CommunesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_communes_show', methods: ['GET'])]
-    public function show(Communes $commune): Response
-    {
+    public function show(Communes $commune, Request $request,ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndCommune($fullname,  $commune,$etablissements,$classeId, $statutId,);
+
         return $this->render('communes/show.html.twig', [
             'commune' => $commune,
+            'eleves' => $eleves,
+            'classes' => $classesRepository->findAll(),
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

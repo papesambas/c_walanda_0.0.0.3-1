@@ -55,10 +55,17 @@ class Noms
     #[ORM\OneToMany(targetEntity: Meres::class, mappedBy: 'nom')]
     private Collection $meres;
 
+    /**
+     * @var Collection<int, Eleves>
+     */
+    #[ORM\OneToMany(targetEntity: Eleves::class, mappedBy: 'nom')]
+    private Collection $eleves;
+
     public function __construct()
     {
         $this->peres = new ArrayCollection();
         $this->meres = new ArrayCollection();
+        $this->eleves = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,6 +145,36 @@ class Noms
             // set the owning side to null (unless already changed)
             if ($mere->getNom() === $this) {
                 $mere->setNom(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Eleves>
+     */
+    public function getEleves(): Collection
+    {
+        return $this->eleves;
+    }
+
+    public function addElefe(Eleves $elefe): static
+    {
+        if (!$this->eleves->contains($elefe)) {
+            $this->eleves->add($elefe);
+            $elefe->setNom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeElefe(Eleves $elefe): static
+    {
+        if ($this->eleves->removeElement($elefe)) {
+            // set the owning side to null (unless already changed)
+            if ($elefe->getNom() === $this) {
+                $elefe->setNom(null);
             }
         }
 

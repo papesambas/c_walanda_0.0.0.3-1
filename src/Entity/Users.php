@@ -136,6 +136,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Etablissements::class, mappedBy: 'superUsers')]
     private Collection $etablissements;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Eleves $eleves = null;
+
     public function __construct()
     {
         $this->etablissements = new ArrayCollection();
@@ -349,6 +352,28 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->etablissements->removeElement($etablissement)) {
             $etablissement->removeSuperUser($this);
         }
+
+        return $this;
+    }
+
+    public function getEleves(): ?Eleves
+    {
+        return $this->eleves;
+    }
+
+    public function setEleves(?Eleves $eleves): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($eleves === null && $this->eleves !== null) {
+            $this->eleves->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($eleves !== null && $eleves->getUser() !== $this) {
+            $eleves->setUser($this);
+        }
+
+        $this->eleves = $eleves;
 
         return $this;
     }
