@@ -3,17 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Classes;
-use App\Entity\Etablissements;
 use App\Entity\Niveaux;
 use App\Form\ClassesForm;
+use App\Entity\Etablissements;
+use App\Repository\ElevesRepository;
 use App\Repository\ClassesRepository;
-use App\Repository\EtablissementsRepository;
 use App\Repository\NiveauxRepository;
+use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\EtablissementsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/classes')]
 final class ClassesController extends AbstractController
@@ -27,10 +29,7 @@ final class ClassesController extends AbstractController
         $niveauId = $request->query->get('niveau');
         $taux = $request->query->get('taux');
 
-        dump('designation',$designation,'etablissement',$etablissementId,'niveau',$niveauId);
-
         $classes = $classesRepository->findByFilters($designation, $etablissementId, $niveauId, $taux);
-        dump($classes);
         // Récupération des listes pour les filtres
         $etablissements = $etablissementsRepository->findAll();
         $niveaux = $niveauxRepository->findAll();
@@ -63,10 +62,26 @@ final class ClassesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_classes_show', methods: ['GET'])]
-    public function show(Classes $class): Response
-    {
+    public function show(Classes $classe,Request $request,ElevesRepository $elevesRepository,
+        NiveauxRepository $niveauxRepository,StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $niveauId = $classe->getNiveau()->getId();
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndClasse($fullname,$classe,  $etablissements, $niveauId,$statutId,);
+
         return $this->render('classes/show.html.twig', [
-            'class' => $class,
+            'classe' => $classe,
+            'eleves' => $eleves,
+            'niveaux' => $classe->getNiveau(), // $niveau est un objet Niveau
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

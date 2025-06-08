@@ -6,6 +6,7 @@ use App\Entity\Eleves;
 use App\Form\ElevesForm;
 use App\Repository\ElevesRepository;
 use App\Repository\ClassesRepository;
+use App\Repository\NiveauxRepository;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ final class ElevesController extends AbstractController
 {
 #[Route('/', name: 'app_eleves_index', methods: ['GET'])]
     public function index(Request $request,ElevesRepository $elevesRepository,
-        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+        NiveauxRepository $niveauxRepository,StatutsRepository $statutsRepository
     ): Response {
         // Récupérer les paramètres de filtre
         $etablissements = null;
@@ -33,7 +34,7 @@ final class ElevesController extends AbstractController
 
         return $this->render('eleves/index.html.twig', [
             'eleves' => $eleves,
-            'classes' => $classesRepository->findAll(),
+            'niveaux' => $niveauxRepository->findAll(),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }
