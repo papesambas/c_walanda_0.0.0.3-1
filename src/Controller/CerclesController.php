@@ -113,11 +113,12 @@ final class CerclesController extends AbstractController
 
         // Appliquer les filtres
         $eleves = $elevesRepository->findByFiltersAndCercle($fullname,  $cercle,$etablissements,$classeId, $statutId,);
+        $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
 
         return $this->render('cercles/show.html.twig', [
             'cercle' => $cercle,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findAll(),
+            'classes' => $classesRepository->findByEleveIds($eleveIds),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }

@@ -72,9 +72,7 @@ class EtablissementsFixtures extends Fixture implements DependentFixtureInterfac
 
         // Génération des numéros de décision avec vérification
         $decisionCreation = $this->generateDecisionNumber();
-        //dump($decisionCreation); // Pour débogage, à supprimer en production
         $decisionOuverture = $this->generateDecisionNumber();
-        //dump($decisionOuverture); // Pour débogage, à supprimer en production
 
         $etablissement = new Etablissements();
         $etablissement

@@ -112,11 +112,12 @@ final class LieuNaissancesController extends AbstractController
 
         // Appliquer les filtres
         $eleves = $elevesRepository->findByFiltersAndLieuNaissance($fullname,  $lieuNaissance,$etablissements,$classeId, $statutId,);
-
+        $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
+        
         return $this->render('lieu_naissances/show.html.twig', [
             'lieu_naissance' => $lieuNaissance,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findAll(),
+            'classes' => $classesRepository->findByEleveIds($eleveIds),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }

@@ -76,11 +76,9 @@ final class ClassesController extends AbstractController
 
         // Appliquer les filtres
         $eleves = $elevesRepository->findByFiltersAndClasse($fullname,$classe,  $etablissements, $niveauId,$statutId,);
-
         return $this->render('classes/show.html.twig', [
             'classe' => $classe,
             'eleves' => $eleves,
-            'niveaux' => $classe->getNiveau(), // $niveau est un objet Niveau
             'statuts' => $statutsRepository->findAll(),
         ]);
     }

@@ -4,12 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Enseignements;
 use App\Form\EnseignementsForm;
-use App\Repository\EnseignementsRepository;
+use App\Repository\ElevesRepository;
+use App\Repository\NiveauxRepository;
+use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\EnseignementsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/enseignements')]
 final class EnseignementsController extends AbstractController
@@ -43,10 +46,30 @@ final class EnseignementsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_enseignements_show', methods: ['GET'])]
-    public function show(Enseignements $enseignement): Response
-    {
+    public function show(Enseignements $enseignement,
+        Request $request,
+        ElevesRepository $elevesRepository,
+        NiveauxRepository $niveauxRepository,
+        StatutsRepository $statutsRepository
+    ): Response {
+        // Récupérer les paramètres de filtre
+        $etablissements = null;
+        $fullname = $request->query->get('fullname');
+        $classeId = $request->query->get('classe');
+        $classeId = is_numeric($classeId) ? (int) $classeId : null;
+        $niveauId = $request->query->get('niveau');
+        $niveauId = is_numeric($niveauId) ? (int) $niveauId : null;
+
+        $statutId = $request->query->get('statut');
+        $statutId = is_numeric($statutId) ? (int) $statutId : null;
+
+        // Appliquer les filtres
+        $eleves = $elevesRepository->findByFiltersAndEnseignement($fullname,$enseignement ,$etablissements, $niveauId, $statutId,);
+
         return $this->render('enseignements/show.html.twig', [
-            'enseignement' => $enseignement,
+            'eleves' => $eleves,
+            'niveaux' => $niveauxRepository->findAll(),
+            'statuts' => $statutsRepository->findAll(),
         ]);
     }
 

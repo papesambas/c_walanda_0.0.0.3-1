@@ -1,0 +1,207 @@
+{# templates/parents/_filter.html.twig #}
+
+<div class="filter-container">
+    {{ form_start(form, {'attr': {'class': 'filter-form'}}) }}
+
+    <div class="filter-header bg-primary text-white p-3 rounded-top">
+        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtres de recherche</h5>
+        <h5 class="mb-0 ps-4 fst-italic fs-6">** pour les Inscriptions **</h5>
+    </div>
+
+    <div class="filter-body p-3">
+        <!-- Section Père -->
+        <div class="filter-section mb-4">
+            <h6 class="section-title d-flex align-items-center text-primary mb-3">
+                <i class="bi bi-gender-male me-2"></i>Informations du père
+            </h6>
+
+            <div class="row g-2">
+                <!-- Recherche nom/prénom -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.qPere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Nom, prénom...'
+                            }
+                        }) }}
+                        {{ form_label(form.qPere, 'Nom et Prénom du père ...', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.telephonePere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Numéro de téléphone...'
+                            }
+                        }) }}
+                        {{ form_label(form.telephonePere, 'Numéro de téléphone du père ...', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+
+                <!-- NINA -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.ninaPere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Numéro d\'identification...'
+                            }
+                        }) }}
+                        {{ form_label(form.ninaPere, 'Numéro Nina du père ...', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Mère -->
+        <div class="filter-section">
+            <h6 class="section-title d-flex align-items-center text-danger mb-3">
+                <i class="bi bi-gender-female me-2"></i>Informations de la mère
+            </h6>
+
+            <div class="row g-2">
+                <!-- Recherche nom/prénom -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.qMere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Nom, prénom...'
+                            }
+                        }) }}
+                        {{ form_label(form.qMere, 'Nom et Prénom de la mère', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.telephoneMere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Numéro de téléphone...'
+                            }
+                        }) }}
+                        {{ form_label(form.telephoneMere, 'Numéro de téléphone de la mère', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+
+                <!-- NINA -->
+                <div class="col-12">
+                    <div class="form-floating">
+                        {{ form_widget(form.ninaMere, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Numéro d\'identification...'
+                            }
+                        }) }}
+                        {{ form_label(form.ninaMere, 'Numéro Nina de la mère', {
+            'label_attr': {
+                'class': 'text-muted fw-semibold small fst-italic'
+            }
+        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="filter-footer p-3 bg-light rounded-bottom">
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search me-2"></i> Appliquer les filtres
+            </button>
+            <a href="{{ path('app_parents_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-repeat me-2"></i> Réinitialiser
+            </a>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<style>
+    .filter-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-header {
+        background-color: var(--primary-color);
+    }
+
+    .filter-section {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1rem;
+    }
+
+    .filter-section:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .form-floating>label {
+        padding: 0.5rem 1rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        height: 48px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.2);
+    }
+
+    .filter-footer {
+        border-top: 1px solid #e9ecef;
+    }
+
+    .filter-form .btn {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        border-radius: 8px;
+    }
+
+    .italic-input {
+        font-style: italic;
+    }
+</style>

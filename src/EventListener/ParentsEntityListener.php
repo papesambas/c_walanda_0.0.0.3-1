@@ -71,7 +71,7 @@ class ParentsEntityListener
 
     private function getParentSlug(Parents $parents): string
     {
-        $slug = mb_strtolower($parents->getPere()->getFullname() . '' . $parents->getMere()->getFullname() , 'UTF-8');
+        $slug = mb_strtolower($parents->getPere()->getFullname() . ' et ' . $parents->getMere()->getFullname() , 'UTF-8');
         return $this->slugger->slug($slug)->toString();
     }
 

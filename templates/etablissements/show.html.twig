@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des Élèves{% endblock %}
+{% block title %}Liste des Classes{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -11,8 +11,6 @@
         --primary-color: #2c3e50;
         --secondary-color: #3498db;
         --accent-color: #e74c3c;
-        --female-color: #e83e8c;
-        --male-color: #3498db;
     }
 
     body {
@@ -68,16 +66,6 @@
         justify-content: center;
     }
 
-    .gender-female {
-        color: var(--female-color);
-        background-color: rgba(232, 62, 140, 0.1);
-    }
-
-    .gender-male {
-        color: var(--male-color);
-        background-color: rgba(52, 152, 219, 0.1);
-    }
-
     .empty-state {
         text-align: center;
         padding: 3rem;
@@ -85,12 +73,17 @@
         border-radius: 12px;
     }
 
-    .badge-active {
-        background-color: #28a745;
+    .progress-container {
+        background: #f8f9fa;
+        border-radius: 10px;
+        height: 8px;
+        margin-top: 5px;
     }
 
-    .badge-inactive {
-        background-color: #6c757d;
+    .progress-bar {
+        height: 100%;
+        border-radius: 10px;
+        background: var(--secondary-color);
     }
 
     /* Ajout des styles pour les filtres */
@@ -98,20 +91,18 @@
         min-width: 180px;
         flex-grow: 1;
     }
-
+    
     .btn-group .btn {
         flex-shrink: 0;
     }
-
+    
     @media (max-width: 768px) {
         .filter-group {
             min-width: 100%;
         }
-
         .btn-group {
             width: 100%;
         }
-
         .btn-group .btn {
             width: 50%;
         }
@@ -121,10 +112,10 @@
 
 {% block body %}
 <div class="header-section text-center">
-    <h1 class="display-5 fw-bold"><i class="bi bi-people me-2"></i>Gestion des Élèves</h1>
-    <p class="lead">Liste complète des élèves enregistrés dans le système</p>
-    <a href="{{ path('app_eleves_new') }}" class="btn btn-light btn-lg mt-3">
-        <i class="bi bi-plus-circle me-2"></i>Ajouter un Élève
+    <h1 class="display-5 fw-bold"><i class="bi bi-people me-2"></i>Gestion des Classes</h1>
+    <p class="lead">Liste complète des classes de {{ etablis_Designe}} enregistrées dans le système</p>
+    <a href="{{ path('app_classes_new') }}" class="btn btn-light btn-lg mt-3">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter une Classe
     </a>
 </div>
 
@@ -132,49 +123,53 @@
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
             <div class="stat-card">
-                <h6 class="text-muted">Total Élèves</h6>
-                <div class="stat-number">{{ eleves|length }}</div>
+                <h6 class="text-muted">Total Classes</h6>
+                <div class="stat-number">{{ classes|length }}</div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card">
-                <h6 class="text-muted">Filles</h6>
+                <h6 class="text-muted">Capacité Totale</h6>
                 <div class="stat-number">
-                    {% set totalFemales = 0 %}
-                    {% for eleve in eleves %}
-                    {% if eleve.sexe == 'F' %}
-                    {% set totalFemales = totalFemales + 1 %}
-                    {% endif %}
+                    {% set totalCapacite = 0 %}
+                    {% for item in classes %}
+                        {% if item is iterable %}
+                            {% set classe = item[0] %}
+                        {% else %}
+                            {% set classe = item %}
+                        {% endif %}
+                        {% set totalCapacite = totalCapacite + classe.capacite %}
                     {% endfor %}
-                    {{ totalFemales }}
+                    {{ totalCapacite }}
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card">
-                <h6 class="text-muted">Garçons</h6>
+                <h6 class="text-muted">Effectif Total</h6>
                 <div class="stat-number">
-                    {% set totalMales = 0 %}
-                    {% for eleve in eleves %}
-                    {% if eleve.sexe == 'M' %}
-                    {% set totalMales = totalMales + 1 %}
-                    {% endif %}
+                    {% set totalEffectif = 0 %}
+                    {% for item in classes %}
+                        {% if item is iterable %}
+                            {% set classe = item[0] %}
+                        {% else %}
+                            {% set classe = item %}
+                        {% endif %}
+                        {% set totalEffectif = totalEffectif + classe.effectif %}
                     {% endfor %}
-                    {{ totalMales }}
+                    {{ totalEffectif }}
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="stat-card">
-                <h6 class="text-muted">Actifs</h6>
+                <h6 class="text-muted">Taux de Remplissage</h6>
                 <div class="stat-number">
-                    {% set totalActifs = 0 %}
-                    {% for eleve in eleves %}
-                    {% if eleve.isActif %}
-                    {% set totalActifs = totalActifs + 1 %}
+                    {% if totalCapacite > 0 %}
+                        {{ ((totalEffectif / totalCapacite) * 100)|round(1) }}%
+                    {% else %}
+                        0%
                     {% endif %}
-                    {% endfor %}
-                    {{ totalActifs }}
                 </div>
             </div>
         </div>
@@ -183,44 +178,40 @@
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h5 class="mb-0"><i class="bi bi-list me-2"></i>Liste des Élèves</h5>
-
+                <h5 class="mb-0"><i class="bi bi-list me-2"></i>Liste des Classes</h5>
+                
                 <!-- Formulaire de recherche combinée -->
                 <form method="get" class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
                     <div class="filter-group">
-                        <input type="text" name="fullname" class="form-control" placeholder="Nom complet"
-                            style="height: 40px;" value="{{ app.request.query.get('fullname') }}">
+                        <input type="text" name="designation" class="form-control heigt" style="height: 40px;"
+                               placeholder="Désignation" value="{{ app.request.query.get('designation') }}">
                     </div>
-
+                    
                     <div class="filter-group">
-                        <select name="classe" class="form-select">
-                            <option value="">Tous les niveaux</option>
-                            {% for niveau in niveaux %}
-                            <option value="{{ niveau.id }}" {{ app.request.query.get('classe')==niveau.id ? 'selected'
-                                : '' }}>
-                                {{ niveau.designation }}
-                            </option>
+                        <select name="niveau" class="form-select">
+                            <option value="">Tous niveaux</option>
+                            {% for niv in niveaux %}
+                                <option value="{{ niv.id }}" {{ app.request.query.get('niveau') == niv.id ? 'selected' }}>
+                                    {{ niv.designation }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
-
+                    
                     <div class="filter-group">
-                        <select name="statut" class="form-select">
-                            <option value="">Tous les statuts</option>
-                            {% for statut in statuts %}
-                            <option value="{{ statut.id }}" {{ app.request.query.get('statut')==statut.id ? 'selected'
-                                : '' }}>
-                                {{ statut.designation }}
-                            </option>
-                            {% endfor %}
+                        <select name="taux" class="form-select">
+                            <option value="">Taux de remplissage</option>
+                            <option value="low" {{ app.request.query.get('taux') == 'low' ? 'selected' }}>Moins de 50%</option>
+                            <option value="medium" {{ app.request.query.get('taux') == 'medium' ? 'selected' }}>50% - 80%</option>
+                            <option value="high" {{ app.request.query.get('taux') == 'high' ? 'selected' }}>Plus de 80%</option>
                         </select>
                     </div>
-
+                    
                     <div class="btn-group">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-funnel"></i> Filtrer
                         </button>
-                        <a href="{{ path('app_eleves_index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ path('app_classes_index') }}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-clockwise"></i>
                         </a>
                     </div>
@@ -229,120 +220,99 @@
         </div>
 
         <div class="card-body p-0">
-            {% if eleves is not empty %}
+            {% if classes is not empty %}
             <div class="table-responsive">
-                <table class="table table-hover table-sm mb-0">
+                <table class="table table-hover mb-0">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nom complet</th>
-                            <th>Date Naiss.</th>
-                            <th>Né(e) à :</th>
-                            <th>Classe</th>
-                            <th>Enseignement</th>
-                            <th>Statut</th>
-                            <th>Actif</th>
+                            <th>Désignation</th>
+                            <th>Établissement</th>
+                            <th>Niveau</th>
+                            <th>Capacité</th>
+                            <th>Effectif</th>
+                            <th>Taux</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for eleve in eleves %}
-                        <tr>
-                            <td class="fw-bold">#{{ eleve.id }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar me-2 {{ eleve.sexe == 'F' ? 'gender-female' : 'gender-male' }}">
-                                        {% if eleve.sexe == 'F' %}
-                                        <i class="bi bi-gender-female fs-4" style="color: #e83e8c;"></i>
-                                        {% else %}
-                                        <i class="bi bi-gender-male fs-4" style="color: #3498db;"></i>
-                                        {% endif %}
+                        {% for item in classes %}
+                            {% if item is iterable %}
+                                {% set classe = item[0] %}
+                                {% set taux_remplissage = item.taux_remplissage %}
+                            {% else %}
+                                {% set classe = item %}
+                                {% set taux_remplissage = (classe.capacite > 0) ? (classe.effectif / classe.capacite * 100) : 0 %}
+                            {% endif %}
+                            
+                            <tr>
+                                <td class="fw-bold">#{{ classe.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar me-2">
+                                            {{ classe.designation|slice(0, 2)|upper }}
+                                        </div>
+                                        <div>
+                                            <strong>{{ classe.designation }}</strong>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <strong>{{ eleve.fullname }}</strong>
+                                </td>
+                                <td>
+                                    {% if classe.etablissement %}
+                                    <span class="badge bg-primary">
+                                        {{ classe.etablissement.designation|u.truncate(40, '...') }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if classe.niveau %}
+                                    <span class="badge bg-info">
+                                        {{ classe.niveau.designation }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ classe.capacite }}</td>
+                                <td>{{ classe.effectif }}</td>
+                                <td>
+                                    {{ taux_remplissage|round(1) }}%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: {{ min(100, taux_remplissage) }}%"></div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                {{ eleve.dateNaissance|date('d/m/Y') }}
-                            </td>
-                            <td>
-                                {% if eleve.lieuNaissance %}
-                                <a href="{{ path('app_lieu_naissances_show', {'id': eleve.lieuNaissance.id}) }}"
-                                    class="text-decoration-none  text-dark">
-                                    {{ eleve.lieuNaissance.designation }}
-                                </a>
-
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if eleve.classe %}
-                                <a href="{{ path('app_classes_show', {'id': eleve.classe.id}) }}"
-                                    class="text-decoration-none text-dark text-sm"
-                                    title="{{ eleve.classe.designation }}">
-                                    {{ eleve.classe.designation|u.truncate(15, '...') }}
-                                </a>
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if eleve.etablissement %}
-                                <a href="{{ path('app_enseignements_show', {'id': eleve.etablissement.enseignement.id}) }}"
-                                    class="text-decoration-none text-dark text-sm"
-                                    title="{{ eleve.etablissement.enseignement.designation }}">
-                                    {{ eleve.etablissement.enseignement.designation|u.truncate(15, '...') }}
-                                </a>
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if eleve.statut %}
-                                <span class="badge bg-info">
-                                    {{ eleve.statut.designation }}
-                                </span>
-                                {% else %}
-                                <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if eleve.isActif %}
-                                <span class="badge badge-active">Actif</span>
-                                {% else %}
-                                <span class="badge badge-inactive">Inactif</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                <a href="{{ path('app_eleves_show', {'id': eleve.id}) }}"
-                                    class="btn btn-sm btn-outline-primary me-1" title="Voir">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ path('app_eleves_edit', {'id': eleve.id}) }}"
-                                    class="btn btn-sm btn-outline-success me-1" title="Modifier">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_eleves_delete', {'id': eleve.id}) }}"
-                                    class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ eleve.id) }}">
-                                    <button class="btn btn-sm btn-outline-danger" title="Supprimer">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ path('app_classes_show', {'id': classe.id}) }}"
+                                        class="btn btn-sm btn-outline-primary me-1" title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_classes_edit', {'id': classe.id}) }}"
+                                        class="btn btn-sm btn-outline-success me-1" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post"
+                                        action="{{ path('app_classes_delete', {'id': classe.id}) }}"
+                                        class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
+                                        <input type="hidden" name="_token"
+                                            value="{{ csrf_token('delete' ~ classe.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
             {% else %}
             <div class="empty-state my-4">
-                <i class="bi bi-person display-4 text-muted"></i>
-                <h4 class="mt-3 text-muted">Aucun élève enregistré</h4>
-                <a href="{{ path('app_eleves_new') }}" class="btn btn-primary mt-3">
-                    <i class="bi bi-plus-circle me-2"></i>Ajouter un élève
+                <i class="bi bi-people display-4 text-muted"></i>
+                <h4 class="mt-3 text-muted">Aucune classe enregistrée</h4>
+                <a href="{{ path('app_classes_new') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter une classe
                 </a>
             </div>
             {% endif %}
@@ -361,7 +331,7 @@
         const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
-
+    
         // Fonction de recherche
         const searchInput = document.getElementById('searchInput')
         if (searchInput) {

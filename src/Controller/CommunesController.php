@@ -114,11 +114,11 @@ final class CommunesController extends AbstractController
 
         // Appliquer les filtres
         $eleves = $elevesRepository->findByFiltersAndCommune($fullname,  $commune,$etablissements,$classeId, $statutId,);
-
+        $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
         return $this->render('communes/show.html.twig', [
             'commune' => $commune,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findAll(),
+            'classes' => $classesRepository->findByEleveIds($eleveIds),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }

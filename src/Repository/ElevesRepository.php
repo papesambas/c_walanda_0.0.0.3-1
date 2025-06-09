@@ -6,8 +6,10 @@ use App\Entity\Cercles;
 use App\Entity\Classes;
 use App\Entity\Communes;
 use App\Entity\Eleves;
+use App\Entity\Enseignements;
 use App\Entity\Etablissements;
 use App\Entity\LieuNaissances;
+use App\Entity\Parents;
 use App\Entity\Regions;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -199,7 +201,7 @@ class ElevesRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-        public function findByFiltersAndClasse(?string $fullname, ?Classes $classes, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
+    public function findByFiltersAndClasse(?string $fullname, ?Classes $classes, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
     {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.classe', 'c')
@@ -215,16 +217,9 @@ class ElevesRepository extends ServiceEntityRepository
                 ->setParameter('classe', $classes);
         }
 
-
         if ($fullname) {
             $qb->andWhere('e.fullname LIKE :fullname')
                 ->setParameter('fullname', '%' . $fullname . '%');
-        }
-
-        if ($niveauId) {
-            $qb->leftJoin('e.classe', 'cl')
-                ->andWhere('cl.id = :niveauId')
-                ->setParameter('niveauId', $niveauId);
         }
 
         if ($statutId) {
@@ -235,7 +230,7 @@ class ElevesRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-        public function findByFiltersAndEtablissement(?string $fullname, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
+    public function findByFiltersAndEtablissement(?string $fullname, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
     {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.classe', 'c')
@@ -264,6 +259,77 @@ class ElevesRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findByFiltersAndEnseignement(?string $fullname, Enseignements $enseignements, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.classe', 'c')
+            ->leftJoin('e.statut', 's');
+
+        if ($etablissements) {
+            $qb->andWhere('e.etablissement = :etablissement')
+                ->setParameter('etablissement', $etablissements);
+        }
+
+        if ($enseignements) {
+            $qb->leftJoin('e.etablissement', 'et')
+                ->andWhere('et.enseignement = :enseignement')
+                ->setParameter('enseignement', $enseignements);
+        }
+
+        if ($fullname) {
+            $qb->andWhere('e.fullname LIKE :fullname')
+                ->setParameter('fullname', '%' . $fullname . '%');
+        }
+
+        if ($niveauId) {
+            $qb->leftJoin('e.classe', 'cl')
+                ->andWhere('cl.id = :niveauId')
+                ->setParameter('niveauId', $niveauId);
+        }
+
+        if ($statutId) {
+            $qb->andWhere('s.id = :statutId')
+                ->setParameter('statutId', $statutId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByFiltersAndParent(?string $fullname, ?Parents $parents, ?Etablissements $etablissements, ?int $classeId, ?int $statutId): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.classe', 'c')
+            ->leftJoin('e.statut', 's');
+
+        if ($etablissements) {
+            $qb->andWhere('e.etablissement = :etablissement')
+                ->setParameter('etablissement', $etablissements);
+        }
+
+        if ($parents) {
+            $qb->andWhere('e.parent = :parent')
+                ->setParameter('parent', $parents);
+        }
+
+        if ($fullname) {
+            $qb->andWhere('e.fullname LIKE :fullname')
+                ->setParameter('fullname', '%' . $fullname . '%');
+        }
+
+        if ($classeId) {
+            $qb->andWhere('c.id = :classeId')
+                ->setParameter('classeId', $classeId);
+        }
+
+        if ($statutId) {
+            $qb->andWhere('s.id = :statutId')
+                ->setParameter('statutId', $statutId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
 
     //    /**
     //     * @return Eleves[] Returns an array of Eleves objects

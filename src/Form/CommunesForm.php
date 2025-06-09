@@ -142,8 +142,6 @@ class CommunesForm extends AbstractType
                 // Ajouter le champ cercle dépendant de la région
                 $this->addCercleField($form, $region);
 
-                // (Facultatif) debug
-                // dump($cercle, $region, $form->get('region'));
             }
         );
     }

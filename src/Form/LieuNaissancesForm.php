@@ -177,9 +177,6 @@ class LieuNaissancesForm extends AbstractType
 
                 // Ajouter le champ cercle dépendant de la région
                 $this->addCommuneField($form, $region);
-
-                // (Facultatif) debug
-                // dump($cercle, $region, $form->get('region'));
             }
         );
     }
