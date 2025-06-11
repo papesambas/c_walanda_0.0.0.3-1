@@ -12,6 +12,7 @@ use App\Repository\EnseignementsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/enseignements')]
@@ -45,8 +46,41 @@ final class EnseignementsController extends AbstractController
         ]);
     }
 
+    #[Route('/create/{label}', name: 'app_enseignements_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $enseignement = new Enseignements();
+        $enseignement->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($enseignement);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $enseignement->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_enseignements_search', methods: ['GET'])]
+    public function searchRegions(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(Enseignements::class)
+            ->createQueryBuilder('e')
+            ->where('e.designation LIKE :term')
+            ->setParameter('term', '%' . $term . '%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
+    }
+
+
     #[Route('/{id}', name: 'app_enseignements_show', methods: ['GET'])]
-    public function show(Enseignements $enseignement,
+    public function show(
+        Enseignements $enseignement,
         Request $request,
         ElevesRepository $elevesRepository,
         NiveauxRepository $niveauxRepository,
@@ -64,7 +98,7 @@ final class EnseignementsController extends AbstractController
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
         // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndEnseignement($fullname,$enseignement ,$etablissements, $niveauId, $statutId,);
+        $eleves = $elevesRepository->findByFiltersAndEnseignement($fullname, $enseignement, $etablissements, $niveauId, $statutId,);
 
         return $this->render('enseignements/show.html.twig', [
             'eleves' => $eleves,
@@ -94,7 +128,7 @@ final class EnseignementsController extends AbstractController
     #[Route('/{id}', name: 'app_enseignements_delete', methods: ['POST'])]
     public function delete(Request $request, Enseignements $enseignement, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$enseignement->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $enseignement->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($enseignement);
             $entityManager->flush();
         }

@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Scolarites1 index{% endblock %}
+
+{% block body %}
+    <h1>Scolarites1 index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Scolarite</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for scolarites1 in scolarites1s %}
+            <tr>
+                <td>{{ scolarites1.id }}</td>
+                <td>{{ scolarites1.scolarite }}</td>
+                <td>{{ scolarites1.createdAt ? scolarites1.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ scolarites1.updatedAt ? scolarites1.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ scolarites1.slug }}</td>
+                <td>
+                    <a href="{{ path('app_scolarites1_show', {'id': scolarites1.id}) }}">show</a>
+                    <a href="{{ path('app_scolarites1_edit', {'id': scolarites1.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_scolarites1_new') }}">Create new</a>
+{% endblock %}

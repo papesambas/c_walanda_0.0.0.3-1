@@ -16,6 +16,23 @@ class NiveauxRepository extends ServiceEntityRepository
         parent::__construct($registry, Niveaux::class);
     }
 
+    public function findByCycleAndDesignation(int $cycleId, ?string $term = null): array
+{
+    $qb = $this->createQueryBuilder('n')
+        ->where('n.cycle = :cycleId')
+        ->setParameter('cycleId', $cycleId);
+
+    if ($term) {
+        $qb->andWhere('n.designation LIKE :term')
+            ->setParameter('term', '%' . $term . '%');
+    }
+
+    return $qb->orderBy('n.designation', 'ASC')
+        ->setMaxResults(10)
+        ->getQuery()
+        ->getResult();
+}
+
     //    /**
     //     * @return Niveaux[] Returns an array of Niveaux objects
     //     */

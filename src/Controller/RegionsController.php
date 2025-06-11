@@ -46,6 +46,37 @@ final class RegionsController extends AbstractController
         ]);
     }
 
+            #[Route('/create/{label}', name: 'app_regions_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $region = new Regions();
+        $region->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($region);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $region->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_regions_search', methods: ['GET'])]
+    public function searchRegions(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(Regions::class)
+            ->createQueryBuilder('n')
+            ->where('n.designation LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
+    }
+
     #[Route('/{id}', name: 'app_regions_show', methods: ['GET'])]
     public function show(Regions $region, Request $request,ElevesRepository $elevesRepository,
         ClassesRepository $classesRepository,StatutsRepository $statutsRepository
@@ -96,36 +127,5 @@ final class RegionsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_regions_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-        #[Route('/create/{label}', name: 'app_regions_create', methods: ['POST'])]
-    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $region = new Regions();
-        $region->setDesignation(trim(strip_tags($label)));
-        $entityManager->persist($region);
-        $entityManager->flush();
-        //on récupère l'Id qui a été créé
-        $id = $region->getId();
-
-        return new JsonResponse(['id' => $id]);
-    }
-
-    #[Route('/search', name: 'api_regions_search', methods: ['GET'])]
-    public function searchRegions(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $term = $request->query->get('term');
-        $results = $em->getRepository(Regions::class)
-            ->createQueryBuilder('n')
-            ->where('n.designation LIKE :term')
-            ->setParameter('term', '%'.$term.'%')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
-
-        return $this->json(array_map(fn($n) => [
-            'id' => $n->getId(),
-            'text' => $n->getDesignation()
-        ], $results));
     }
 }

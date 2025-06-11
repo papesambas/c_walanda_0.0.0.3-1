@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250607124019 extends AbstractMigration
+final class Version20250611220442 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -36,7 +36,7 @@ final class Version20250607124019 extends AbstractMigration
             CREATE TABLE cycles_enseignements (cycles_id INT NOT NULL, enseignements_id INT NOT NULL, INDEX IDX_61407BF144C85140 (cycles_id), INDEX IDX_61407BF1DCB471D6 (enseignements_id), PRIMARY KEY(cycles_id, enseignements_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE eleves (id INT AUTO_INCREMENT NOT NULL, nom_id INT NOT NULL, prenom_id INT NOT NULL, lieu_naissance_id INT NOT NULL, parent_id INT NOT NULL, etablissement_id INT DEFAULT NULL, classe_id INT DEFAULT NULL, user_id INT DEFAULT NULL, statut_id INT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, sexe VARCHAR(1) NOT NULL, date_naissance DATE NOT NULL COMMENT '(DC2Type:date_immutable)', date_acte DATE NOT NULL COMMENT '(DC2Type:date_immutable)', numero_acte VARCHAR(30) NOT NULL, email VARCHAR(255) DEFAULT NULL, niveau VARCHAR(255) DEFAULT NULL, is_actif TINYINT(1) NOT NULL, is_admis TINYINT(1) NOT NULL, is_allowed TINYINT(1) NOT NULL, fullname VARCHAR(255) DEFAULT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, INDEX IDX_383B09B1C8121CE9 (nom_id), INDEX IDX_383B09B158819F9E (prenom_id), INDEX IDX_383B09B138C8067D (lieu_naissance_id), INDEX IDX_383B09B1727ACA70 (parent_id), INDEX IDX_383B09B1FF631228 (etablissement_id), INDEX IDX_383B09B18F5EA509 (classe_id), UNIQUE INDEX UNIQ_383B09B1A76ED395 (user_id), INDEX IDX_383B09B1F6203804 (statut_id), INDEX IDX_383B09B1B03A8386 (created_by_id), INDEX IDX_383B09B1896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE eleves (id INT AUTO_INCREMENT NOT NULL, nom_id INT NOT NULL, prenom_id INT NOT NULL, lieu_naissance_id INT NOT NULL, parent_id INT NOT NULL, etablissement_id INT DEFAULT NULL, classe_id INT DEFAULT NULL, user_id INT DEFAULT NULL, statut_id INT NOT NULL, scolarite1_id INT DEFAULT NULL, scolarite2_id INT DEFAULT NULL, scolarites3_id INT DEFAULT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, sexe VARCHAR(1) NOT NULL, date_naissance DATE NOT NULL COMMENT '(DC2Type:date_immutable)', date_acte DATE NOT NULL COMMENT '(DC2Type:date_immutable)', numero_acte VARCHAR(30) NOT NULL, email VARCHAR(255) DEFAULT NULL, niveau VARCHAR(255) DEFAULT NULL, is_actif TINYINT(1) NOT NULL, is_admis TINYINT(1) NOT NULL, is_allowed TINYINT(1) NOT NULL, fullname VARCHAR(255) DEFAULT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, INDEX IDX_383B09B1C8121CE9 (nom_id), INDEX IDX_383B09B158819F9E (prenom_id), INDEX IDX_383B09B138C8067D (lieu_naissance_id), INDEX IDX_383B09B1727ACA70 (parent_id), INDEX IDX_383B09B1FF631228 (etablissement_id), INDEX IDX_383B09B18F5EA509 (classe_id), UNIQUE INDEX UNIQ_383B09B1A76ED395 (user_id), INDEX IDX_383B09B1F6203804 (statut_id), INDEX IDX_383B09B1F4C45000 (scolarite1_id), INDEX IDX_383B09B1E671FFEE (scolarite2_id), INDEX IDX_383B09B15EA22A61 (scolarites3_id), INDEX IDX_383B09B1B03A8386 (created_by_id), INDEX IDX_383B09B1896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE enseignements (id INT AUTO_INCREMENT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, designation VARCHAR(60) NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, UNIQUE INDEX UNIQ_89D792808947610D (designation), INDEX IDX_89D79280B03A8386 (created_by_id), INDEX IDX_89D79280896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -82,6 +82,15 @@ final class Version20250607124019 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE reset_password_request (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, selector VARCHAR(20) NOT NULL, hashed_token VARCHAR(100) NOT NULL, requested_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', expires_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_7CE748AA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE TABLE scolarites1 (id INT AUTO_INCREMENT NOT NULL, niveau_id INT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, scolarite INT NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, INDEX IDX_328D2B44B3E9C81 (niveau_id), INDEX IDX_328D2B44B03A8386 (created_by_id), INDEX IDX_328D2B44896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE TABLE scolarites2 (id INT AUTO_INCREMENT NOT NULL, scolarite1_id INT NOT NULL, niveau_id INT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, scolarite INT NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, INDEX IDX_AB847AFEF4C45000 (scolarite1_id), INDEX IDX_AB847AFEB3E9C81 (niveau_id), INDEX IDX_AB847AFEB03A8386 (created_by_id), INDEX IDX_AB847AFE896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE TABLE scolarites3 (id INT AUTO_INCREMENT NOT NULL, niveau_id INT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, scolarite INT NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, INDEX IDX_DC834A68B3E9C81 (niveau_id), INDEX IDX_DC834A68B03A8386 (created_by_id), INDEX IDX_DC834A68896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE statuts (id INT AUTO_INCREMENT NOT NULL, created_by_id INT DEFAULT NULL, updated_by_id INT DEFAULT NULL, designation VARCHAR(60) NOT NULL, is_active TINYINT(1) NOT NULL, created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', slug VARCHAR(128) NOT NULL, UNIQUE INDEX UNIQ_403505E68947610D (designation), INDEX IDX_403505E6B03A8386 (created_by_id), INDEX IDX_403505E6896DBBDE (updated_by_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -163,6 +172,15 @@ final class Version20250607124019 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE eleves ADD CONSTRAINT FK_383B09B1F6203804 FOREIGN KEY (statut_id) REFERENCES statuts (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves ADD CONSTRAINT FK_383B09B1F4C45000 FOREIGN KEY (scolarite1_id) REFERENCES scolarites1 (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves ADD CONSTRAINT FK_383B09B1E671FFEE FOREIGN KEY (scolarite2_id) REFERENCES scolarites2 (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves ADD CONSTRAINT FK_383B09B15EA22A61 FOREIGN KEY (scolarites3_id) REFERENCES scolarites3 (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE eleves ADD CONSTRAINT FK_383B09B1B03A8386 FOREIGN KEY (created_by_id) REFERENCES users (id)
@@ -309,6 +327,36 @@ final class Version20250607124019 extends AbstractMigration
             ALTER TABLE reset_password_request ADD CONSTRAINT FK_7CE748AA76ED395 FOREIGN KEY (user_id) REFERENCES users (id)
         SQL);
         $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 ADD CONSTRAINT FK_328D2B44B3E9C81 FOREIGN KEY (niveau_id) REFERENCES niveaux (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 ADD CONSTRAINT FK_328D2B44B03A8386 FOREIGN KEY (created_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 ADD CONSTRAINT FK_328D2B44896DBBDE FOREIGN KEY (updated_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 ADD CONSTRAINT FK_AB847AFEF4C45000 FOREIGN KEY (scolarite1_id) REFERENCES scolarites1 (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 ADD CONSTRAINT FK_AB847AFEB3E9C81 FOREIGN KEY (niveau_id) REFERENCES niveaux (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 ADD CONSTRAINT FK_AB847AFEB03A8386 FOREIGN KEY (created_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 ADD CONSTRAINT FK_AB847AFE896DBBDE FOREIGN KEY (updated_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 ADD CONSTRAINT FK_DC834A68B3E9C81 FOREIGN KEY (niveau_id) REFERENCES niveaux (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 ADD CONSTRAINT FK_DC834A68B03A8386 FOREIGN KEY (created_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 ADD CONSTRAINT FK_DC834A68896DBBDE FOREIGN KEY (updated_by_id) REFERENCES users (id)
+        SQL);
+        $this->addSql(<<<'SQL'
             ALTER TABLE statuts ADD CONSTRAINT FK_403505E6B03A8386 FOREIGN KEY (created_by_id) REFERENCES users (id)
         SQL);
         $this->addSql(<<<'SQL'
@@ -411,6 +459,15 @@ final class Version20250607124019 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE eleves DROP FOREIGN KEY FK_383B09B1F6203804
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves DROP FOREIGN KEY FK_383B09B1F4C45000
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves DROP FOREIGN KEY FK_383B09B1E671FFEE
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE eleves DROP FOREIGN KEY FK_383B09B15EA22A61
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE eleves DROP FOREIGN KEY FK_383B09B1B03A8386
@@ -557,6 +614,36 @@ final class Version20250607124019 extends AbstractMigration
             ALTER TABLE reset_password_request DROP FOREIGN KEY FK_7CE748AA76ED395
         SQL);
         $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 DROP FOREIGN KEY FK_328D2B44B3E9C81
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 DROP FOREIGN KEY FK_328D2B44B03A8386
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites1 DROP FOREIGN KEY FK_328D2B44896DBBDE
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 DROP FOREIGN KEY FK_AB847AFEF4C45000
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 DROP FOREIGN KEY FK_AB847AFEB3E9C81
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 DROP FOREIGN KEY FK_AB847AFEB03A8386
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites2 DROP FOREIGN KEY FK_AB847AFE896DBBDE
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 DROP FOREIGN KEY FK_DC834A68B3E9C81
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 DROP FOREIGN KEY FK_DC834A68B03A8386
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE scolarites3 DROP FOREIGN KEY FK_DC834A68896DBBDE
+        SQL);
+        $this->addSql(<<<'SQL'
             ALTER TABLE statuts DROP FOREIGN KEY FK_403505E6B03A8386
         SQL);
         $this->addSql(<<<'SQL'
@@ -651,6 +738,15 @@ final class Version20250607124019 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE reset_password_request
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE scolarites1
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE scolarites2
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE scolarites3
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE statuts

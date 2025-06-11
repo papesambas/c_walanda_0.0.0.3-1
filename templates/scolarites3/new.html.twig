@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Scolarites3{% endblock %}
+
+{% block body %}
+    <h1>Create new Scolarites3</h1>
+
+    {{ include('scolarites3/_form.html.twig') }}
+
+    <a href="{{ path('app_scolarites3_index') }}">back to list</a>
+{% endblock %}

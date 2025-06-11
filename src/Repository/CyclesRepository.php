@@ -16,6 +16,24 @@ class CyclesRepository extends ServiceEntityRepository
         parent::__construct($registry, Cycles::class);
     }
 
+    public function findByEnseignementAndDesignation(int $enseignementId, ?string $term = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->join('c.enseignement', 'e')                    // jointure
+            ->where('e.id = :enseignementId')               // on filtre sur l’ID de e
+            ->setParameter('enseignementId', $enseignementId);
+
+        if ($term) {
+            $qb->andWhere('c.designation LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        return $qb->orderBy('c.designation', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Cycles[] Returns an array of Cycles objects
     //     */

@@ -13,6 +13,7 @@ use App\Repository\EtablissementsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/etablissements')]
@@ -44,6 +45,37 @@ final class EtablissementsController extends AbstractController
             'etablissement' => $etablissement,
             'form' => $form,
         ]);
+    }
+
+            #[Route('/create/{label}', name: 'app_etablissements_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $etablissement = new Etablissements();
+        $etablissement->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($etablissement);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $etablissement->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_etablissements_search', methods: ['GET'])]
+    public function searchRegions(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(Etablissements::class)
+            ->createQueryBuilder('e')
+            ->where('e.designation LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
     }
 
     #[Route('/{id}', name: 'app_etablissements_show', methods: ['GET'])]

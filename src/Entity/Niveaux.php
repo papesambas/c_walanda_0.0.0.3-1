@@ -49,9 +49,30 @@ class Niveaux
     #[ORM\OneToMany(targetEntity: Classes::class, mappedBy: 'niveau')]
     private Collection $classes;
 
+    /**
+     * @var Collection<int, Scolarites1>
+     */
+    #[ORM\OneToMany(targetEntity: Scolarites1::class, mappedBy: 'niveau', orphanRemoval: true)]
+    private Collection $scolarites1s;
+
+    /**
+     * @var Collection<int, Scolarites2>
+     */
+    #[ORM\OneToMany(targetEntity: Scolarites2::class, mappedBy: 'niveau', orphanRemoval: true)]
+    private Collection $scolarites2s;
+
+    /**
+     * @var Collection<int, Scolarites3>
+     */
+    #[ORM\OneToMany(targetEntity: Scolarites3::class, mappedBy: 'niveau', orphanRemoval: true)]
+    private Collection $scolarites3s;
+
     public function __construct()
     {
         $this->classes = new ArrayCollection();
+        $this->scolarites1s = new ArrayCollection();
+        $this->scolarites2s = new ArrayCollection();
+        $this->scolarites3s = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -139,6 +160,96 @@ class Niveaux
             // set the owning side to null (unless already changed)
             if ($class->getNiveau() === $this) {
                 $class->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scolarites1>
+     */
+    public function getScolarites1s(): Collection
+    {
+        return $this->scolarites1s;
+    }
+
+    public function addScolarites1(Scolarites1 $scolarites1): static
+    {
+        if (!$this->scolarites1s->contains($scolarites1)) {
+            $this->scolarites1s->add($scolarites1);
+            $scolarites1->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScolarites1(Scolarites1 $scolarites1): static
+    {
+        if ($this->scolarites1s->removeElement($scolarites1)) {
+            // set the owning side to null (unless already changed)
+            if ($scolarites1->getNiveau() === $this) {
+                $scolarites1->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scolarites2>
+     */
+    public function getScolarites2s(): Collection
+    {
+        return $this->scolarites2s;
+    }
+
+    public function addScolarites2(Scolarites2 $scolarites2): static
+    {
+        if (!$this->scolarites2s->contains($scolarites2)) {
+            $this->scolarites2s->add($scolarites2);
+            $scolarites2->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScolarites2(Scolarites2 $scolarites2): static
+    {
+        if ($this->scolarites2s->removeElement($scolarites2)) {
+            // set the owning side to null (unless already changed)
+            if ($scolarites2->getNiveau() === $this) {
+                $scolarites2->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scolarites3>
+     */
+    public function getScolarites3s(): Collection
+    {
+        return $this->scolarites3s;
+    }
+
+    public function addScolarites3(Scolarites3 $scolarites3): static
+    {
+        if (!$this->scolarites3s->contains($scolarites3)) {
+            $this->scolarites3s->add($scolarites3);
+            $scolarites3->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScolarites3(Scolarites3 $scolarites3): static
+    {
+        if ($this->scolarites3s->removeElement($scolarites3)) {
+            // set the owning side to null (unless already changed)
+            if ($scolarites3->getNiveau() === $this) {
+                $scolarites3->setNiveau(null);
             }
         }
 

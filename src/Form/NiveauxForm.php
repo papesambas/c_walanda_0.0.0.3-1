@@ -16,25 +16,9 @@ class NiveauxForm extends AbstractType
     {
         $builder
             ->add('designation')
-            ->add('effectif')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('slug')
             ->add('cycle', EntityType::class, [
                 'class' => Cycles::class,
-                'choice_label' => 'id',
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
-            ->add('updatedBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
+                'choice_label' => 'designation',
             ])
         ;
     }

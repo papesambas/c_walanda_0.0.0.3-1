@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Scolarites1{% endblock %}
+
+{% block body %}
+    <h1>Scolarites1</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ scolarites1.id }}</td>
+            </tr>
+            <tr>
+                <th>Scolarite</th>
+                <td>{{ scolarites1.scolarite }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ scolarites1.createdAt ? scolarites1.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ scolarites1.updatedAt ? scolarites1.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ scolarites1.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_scolarites1_index') }}">back to list</a>
+
+    <a href="{{ path('app_scolarites1_edit', {'id': scolarites1.id}) }}">edit</a>
+
+    {{ include('scolarites1/_delete_form.html.twig') }}
+{% endblock %}

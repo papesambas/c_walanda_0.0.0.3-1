@@ -80,27 +80,6 @@ final class NomsController extends AbstractController
         return $this->redirectToRoute('app_noms_index', [], Response::HTTP_SEE_OTHER);
     }
 
-/*    #[Route('/search', name: 'app_noms_search', methods: ['GET'])]
-    public function search(Request $request, NomsRepository $repo): JsonResponse
-    {
-        $term = $request->query->get('term', '');
-        $results = $repo->createQueryBuilder('n')
-            ->where('n.designation LIKE :term')
-            ->setParameter('term', '%' . $term . '%')
-            ->orderBy('n.designation', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
-
-        $data = array_map(fn(Noms $nom) => [
-            'id'   => $nom->getId(),
-            'text' => $nom->getDesignation(),
-        ], $results);
-
-        return $this->json($data);
-    }
-*/
-
     #[Route('/create/{label}', name: 'app_noms_create', methods: ['POST'])]
     public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
     {

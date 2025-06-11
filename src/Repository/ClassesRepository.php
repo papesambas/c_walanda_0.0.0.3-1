@@ -18,6 +18,30 @@ class ClassesRepository extends ServiceEntityRepository
         parent::__construct($registry, Classes::class);
     }
 
+    public function findByNiveauAndDesignation(int $niveauId, ?string $term = null, ?Etablissements $etablissement): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.niveau = :niveauId')
+            ->setParameter('niveauId', $niveauId);
+
+        if ($etablissement) {
+            $qb->andWhere('c.etablissement = :etablissement')
+                ->setParameter('etablissement', $etablissement);
+        }
+
+
+        if ($term) {
+            $qb->andWhere('c.designation LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        return $qb->orderBy('c.designation', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+
     // src/Repository/ClasseRepository.php
     public function findByFilters($designation, $etablissement, $niveau, $taux)
     {

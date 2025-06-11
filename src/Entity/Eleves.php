@@ -79,6 +79,17 @@ class Eleves
     #[ORM\JoinColumn(nullable: false)]
     private ?Statuts $statut = null;
 
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Scolarites1 $scolarite1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Scolarites2 $scolarite2 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?Scolarites3 $Scolarite3 = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -311,6 +322,42 @@ class Eleves
     public function setStatut(?Statuts $statut): static
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getScolarite1(): ?Scolarites1
+    {
+        return $this->scolarite1;
+    }
+
+    public function setScolarite1(?Scolarites1 $scolarite1): static
+    {
+        $this->scolarite1 = $scolarite1;
+
+        return $this;
+    }
+
+    public function getScolarite2(): ?Scolarites2
+    {
+        return $this->scolarite2;
+    }
+
+    public function setScolarite2(?Scolarites2 $scolarite2): static
+    {
+        $this->scolarite2 = $scolarite2;
+
+        return $this;
+    }
+
+    public function getScolarite3(): ?Scolarites3
+    {
+        return $this->Scolarite3;
+    }
+
+    public function setScolarite3(?Scolarites3 $Scolarite3): static
+    {
+        $this->Scolarite3 = $Scolarite3;
 
         return $this;
     }
