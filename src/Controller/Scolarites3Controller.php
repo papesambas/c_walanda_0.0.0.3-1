@@ -2,21 +2,38 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Scolarites3;
+use Psr\Log\LoggerInterface;
 use App\Form\Scolarites3Form;
-use App\Repository\Scolarites3Repository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Scolarites3Repository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/scolarites3')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class Scolarites3Controller extends AbstractController
 {
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
     #[Route(name: 'app_scolarites3_index', methods: ['GET'])]
     public function index(Scolarites3Repository $scolarites3Repository): Response
     {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
         return $this->render('scolarites3/index.html.twig', [
             'scolarites3s' => $scolarites3Repository->findAll(),
         ]);
@@ -71,7 +88,7 @@ final class Scolarites3Controller extends AbstractController
     #[Route('/{id}', name: 'app_scolarites3_delete', methods: ['POST'])]
     public function delete(Request $request, Scolarites3 $scolarites3, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$scolarites3->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $scolarites3->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($scolarites3);
             $entityManager->flush();
         }

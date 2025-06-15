@@ -2,22 +2,33 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Regions;
 use App\Form\RegionsForm;
+use Psr\Log\LoggerInterface;
 use App\Repository\ElevesRepository;
 use App\Repository\ClassesRepository;
+use App\Repository\NiveauxRepository;
 use App\Repository\RegionsRepository;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/regions')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class RegionsController extends AbstractController
 {
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
     #[Route(name: 'app_regions_index', methods: ['GET'])]
     public function index(RegionsRepository $regionsRepository): Response
     {
@@ -46,7 +57,7 @@ final class RegionsController extends AbstractController
         ]);
     }
 
-            #[Route('/create/{label}', name: 'app_regions_create', methods: ['POST'])]
+    #[Route('/create/{label}', name: 'app_regions_create', methods: ['POST'])]
     public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
     {
         $region = new Regions();
@@ -66,7 +77,7 @@ final class RegionsController extends AbstractController
         $results = $em->getRepository(Regions::class)
             ->createQueryBuilder('n')
             ->where('n.designation LIKE :term')
-            ->setParameter('term', '%'.$term.'%')
+            ->setParameter('term', '%' . $term . '%')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
@@ -78,11 +89,31 @@ final class RegionsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_regions_show', methods: ['GET'])]
-    public function show(Regions $region, Request $request,ElevesRepository $elevesRepository,
-        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    public function show(
+        Regions $region,
+        Request $request,
+        ElevesRepository $elevesRepository,
+        NiveauxRepository $niveauxRepository,
+        StatutsRepository $statutsRepository,
+        ClassesRepository $classesRepository,
+        Security $security
     ): Response {
+
+        // Récupération correcte de l'utilisateur
+        $user = $security->getUser();
+
+        if ($user instanceof Users) {
+            $etablissements = $user->getEtablissement();
+        } else {
+            $etablissements = null;
+        }
+
+        // Redirection si aucun établissement n'est associé
+        if ($etablissements === null) {
+            return $this->redirectToRoute('app_cercles_index', ['id' => $region->getId()]);
+        }
+
         // Récupérer les paramètres de filtre
-        $etablissements = null;
         $fullname = $request->query->get('fullname');
         $classeId = $request->query->get('classe');
         $classeId = is_numeric($classeId) ? (int) $classeId : null;
@@ -90,14 +121,16 @@ final class RegionsController extends AbstractController
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
         // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndRegion($fullname,  $region,$etablissements,$classeId, $statutId,);
+        $eleves = $elevesRepository->findByFiltersAndRegion($fullname,  $region, $etablissements, $classeId, $statutId,);
+        $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
 
-        return $this->render('cercles/show.html.twig', [
+        return $this->render('regions/show.html.twig', [
             'region' => $region,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findAll(),
+            'classes'=> $classesRepository->findByEtablissement($etablissements),
             'statuts' => $statutsRepository->findAll(),
         ]);
+
     }
 
     #[Route('/{id}/edit', name: 'app_regions_edit', methods: ['GET', 'POST'])]
@@ -121,7 +154,7 @@ final class RegionsController extends AbstractController
     #[Route('/{id}', name: 'app_regions_delete', methods: ['POST'])]
     public function delete(Request $request, Regions $region, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$region->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $region->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($region);
             $entityManager->flush();
         }

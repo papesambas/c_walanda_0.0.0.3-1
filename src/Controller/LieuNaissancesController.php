@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
+use App\Entity\Communes;
+use Psr\Log\LoggerInterface;
 use App\Entity\LieuNaissances;
 use App\Form\LieuNaissancesForm;
 use App\Repository\ElevesRepository;
@@ -9,21 +12,39 @@ use App\Repository\ClassesRepository;
 use App\Repository\StatutsRepository;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\LieuNaissancesRepository;
+use App\Repository\NiveauxRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/lieu/naissances')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class LieuNaissancesController extends AbstractController
 {
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
     #[Route(name: 'app_lieu_naissances_index', methods: ['GET'])]
     public function index(LieuNaissancesRepository $lieuNaissancesRepository): Response
     {
         return $this->render('lieu_naissances/index.html.twig', [
             'lieu_naissances' => $lieuNaissancesRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/commune/{id}', name: 'app_lieu_naissances_communes_index', methods: ['GET'])]
+    public function indexlieuByCommune(Communes $commune, LieuNaissancesRepository $lieuNaissancesRepository): Response
+    {
+        return $this->render('lieu_naissances/index.html.twig', [
+            'lieu_naissances' => $lieuNaissancesRepository->findByCommune($commune->getId()),
+            'commune' => $commune
         ]);
     }
 
@@ -47,7 +68,7 @@ final class LieuNaissancesController extends AbstractController
         ]);
     }
 
-            #[Route('/create', name: 'app_lieu_naissances_create', methods: ['POST'])]
+    #[Route('/create', name: 'app_lieu_naissances_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, CommunesRepository $communesRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -99,25 +120,49 @@ final class LieuNaissancesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_lieu_naissances_show', methods: ['GET'])]
-    public function show(LieuNaissances $lieuNaissance, Request $request,ElevesRepository $elevesRepository,
-        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    public function show(
+        LieuNaissances $lieuNaissance,
+        Request $request,
+        ElevesRepository $elevesRepository,
+        //NiveauxRepository $niveauxRepository,
+        StatutsRepository $statutsRepository,
+        ClassesRepository $classesRepository
     ): Response {
+        // Récupération correcte de l'utilisateur
+        $user = $this->security->getUser();
+
+        if ($user instanceof Users) {
+            $etablissements = $user->getEtablissement();
+        } else {
+            $etablissements = null;
+        }
+
+        // Redirection si aucun établissement n'est associé
+        if ($etablissements === null) {
+            $this->addFlash(
+                'warning',
+                'Votre compte utilisateur n\'est pas associé à un établissement. 
+         Vous ne pouvez pas accéder aux données des élèves.'
+            );
+            return $this->redirectToRoute('app_home');
+        }
+
         // Récupérer les paramètres de filtre
-        $etablissements = null;
         $fullname = $request->query->get('fullname');
         $classeId = $request->query->get('classe');
         $classeId = is_numeric($classeId) ? (int) $classeId : null;
         $statutId = $request->query->get('statut');
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
-        // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndLieuNaissance($fullname,  $lieuNaissance,$etablissements,$classeId, $statutId,);
+        // Appliquer les filtres (virgule en trop supprimée)
+        $eleves = $elevesRepository->findByFiltersAndLieuNaissance($fullname, $lieuNaissance, $etablissements, $classeId, $statutId);
         $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
-        
+
         return $this->render('lieu_naissances/show.html.twig', [
             'lieu_naissance' => $lieuNaissance,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findByEleveIds($eleveIds),
+            //'classes' => $classesRepository->findByEleveIds($eleveIds),
+            'classes'=> $classesRepository->findByEtablissement($etablissements),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }
@@ -143,7 +188,7 @@ final class LieuNaissancesController extends AbstractController
     #[Route('/{id}', name: 'app_lieu_naissances_delete', methods: ['POST'])]
     public function delete(Request $request, LieuNaissances $lieuNaissance, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$lieuNaissance->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $lieuNaissance->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($lieuNaissance);
             $entityManager->flush();
         }

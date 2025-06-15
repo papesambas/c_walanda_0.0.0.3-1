@@ -2,30 +2,47 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Cercles;
 use App\Entity\Communes;
 use App\Form\CommunesForm;
+use Psr\Log\LoggerInterface;
 use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
 use App\Repository\ClassesRepository;
 use App\Repository\StatutsRepository;
 use App\Repository\CommunesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/communes')]
-
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class CommunesController extends AbstractController
 {
-    #[Route('',name: 'app_communes_index', methods: ['GET'])]
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
+    #[Route('', name: 'app_communes_index', methods: ['GET'])]
     public function index(CommunesRepository $communesRepository): Response
     {
         return $this->render('communes/index.html.twig', [
             'communes' => $communesRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/cercle/{id}', name: 'app_communes_cercle_index', methods: ['GET'])]
+    public function indexCommuneByCercle(Cercles $cercle, CommunesRepository $communesRepository): Response
+    {
+        return $this->render('communes/index.html.twig', [
+            'communes' => $communesRepository->findBy(['cercle' => $cercle], ['designation' => 'ASC']),
         ]);
     }
 
@@ -49,7 +66,7 @@ final class CommunesController extends AbstractController
         ]);
     }
 
-        #[Route('/create', name: 'app_communes_create', methods: ['POST'])]
+    #[Route('/create', name: 'app_communes_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, CerclesRepository $cerclesRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -101,24 +118,44 @@ final class CommunesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_communes_show', methods: ['GET'])]
-    public function show(Communes $commune, Request $request,ElevesRepository $elevesRepository,
-        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    public function show(
+        Communes $commune,
+        Request $request,
+        ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,
+        StatutsRepository $statutsRepository,
+        Security $security
     ): Response {
+
+        // Récupération correcte de l'utilisateur
+        $user = $security->getUser();
+
+        if ($user instanceof Users) {
+            $etablissements = $user->getEtablissement();
+        } else {
+            $etablissements = null;
+        }
+
+        // Redirection si aucun établissement n'est associé
+        if ($etablissements === null) {
+            return $this->redirectToRoute('app_lieu_naissances_communes_index', ['id' => $commune->getId()]);
+        }
+
         // Récupérer les paramètres de filtre
-        $etablissements = null;
         $fullname = $request->query->get('fullname');
         $classeId = $request->query->get('classe');
         $classeId = is_numeric($classeId) ? (int) $classeId : null;
         $statutId = $request->query->get('statut');
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
-        // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndCommune($fullname,  $commune,$etablissements,$classeId, $statutId,);
+        // Appliquer les filtres (virgule en trop supprimée)
+        $eleves = $elevesRepository->findByFiltersAndCommune($fullname, $commune, $etablissements, $classeId, $statutId);
         $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
+
         return $this->render('communes/show.html.twig', [
             'commune' => $commune,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findByEleveIds($eleveIds),
+            'classes'=> $classesRepository->findByEtablissement($etablissements),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }

@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/professions')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class ProfessionsController extends AbstractController
 {
     #[Route(name: 'app_professions_index', methods: ['GET'])]

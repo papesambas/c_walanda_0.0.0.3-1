@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
+use Psr\Log\LoggerInterface;
 use App\Entity\Etablissements;
 use App\Form\EtablissementsForm;
 use App\Repository\ElevesRepository;
@@ -9,19 +11,34 @@ use App\Repository\ClassesRepository;
 use App\Repository\NiveauxRepository;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Repository\EtablissementsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/etablissements')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class EtablissementsController extends AbstractController
 {
-    #[Route('/',name: 'app_etablissements_index', methods: ['GET'])]
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
+    #[Route('/', name: 'app_etablissements_index', methods: ['GET'])]
     public function index(EtablissementsRepository $etablissementsRepository): Response
     {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
         return $this->render('etablissements/index.html.twig', [
             'etablissements' => $etablissementsRepository->findAll(),
         ]);
@@ -47,7 +64,7 @@ final class EtablissementsController extends AbstractController
         ]);
     }
 
-            #[Route('/create/{label}', name: 'app_etablissements_create', methods: ['POST'])]
+    #[Route('/create/{label}', name: 'app_etablissements_create', methods: ['POST'])]
     public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
     {
         $etablissement = new Etablissements();
@@ -67,7 +84,7 @@ final class EtablissementsController extends AbstractController
         $results = $em->getRepository(Etablissements::class)
             ->createQueryBuilder('e')
             ->where('e.designation LIKE :term')
-            ->setParameter('term', '%'.$term.'%')
+            ->setParameter('term', '%' . $term . '%')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();
@@ -80,9 +97,12 @@ final class EtablissementsController extends AbstractController
 
     #[Route('/{id}', name: 'app_etablissements_show', methods: ['GET'])]
     public function show(
-        Etablissements $etablissement,Request $request,ClassesRepository $classesRepository,
-     EtablissementsRepository $etablissementsRepository, NiveauxRepository $niveauxRepository): Response
-    {
+        Etablissements $etablissement,
+        Request $request,
+        ClassesRepository $classesRepository,
+        EtablissementsRepository $etablissementsRepository,
+        NiveauxRepository $niveauxRepository
+    ): Response {
         $designation = $request->query->get('designation');
         $etablissementId = $request->query->get('etablissement');
         $niveauId = $request->query->get('niveau');
@@ -90,7 +110,7 @@ final class EtablissementsController extends AbstractController
 
         $classes = $classesRepository->findByFiltersAndEtablissement($designation, $etablissement, $niveauId, $taux);
         // Récupération des listes pour les filtres
-        $etablissements = $etablissementsRepository->findOneBy(['id'=>$etablissement->getId()]);
+        $etablissements = $etablissementsRepository->findOneBy(['id' => $etablissement->getId()]);
         $niveaux = $niveauxRepository->findAll();
 
         return $this->render('etablissements/show.html.twig', [

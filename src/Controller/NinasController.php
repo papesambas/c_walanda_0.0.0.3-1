@@ -11,8 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/ninas')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class NinasController extends AbstractController
 {
     #[Route(name: 'app_ninas_index', methods: ['GET'])]

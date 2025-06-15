@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tomselect-telephone2').forEach(initTelephone2Select);
     document.querySelectorAll('.tomselect-nina').forEach(initNinaSelect);
 
+    document.querySelectorAll('.tomselect-scolarite1').forEach(initScolarite1Select);
+    document.querySelectorAll('.tomselect-scolarite2').forEach(initScolarite2Select);
+
+
+
+
 });
 
 function initRegionSelect(selectElement) {
@@ -1267,7 +1273,7 @@ function initScolarite2Select(scolarite2Select) {
         load(query, callback) {
             const niveauId = niveauSelect?.value;
             const scolarite1Id = scolarite1Select?.value; // Récupération du parent
-            
+
             // Vérification des deux dépendances
             if (!niveauId || !scolarite1Id) {
                 this.clearOptions();
@@ -1276,7 +1282,7 @@ function initScolarite2Select(scolarite2Select) {
 
             // Modification de l'URL avec les deux paramètres
             const url = `/scolarites2/search?term=${encodeURIComponent(query)}&niveau_id=${niveauId}&scolarite1_id=${scolarite1Id}`;
-            
+
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(res => res.ok ? res.json() : [])
                 .then(callback)
@@ -1309,23 +1315,23 @@ function initScolarite2Select(scolarite2Select) {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ 
-                    designation: cleanedInput, 
+                body: JSON.stringify({
+                    designation: cleanedInput,
                     niveau_id: niveauId,
                     scolarite1_id: scolarite1Id // Ajout du parent
                 })
             })
-            .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
-            .then(data => {
-                callback({ id: data.id, text: data.text });
-                this.wrapper.classList.remove('invalid');
-                clearError(this.control);
-            })
-            .catch(err => {
-                console.error(err);
-                this.wrapper.classList.add('invalid');
-                showError(this.control, "Échec de création: " + err);
-            });
+                .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
+                .then(data => {
+                    callback({ id: data.id, text: data.text });
+                    this.wrapper.classList.remove('invalid');
+                    clearError(this.control);
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.wrapper.classList.add('invalid');
+                    showError(this.control, "Échec de création: " + err);
+                });
         },
 
         onInitialize() {

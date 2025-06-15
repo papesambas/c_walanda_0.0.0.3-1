@@ -16,22 +16,32 @@ class LieuNaissancesRepository extends ServiceEntityRepository
         parent::__construct($registry, LieuNaissances::class);
     }
 
-    public function findByCommuneAndDesignation(int $communeId, ?string $term = null): array
-{
-    $qb = $this->createQueryBuilder('c')
-        ->where('c.commune = :communeId')
-        ->setParameter('communeId', $communeId);
-
-    if ($term) {
-        $qb->andWhere('c.designation LIKE :term')
-            ->setParameter('term', '%' . $term . '%');
+    public function findByCommune(int $communeId): array
+    {
+        return $this->createQueryBuilder('l')
+            ->where('l.commune = :communeId')
+            ->setParameter('communeId', $communeId)
+            ->orderBy('l.designation', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
-    return $qb->orderBy('c.designation', 'ASC')
-        ->setMaxResults(10)
-        ->getQuery()
-        ->getResult();
-}
+    public function findByCommuneAndDesignation(int $communeId, ?string $term = null): array
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->where('l.commune = :communeId')
+            ->setParameter('communeId', $communeId);
+
+        if ($term) {
+            $qb->andWhere('l.designation LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        return $qb->orderBy('l.designation', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return LieuNaissances[] Returns an array of LieuNaissances objects

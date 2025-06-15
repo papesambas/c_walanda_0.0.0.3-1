@@ -113,7 +113,7 @@
 {% block body %}
 <div class="header-section text-center">
     <h1 class="display-5 fw-bold"><i class="bi bi-people me-2"></i>Gestion des Classes</h1>
-    <p class="lead">Liste complète des classes enregistrées dans le système</p>
+    <p class="lead">Liste complète des classes de " {{etablissement}} " enregistrées dans le système</p>
     <a href="{{ path('app_classes_new') }}" class="btn btn-light btn-lg mt-3">
         <i class="bi bi-plus-circle me-2"></i>Ajouter une Classe
     </a>
@@ -183,11 +183,10 @@
                 <!-- Formulaire de recherche combinée -->
                 <form method="get" class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
                     <div class="filter-group">
-                        <input type="text" name="designation" class="form-control heigt" style="height: 40px;"
+                        <input type="text" name="designation" class="form-control heigt" style="height: 40px; width: 300px;"
                                placeholder="Désignation" value="{{ app.request.query.get('designation') }}">
                     </div>
-                    
-                    <div class="filter-group">
+                    {#<div class="filter-group">
                         <select name="etablissement" class="form-select ">
                             <option value="">Tous établissements</option>
                             {% for etab in etablissements %}
@@ -196,8 +195,8 @@
                                 </option>
                             {% endfor %}
                         </select>
-                    </div>
-                    
+                    </div>#}
+                                            
                     <div class="filter-group">
                         <select name="niveau" class="form-select">
                             <option value="">Tous niveaux</option>

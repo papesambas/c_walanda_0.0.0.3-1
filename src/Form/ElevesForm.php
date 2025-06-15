@@ -4,21 +4,21 @@ namespace App\Form;
 
 use App\Entity\Noms;
 use App\Entity\Users;
+use App\Entity\Cycles;
 use App\Entity\Eleves;
 use App\Entity\Cercles;
 use App\Entity\Classes;
-use App\Entity\Communes;
-use App\Entity\Cycles;
-use App\Entity\Enseignements;
 use App\Entity\Niveaux;
 use App\Entity\Parents;
 use App\Entity\Prenoms;
 use App\Entity\Regions;
-use App\Entity\Etablissements;
-use App\Entity\LieuNaissances;
+use App\Entity\Communes;
 use App\Entity\Scolarites1;
 use App\Entity\Scolarites2;
 use App\Entity\Scolarites3;
+use App\Entity\Enseignements;
+use App\Entity\Etablissements;
+use App\Entity\LieuNaissances;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,12 +26,14 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 class ElevesForm extends AbstractType
 {
@@ -125,14 +127,24 @@ class ElevesForm extends AbstractType
             ])
             ->add('dateNaissance', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date de naissance',
                 'attr' => [
-                    'class' => 'form-control flatpickr-input',
-                    'data-date-format' => 'd/m/Y',
-                    'data-alt-input' => 'true'
+                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder' => 'JJ/MM/AAAA',
+                    'max' => (new \DateTime('-3 years'))->format('Y-m-d'), // Format attendu par HTML
+                ],
+                'label_attr' => ['class' => 'block mb-2 text-sm font-medium text-gray-700'],
+                'constraints' => [
+                    new NotBlank(['message' => 'La date de naissance est obligatoire.']),
+                    new LessThanOrEqual([
+                        'value' => 'today',
+                        'message' => 'La date de naissance ne peut pas être future.'
+                    ]),
+                    new LessThan([
+                        'value' => '-3 years',
+                        'message' => 'L\'élève doit avoir au moins 3 ans.'
+                    ]),
                 ],
             ])
-
             ->add('region', EntityType::class, [
                 'class' => Regions::class,
                 'choice_label' => 'designation',
@@ -193,7 +205,6 @@ class ElevesForm extends AbstractType
                 'error_bubbling' => false,
                 'mapped' => false,
             ])
-
             ->add('lieuNaissance', EntityType::class, [
                 'class' => LieuNaissances::class,
                 'placeholder' => 'Sélectionnez ou Choisir un Lieu de naissance',
@@ -230,11 +241,19 @@ class ElevesForm extends AbstractType
             ])
             ->add('dateActe', null, [
                 'widget' => 'single_text',
-                'label' => "Date de l'acte",
+                'label' => 'Date de l\'acte',
                 'attr' => [
-                    'class' => 'form-control flatpickr-input',
-                    'data-date-format' => 'd/m/Y',
-                    'data-alt-input' => 'true'
+                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500',
+                    'placeholder' => 'JJ/MM/AAAA',
+                    'max' => (new \DateTime())->format('Y-m-d'), // Format attendu par HTML
+                ],
+                'label_attr' => ['class' => 'block mb-2 text-sm font-medium text-gray-700'],
+                'constraints' => [
+                    new NotBlank(['message' => 'La date de l\'acte est obligatoire.']),
+                    new LessThanOrEqual([
+                        'value' => 'today',
+                        'message' => 'La date de l\'acte ne peut pas être postérieure à aujourd\'hui.'
+                    ]),
                 ],
             ])
             ->add('numeroActe', TextType::class, [

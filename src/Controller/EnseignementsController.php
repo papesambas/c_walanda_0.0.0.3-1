@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
+use Psr\Log\LoggerInterface;
 use App\Entity\Enseignements;
 use App\Form\EnseignementsForm;
 use App\Repository\ElevesRepository;
@@ -9,15 +11,23 @@ use App\Repository\NiveauxRepository;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\EnseignementsRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/enseignements')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class EnseignementsController extends AbstractController
 {
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
     #[Route(name: 'app_enseignements_index', methods: ['GET'])]
     public function index(EnseignementsRepository $enseignementsRepository): Response
     {
@@ -77,7 +87,6 @@ final class EnseignementsController extends AbstractController
         ], $results));
     }
 
-
     #[Route('/{id}', name: 'app_enseignements_show', methods: ['GET'])]
     public function show(
         Enseignements $enseignement,
@@ -86,21 +95,32 @@ final class EnseignementsController extends AbstractController
         NiveauxRepository $niveauxRepository,
         StatutsRepository $statutsRepository
     ): Response {
+        // Récupération correcte de l'utilisateur
+        $user = $this->security->getUser();
+
+        if ($user instanceof Users) {
+            $etablissements = $user->getEtablissement();
+        } else {
+            $etablissements = null;
+        }
+
+        // Redirection avec message si aucun établissement n'est associé
+        if ($etablissements === null) {
+            $this->addFlash('error', 'Vous n\'avez pas les autorisations nécessaires pour accéder à cette page.');
+            return $this->redirectToRoute('app_cycles_enseignement_index', ['id' => $enseignement->getId()]);
+        }
+
         // Récupérer les paramètres de filtre
-        $etablissements = null;
         $fullname = $request->query->get('fullname');
-        $classeId = $request->query->get('classe');
-        $classeId = is_numeric($classeId) ? (int) $classeId : null;
         $niveauId = $request->query->get('niveau');
         $niveauId = is_numeric($niveauId) ? (int) $niveauId : null;
-
         $statutId = $request->query->get('statut');
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
         // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndEnseignement($fullname, $enseignement, $etablissements, $niveauId, $statutId,);
-
+        $eleves = $elevesRepository->findByFiltersAndEnseignement($fullname, $enseignement, $etablissements, $niveauId, $statutId);
         return $this->render('enseignements/show.html.twig', [
+            'enseignement' => $enseignement, // Ajouté pour avoir le contexte dans le template
             'eleves' => $eleves,
             'niveaux' => $niveauxRepository->findAll(),
             'statuts' => $statutsRepository->findAll(),

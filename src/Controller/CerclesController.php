@@ -2,25 +2,36 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Cercles;
 use App\Entity\Regions;
 use App\Form\CerclesForm;
+use Psr\Log\LoggerInterface;
 use App\Repository\ElevesRepository;
 use App\Repository\CerclesRepository;
 use App\Repository\ClassesRepository;
 use App\Repository\RegionsRepository;
 use App\Repository\StatutsRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/cercles')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class CerclesController extends AbstractController
 {
-    #[Route('',name: 'app_cercles_index', methods: ['GET'])]
+    public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+    }
+
+    #[Route('', name: 'app_cercles_index', methods: ['GET'])]
     public function index(CerclesRepository $cerclesRepository): Response
     {
         return $this->render('cercles/index.html.twig', [
@@ -48,7 +59,7 @@ final class CerclesController extends AbstractController
         ]);
     }
 
-        #[Route('/create', name: 'app_cercles_create', methods: ['POST'])]
+    #[Route('/create', name: 'app_cercles_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, RegionsRepository $regionsRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -98,13 +109,35 @@ final class CerclesController extends AbstractController
 
         return new JsonResponse($results);
     }
+    #[Route('/region/{id}', name: 'app_cercle_region_index', methods: ['GET'])]
+    public function indexCommuneByCercle(Regions $region, CerclesRepository $cerclesRepository): Response
+    {
+        return $this->render('cercles/index.html.twig', [
+            'cercles' => $cerclesRepository->findBy(['region' => $region], ['designation' => 'ASC']),
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_cercles_show', methods: ['GET'])]
-    public function show(Cercles $cercle, Request $request,ElevesRepository $elevesRepository,
-        ClassesRepository $classesRepository,StatutsRepository $statutsRepository
+    public function show(
+        Cercles $cercle,
+        Request $request,
+        ElevesRepository $elevesRepository,
+        ClassesRepository $classesRepository,
+        StatutsRepository $statutsRepository
     ): Response {
         // Récupérer les paramètres de filtre
-        $etablissements = null;
+        $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissements = $user->getEtablissement();
+        } else {
+            $etablissements = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
+        // Redirection si aucun établissement n'est associé
+        if ($etablissements === null) {
+            return $this->redirectToRoute('app_communes_cercle_index', ['id' => $cercle->getId()]);
+        }
+
         $fullname = $request->query->get('fullname');
         $classeId = $request->query->get('classe');
         $classeId = is_numeric($classeId) ? (int) $classeId : null;
@@ -112,13 +145,13 @@ final class CerclesController extends AbstractController
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
         // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndCercle($fullname,  $cercle,$etablissements,$classeId, $statutId,);
+        $eleves = $elevesRepository->findByFiltersAndCercle($fullname,  $cercle, $etablissements, $classeId, $statutId,);
         $eleveIds = array_map(fn($eleve) => $eleve->getId(), $eleves);
 
         return $this->render('cercles/show.html.twig', [
             'cercle' => $cercle,
             'eleves' => $eleves,
-            'classes' => $classesRepository->findByEleveIds($eleveIds),
+            'classes'=> $classesRepository->findByEtablissement($etablissements),
             'statuts' => $statutsRepository->findAll(),
         ]);
     }
@@ -151,5 +184,4 @@ final class CerclesController extends AbstractController
 
         return $this->redirectToRoute('app_cercles_index', [], Response::HTTP_SEE_OTHER);
     }
-
 }

@@ -20,8 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/classes')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class ClassesController extends AbstractController
 {
 
@@ -45,18 +47,19 @@ final class ClassesController extends AbstractController
         }
 
         $designation = $request->query->get('designation');
-        $etablissementId = $request->query->get('etablissement');
         $niveauId = $request->query->get('niveau');
         $taux = $request->query->get('taux');
 
-        $classes = $classesRepository->findByFilters($designation, $etablissementId, $niveauId, $taux);
+        
+        $classes = $classesRepository->findByFilters($designation, $etablissement, $niveauId, $taux);
         // Récupération des listes pour les filtres
-        $etablissements = $etablissementsRepository->findAll();
+        $etablissements = $etablissement;
         $niveaux = $niveauxRepository->findAll();
 
         return $this->render('classes/index.html.twig', [
+            'etablissement' => $etablissement,
             'classes' => $classes,
-            'etablissements' => $etablissements,
+            //'etablissements' => $etablissements,
             'niveaux' => $niveaux,
         ]);
     }
@@ -154,7 +157,6 @@ final class ClassesController extends AbstractController
         }
 
         // Récupérer les paramètres de filtre
-        $etablissements = null;
         $fullname = $request->query->get('fullname');
         $classeId = $request->query->get('classe');
         $classeId = is_numeric($classeId) ? (int) $classeId : null;
@@ -163,8 +165,9 @@ final class ClassesController extends AbstractController
         $statutId = is_numeric($statutId) ? (int) $statutId : null;
 
         // Appliquer les filtres
-        $eleves = $elevesRepository->findByFiltersAndClasse($fullname, $classe,  $etablissements, $niveauId, $statutId,);
+        $eleves = $elevesRepository->findByFiltersAndClasse($fullname, $classe,  $etablissement, $niveauId, $statutId,);
         return $this->render('classes/show.html.twig', [
+            'etablissement' => $etablissement,
             'classe' => $classe,
             'eleves' => $eleves,
             'statuts' => $statutsRepository->findAll(),

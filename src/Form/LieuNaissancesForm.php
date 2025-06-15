@@ -30,7 +30,7 @@ class LieuNaissancesForm extends AbstractType
                 'label' => 'lieu de naissance',
                 'attr' => [
                     'placeholder' => 'Entrez la designation du lieu de naissance',
-                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 tomselect-lieu-naissance',
+                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500',
                     'minlength' => 2,
                     'maxlength' => 255,
                 ],

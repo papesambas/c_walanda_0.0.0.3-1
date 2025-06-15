@@ -193,10 +193,10 @@
                     </div>
 
                     <div class="filter-group">
-                        <select name="classe" class="form-select">
+                        <select name="niveau" class="form-select">
                             <option value="">Tous les niveaux</option>
                             {% for niveau in niveaux %}
-                            <option value="{{ niveau.id }}" {{ app.request.query.get('classe')==niveau.id ? 'selected'
+                            <option value="{{ niveau.id }}" {{ app.request.query.get('niveau')==niveau.id ? 'selected'
                                 : '' }}>
                                 {{ niveau.designation }}
                             </option>

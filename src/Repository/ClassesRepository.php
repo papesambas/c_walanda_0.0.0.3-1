@@ -45,8 +45,13 @@ class ClassesRepository extends ServiceEntityRepository
     // src/Repository/ClasseRepository.php
     public function findByFilters($designation, $etablissement, $niveau, $taux)
     {
-        $qb = $this->createQueryBuilder('c')
-            ->select('c', '(c.effectif * 100.0) / NULLIF(c.capacite, 0) AS taux_remplissage');
+        $qb = $this->createQueryBuilder('c');
+
+        // Calcul du taux de remplissage conditionnel
+        $hasTauxFilter = $taux !== null;
+        if ($hasTauxFilter) {
+            $qb->addSelect('(c.effectif * 100.0) / NULLIF(c.capacite, 0) AS taux_remplissage');
+        }
 
         if ($designation) {
             $qb->andWhere('c.designation LIKE :designation')
@@ -63,7 +68,7 @@ class ClassesRepository extends ServiceEntityRepository
                 ->setParameter('niveau', $niveau);
         }
 
-        if ($taux) {
+        if ($hasTauxFilter) {
             switch ($taux) {
                 case 'low':
                     $qb->andHaving('taux_remplissage < 50');
@@ -77,10 +82,11 @@ class ClassesRepository extends ServiceEntityRepository
             }
         }
 
-        return $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
+
+        // Retourne uniquement les entités Classes si un filtre de taux est appliqué
+        return $hasTauxFilter ? array_map(fn($row) => $row[0], $result) : $result;
     }
-
-
 
     public function findByFiltersAndEtablissement($designation, ?Etablissements $etablissement, $niveau, $taux)
     {
@@ -133,6 +139,17 @@ class ClassesRepository extends ServiceEntityRepository
             ->orderBy('c.id', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findByEtablissement(Etablissements $etablissement): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.etablissement = :etablissement')
+            ->setParameter('etablissement', $etablissement)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
     //    /**

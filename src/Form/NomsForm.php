@@ -22,7 +22,7 @@ class NomsForm extends AbstractType
                 'label' => 'Nom',
                 'attr' => [
                     'placeholder' => 'Entrez le nom',
-                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 tomselect-nom',
+                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500',
                     'minlength' => 2,
                     'maxlength' => 255,
                 ],

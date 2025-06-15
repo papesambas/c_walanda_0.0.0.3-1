@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Cycles;
+use App\Entity\Enseignements;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,6 +17,32 @@ class CyclesRepository extends ServiceEntityRepository
         parent::__construct($registry, Cycles::class);
     }
 
+    public function findForAll(?Enseignements $enseignements): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        if ($enseignements) {
+            $qb->andWhere(':enseignements MEMBER OF c.enseignement')
+                ->setParameter('enseignements', $enseignements);
+        }
+
+        return $qb->orderBy('c.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    // CyclesRepository.php
+public function findByEnseignementOrdered(Enseignements $enseignement): array
+{
+    return $this->createQueryBuilder('c')
+        ->innerJoin('c.enseignement', 'e')
+        ->where('e = :enseignement')
+        ->setParameter('enseignement', $enseignement)
+        ->orderBy('c.designation', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
     public function findByEnseignementAndDesignation(int $enseignementId, ?string $term = null): array
     {
         $qb = $this->createQueryBuilder('c')

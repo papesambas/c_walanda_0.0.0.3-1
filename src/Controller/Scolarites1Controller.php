@@ -14,11 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/scolarites1')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class Scolarites1Controller extends AbstractController
 {
-        public function __construct(private Security $security, private LoggerInterface $logger)
+    public function __construct(private Security $security, private LoggerInterface $logger)
     {
         $this->security = $security;
     }
@@ -26,6 +28,13 @@ final class Scolarites1Controller extends AbstractController
     #[Route(name: 'app_scolarites1_index', methods: ['GET'])]
     public function index(Scolarites1Repository $scolarites1Repository): Response
     {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
         return $this->render('scolarites1/index.html.twig', [
             'scolarites1s' => $scolarites1Repository->findAll(),
         ]);
@@ -104,6 +113,13 @@ final class Scolarites1Controller extends AbstractController
     #[Route('/{id}', name: 'app_scolarites1_show', methods: ['GET'])]
     public function show(Scolarites1 $scolarites1): Response
     {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
         return $this->render('scolarites1/show.html.twig', [
             'scolarites1' => $scolarites1,
         ]);
@@ -112,6 +128,13 @@ final class Scolarites1Controller extends AbstractController
     #[Route('/{id}/edit', name: 'app_scolarites1_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Scolarites1 $scolarites1, EntityManagerInterface $entityManager): Response
     {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
         $form = $this->createForm(Scolarites1Form::class, $scolarites1);
         $form->handleRequest($request);
 
@@ -130,7 +153,14 @@ final class Scolarites1Controller extends AbstractController
     #[Route('/{id}', name: 'app_scolarites1_delete', methods: ['POST'])]
     public function delete(Request $request, Scolarites1 $scolarites1, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$scolarites1->getId(), $request->getPayload()->getString('_token'))) {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $scolarites1->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($scolarites1);
             $entityManager->flush();
         }

@@ -12,8 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/telephones2')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 final class Telephones2Controller extends AbstractController
 {
     #[Route(name: 'app_telephones2_index', methods: ['GET'])]

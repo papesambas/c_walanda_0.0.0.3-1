@@ -16,22 +16,32 @@ class CommunesRepository extends ServiceEntityRepository
         parent::__construct($registry, Communes::class);
     }
 
-    public function findByCercleAndDesignation(int $cercleId, ?string $term = null): array
-{
-    $qb = $this->createQueryBuilder('c')
-        ->where('c.cercle = :cercleId')
-        ->setParameter('cercleId', $cercleId);
-
-    if ($term) {
-        $qb->andWhere('c.designation LIKE :term')
-            ->setParameter('term', '%' . $term . '%');
+    public function findByCercle(int $cercleId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.cercle = :cercleId')
+            ->setParameter('cercleId', $cercleId)
+            ->orderBy('c.designation', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
-    return $qb->orderBy('c.designation', 'ASC')
-        ->setMaxResults(10)
-        ->getQuery()
-        ->getResult();
-}
+    public function findByCercleAndDesignation(int $cercleId, ?string $term = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.cercle = :cercleId')
+            ->setParameter('cercleId', $cercleId);
+
+        if ($term) {
+            $qb->andWhere('c.designation LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        return $qb->orderBy('c.designation', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
 
 
     //    /**

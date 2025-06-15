@@ -23,7 +23,7 @@ class StatutsForm extends AbstractType
                 'label' => 'Statut',
                 'attr' => [
                     'placeholder' => 'Entrez la désignation',
-                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 tomselect-statut',
+                    'class' => 'w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500',
                     'minlength' => 2,
                     'maxlength' => 255,
                 ],

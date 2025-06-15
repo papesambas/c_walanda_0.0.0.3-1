@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Cercles;
 use App\Entity\Classes;
 use App\Entity\Communes;
+use App\Entity\Cycles;
 use App\Entity\Eleves;
 use App\Entity\Enseignements;
 use App\Entity\Etablissements;
@@ -53,7 +54,7 @@ class ElevesRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findByFiltersAndLieuNaissance(?string $fullname, ?LieuNaissances $lieuNaissances, ?Etablissements $etablissements, ?int $classeId, ?int $statutId): array
+    public function findByFiltersAndLieuNaissance(?string $fullname, ?LieuNaissances $lieuNaissances, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
     {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.classe', 'c')
@@ -75,9 +76,11 @@ class ElevesRepository extends ServiceEntityRepository
                 ->setParameter('fullname', '%' . $fullname . '%');
         }
 
-        if ($classeId) {
-            $qb->andWhere('c.id = :classeId')
-                ->setParameter('classeId', $classeId);
+        if ($niveauId) {
+            $qb
+                ->leftJoin('c.niveau', 'n')
+                ->andWhere('n.id = :niveauId')
+                ->setParameter('niveauId', $niveauId);
         }
 
         if ($statutId) {
@@ -189,7 +192,8 @@ class ElevesRepository extends ServiceEntityRepository
 
         if ($niveauId) {
             $qb->leftJoin('e.classe', 'cl')
-                ->andWhere('cl.id = :niveauId')
+                ->leftJoin('cl.niveau', 'n')
+                ->andWhere('n.id = :niveauId')
                 ->setParameter('niveauId', $niveauId);
         }
 
@@ -284,7 +288,44 @@ class ElevesRepository extends ServiceEntityRepository
 
         if ($niveauId) {
             $qb->leftJoin('e.classe', 'cl')
-                ->andWhere('cl.id = :niveauId')
+                ->andWhere('cl.niveau = :niveauId')
+                ->setParameter('niveauId', $niveauId);
+        }
+
+        if ($statutId) {
+            $qb->andWhere('s.id = :statutId')
+                ->setParameter('statutId', $statutId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByFiltersAndCycle(?string $fullname, Cycles $cycles, ?Etablissements $etablissements, ?int $niveauId, ?int $statutId): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.classe', 'c')
+            ->leftJoin('e.statut', 's');
+
+        if ($etablissements) {
+            $qb->andWhere('e.etablissement = :etablissement')
+                ->setParameter('etablissement', $etablissements);
+        }
+
+        if ($cycles) {
+            $qb->leftJoin('c.niveau', 'n')
+                ->leftJoin('n.cycle', 'cy')
+                ->andWhere('cy.id = :cycleId') // Filtre sur l'ID du cycle
+                ->setParameter('cycleId', $cycles->getId());
+        }
+
+        if ($fullname) {
+            $qb->andWhere('e.fullname LIKE :fullname')
+                ->setParameter('fullname', '%' . $fullname . '%');
+        }
+
+        if ($niveauId) {
+            $qb->leftJoin('e.classe', 'cl')
+                ->andWhere('cl.niveau = :niveauId')
                 ->setParameter('niveauId', $niveauId);
         }
 
