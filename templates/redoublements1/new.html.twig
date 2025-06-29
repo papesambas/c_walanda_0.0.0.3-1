@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Redoublements1{% endblock %}
+
+{% block body %}
+    <h1>Create new Redoublements1</h1>
+
+    {{ include('redoublements1/_form.html.twig') }}
+
+    <a href="{{ path('app_redoublements1_index') }}">back to list</a>
+{% endblock %}

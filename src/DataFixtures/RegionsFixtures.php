@@ -3,10 +3,11 @@
 namespace App\DataFixtures;
 
 use App\Entity\Regions;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
-class RegionsFixtures extends Fixture
+class RegionsFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -43,5 +44,10 @@ class RegionsFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+        public function getDependencies(): array
+    {
+        return [Scolarites2Fixtures::class];
     }
 }

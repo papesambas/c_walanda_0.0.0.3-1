@@ -120,7 +120,6 @@ final class Scolarites2Controller extends AbstractController
         }
 
         $scolarites2 = $scolarites2Repository->findByNiveauAndScolarite($niveauId, $scolarite1Id, $term);
-
         $results = array_map(function ($scolarite2) {
             return [
                 'id' => $scolarite2->getId(),

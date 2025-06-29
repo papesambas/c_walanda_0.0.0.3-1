@@ -33,8 +33,6 @@ class EnseignementCycleAssociationFixtures extends Fixture implements DependentF
             'Préscolaire',
             '1er Cycle',
             '2ème Cycle',
-            'Cycle Secondaire',
-            'Technique',
         ];
         
         foreach ($cyclesNames as $name) {

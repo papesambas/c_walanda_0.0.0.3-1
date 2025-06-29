@@ -41,7 +41,7 @@ class EtablissementsForm extends AbstractType
                         'maxMessage' => 'La désignation ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^[\p{L}\d\s\-,']+$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
                         'message' => 'Caractères autorisés : lettres, chiffres, espaces, tirets, virgules et apostrophes.',
                     ]),
                 ],

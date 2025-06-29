@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redoublements1{% endblock %}
+
+{% block body %}
+    <h1>Redoublements1</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ redoublements1.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ redoublements1.designation }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ redoublements1.createdAt ? redoublements1.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ redoublements1.updatedAt ? redoublements1.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ redoublements1.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_redoublements1_index') }}">back to list</a>
+
+    <a href="{{ path('app_redoublements1_edit', {'id': redoublements1.id}) }}">edit</a>
+
+    {{ include('redoublements1/_delete_form.html.twig') }}
+{% endblock %}

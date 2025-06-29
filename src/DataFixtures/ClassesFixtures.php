@@ -20,8 +20,6 @@ class ClassesFixtures extends Fixture implements DependentFixtureInterface
             'Préscolaire' => ['Maternelle', 'Petite Section', 'Moyenne Section', 'Grande Section'],
             '1er Cycle' => ['1ère Année', '2ème Année', '3ème Année', '4ème Année', '5ème Année', '6ème Année'],
             '2ème Cycle' => ['7ème Année', '8ème Année', '9ème Année'],
-            'Cycle Secondaire' => ['10ème Année', '11ème Année', '12ème Année'],
-            'Technique' => ['1ère Année Technique', '2ème Année Technique', '3ème Année Technique', '4ème Année Technique'],
         ];
 
         $etablissements = ['MAMADOU TRAORE ANNEXE CLASSIQUE 1', 'MAMADOU TRAORE ANNEXE CLASSIQUE 2'];

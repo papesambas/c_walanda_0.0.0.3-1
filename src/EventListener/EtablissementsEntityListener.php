@@ -84,7 +84,7 @@ class EtablissementsEntityListener
                 ->setEmail($username . '@' . $etablissement->getSlug() . '.com')
                 ->setRoles($config[3])
                 ->setEtablissement($etablissement)
-                ->setSlug($this->slugger->slug($username)->toString(). '-' . $etablissement->getId())
+                ->setSlug($this->slugger->slug($username)->toString() . '-' . $etablissement->getId())
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setIsActif(true);
 
@@ -97,7 +97,7 @@ class EtablissementsEntityListener
         }
     }
 
-        public function postFlush(PostFlushEventArgs $args): void
+    public function postFlush(PostFlushEventArgs $args): void
     {
         if (empty($this->newUsers)) {
             return;

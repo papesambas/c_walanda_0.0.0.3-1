@@ -9,6 +9,9 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Cycle</th>
+                <th>Niveau</th>
+                <th>Scolarite 1</th>
                 <th>Scolarite</th>
                 <th>CreatedAt</th>
                 <th>UpdatedAt</th>
@@ -20,6 +23,9 @@
         {% for scolarites2 in scolarites2s %}
             <tr>
                 <td>{{ scolarites2.id }}</td>
+                <td>{{ scolarites2.niveau.cycle }}</td>
+                <td>{{ scolarites2.niveau }}</td>
+                <td>{{ scolarites2.scolarite1 }}</td>
                 <td>{{ scolarites2.scolarite }}</td>
                 <td>{{ scolarites2.createdAt ? scolarites2.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ scolarites2.updatedAt ? scolarites2.updatedAt|date('Y-m-d H:i:s') : '' }}</td>

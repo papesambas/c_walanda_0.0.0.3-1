@@ -3,13 +3,13 @@
 namespace App\EventListener;
 
 use LogicException;
-use App\Entity\Scolarites3;
+use App\Entity\Redoublements1;
 use Symfony\Bundle\SecurityBundle\Security;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class Scolarites3EntityListener
+class Redoublements1EntityListener
 {
     private $security;
     private $slugger;
@@ -22,54 +22,54 @@ class Scolarites3EntityListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function prePersist(Scolarites3 $scolarite3, LifecycleEventArgs $arg): void
+    public function prePersist(Redoublements1 $redoublement1, LifecycleEventArgs $arg): void
     {
         $token = $this->tokenStorage->getToken();
         $user = $token ? $token->getUser() : null;
 
-        $scolarite3->setCreatedAt(new \DateTimeImmutable('now'))
-            ->setSlug($this->getScolarite3Slug($scolarite3));
+        $redoublement1->setCreatedAt(new \DateTimeImmutable('now'))
+            ->setSlug($this->getRedoublement1Slug($redoublement1));
 
         if ($user) {
-            $scolarite3->setCreatedBy($user);
+            $redoublement1->setCreatedBy($user);
         }
     }
 
-    public function preUpdate(Scolarites3 $scolarite3, LifecycleEventArgs $arg): void
+    public function preUpdate(Redoublements1 $redoublement1, LifecycleEventArgs $arg): void
     {
         $token = $this->tokenStorage->getToken();
         $user = $token ? $token->getUser() : null;
 
-        $scolarite3->setUpdatedAt(new \DateTimeImmutable('now'))
-            ->setSlug($this->getScolarite3Slug($scolarite3));
+        $redoublement1->setUpdatedAt(new \DateTimeImmutable('now'))
+            ->setSlug($this->getRedoublement1Slug($redoublement1));
 
         if ($user) {
-            $scolarite3->setUpdatedBy($user);
+            $redoublement1->setUpdatedBy($user);
         }
     }
 
-        public function postPersist(Scolarites3 $scolarite3, LifecycleEventArgs $args): void
+        public function postPersist(Redoublements1 $redoublement1, LifecycleEventArgs $args): void
     {
         // Exécuté après l'enregistrement
     }
 
-    public function postUpdate(Scolarites3 $scolarite3, LifecycleEventArgs $args): void
+    public function postUpdate(Redoublements1 $redoublement1, LifecycleEventArgs $args): void
     {
         // Exécuté après la mise à jour
     }
-    public function postRemove(Scolarites3 $scolarite3, LifecycleEventArgs $args): void
+    public function postRemove(Redoublements1 $redoublement1, LifecycleEventArgs $args): void
     {
         // Exécuté après la suppression
     }
-    public function preRemove(Scolarites3 $scolarite3, LifecycleEventArgs $args): void
+    public function preRemove(Redoublements1 $redoublement1, LifecycleEventArgs $args): void
     {
         // Exécuté avant la suppression
     }
     
 
-    private function getScolarite3Slug(Scolarites3 $scolarite3): string
+    private function getRedoublement1Slug(Redoublements1 $redoublement1): string
     {
-        $slug = mb_strtolower($scolarite3->getScolarite() . '' . $scolarite3->getId() , 'UTF-8');
+        $slug = mb_strtolower($redoublement1->getDesignation() . '' . $redoublement1->getId() , 'UTF-8');
         return $this->slugger->slug($slug)->toString();
     }
 

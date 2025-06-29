@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redoublements1 index{% endblock %}
+
+{% block body %}
+    <h1>Redoublements1 index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cycle</th>
+                <th>Niveau</th>
+                <th>Scolarité 1</th>
+                <th>Scolarité 2</th>
+                <th>Designation</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for redoublements1 in redoublements1s %}
+            <tr>
+                <td>{{ redoublements1.id }}</td>
+                <td>{{ redoublements1.cycle }}</td>
+                <td>{{ redoublements1.niveau }}</td>
+                <td>{{ redoublements1.scolarite1 }}</td>
+                <td>{{ redoublements1.scolarite2 }}</td>
+                <td>{{ redoublements1.designation }}</td>
+                <td>{{ redoublements1.createdAt ? redoublements1.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ redoublements1.updatedAt ? redoublements1.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ redoublements1.slug }}</td>
+                <td>
+                    <a href="{{ path('app_redoublements1_show', {'id': redoublements1.id}) }}">show</a>
+                    <a href="{{ path('app_redoublements1_edit', {'id': redoublements1.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_redoublements1_new') }}">Create new</a>
+{% endblock %}

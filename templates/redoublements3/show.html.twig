@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redoublements3{% endblock %}
+
+{% block body %}
+    <h1>Redoublements3</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ redoublements3.id }}</td>
+            </tr>
+            <tr>
+                <th>Designation</th>
+                <td>{{ redoublements3.designation }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_redoublements3_index') }}">back to list</a>
+
+    <a href="{{ path('app_redoublements3_edit', {'id': redoublements3.id}) }}">edit</a>
+
+    {{ include('redoublements3/_delete_form.html.twig') }}
+{% endblock %}

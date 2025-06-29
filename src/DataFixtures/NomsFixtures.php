@@ -3,10 +3,11 @@
 namespace App\DataFixtures;
 
 use App\Entity\Noms;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
-class NomsFixtures extends Fixture
+class NomsFixtures extends Fixture implements DependentFixtureInterface
 {
     private const NOMS = [
         'Traoré','Coulibaly','Diabaté','Konaté','Cissé','Camara','Sow','Ba','Barry','Keita',
@@ -78,5 +79,10 @@ class NomsFixtures extends Fixture
             }
         }
         return $out;
+    }
+
+        public function getDependencies(): array
+    {
+        return [RegionsFixtures::class];
     }
 }

@@ -37,7 +37,7 @@ class StatutsForm extends AbstractType
                     ]),
                     new Regex(
                         [
-                            'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                            'pattern' => "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
                             'message' => 'la désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                         ]
                     ),

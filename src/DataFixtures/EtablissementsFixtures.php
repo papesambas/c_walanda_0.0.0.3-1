@@ -118,6 +118,6 @@ private function generateDecisionNumber(): string
 }
     public function getDependencies(): array
     {
-        return [EnseignementsFixtures::class];
+        return [Scolarites2Fixtures::class];
     }
 }

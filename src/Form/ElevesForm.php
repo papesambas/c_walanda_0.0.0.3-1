@@ -15,7 +15,6 @@ use App\Entity\Regions;
 use App\Entity\Communes;
 use App\Entity\Scolarites1;
 use App\Entity\Scolarites2;
-use App\Entity\Scolarites3;
 use App\Entity\Enseignements;
 use App\Entity\Etablissements;
 use App\Entity\LieuNaissances;
@@ -23,6 +22,7 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -37,8 +37,17 @@ use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 class ElevesForm extends AbstractType
 {
+    public function __construct(private Security $security) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+            $enseignement = $etablissement->getEnseignement();
+        } else {
+            $etablissements = null;
+        }
+
         $builder
             ->add('nom', EntityType::class, [
                 'label' => 'Nom',
@@ -232,7 +241,7 @@ class ElevesForm extends AbstractType
                         'maxMessage' => 'Le lieu de naissance ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                         'message' => 'Le lieu de naissance doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                     ]),
                 ],
@@ -274,7 +283,7 @@ class ElevesForm extends AbstractType
                     ]),
                     new Regex(
                         [
-                            'pattern' => '/^[a-zA-Z0-9\s\-]+$/',
+                            'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                             'message' => 'Le numéro fiscal ne doit contenir que des lettres, des chiffres, des espaces et des tirets.',
                         ]
                     ),
@@ -305,10 +314,16 @@ class ElevesForm extends AbstractType
                 'class' => Enseignements::class,
                 'placeholder' => 'Sélectionnez ou Choisir un enseignement',
                 'choice_label' => 'designation',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('e')
-                        ->orderBy('e.id', 'ASC');
+                'query_builder' => function (EntityRepository $er) use ($etablissement) {
+                    $qb = $er->createQueryBuilder('e')
+                        ->orderBy('e.designation', 'ASC');
+                    if ($etablissement && $etablissement->getEnseignement()) {
+                        $qb->andWhere('e.id = :enseignementId')
+                            ->setParameter('enseignementId', $etablissement->getEnseignement()->getId());
+                    }
+                    return $qb;
                 },
+                'data' => $enseignement,
                 'attr' => [
                     'class' => 'form-control tomselect-enseignement',
                     //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
@@ -328,7 +343,7 @@ class ElevesForm extends AbstractType
                         'maxMessage' => 'Enseignement ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                         'message' => 'Le niveau doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                     ]),
                 ],
@@ -363,7 +378,7 @@ class ElevesForm extends AbstractType
                         'maxMessage' => 'Le cycle ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                         'message' => 'Le niveau doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                     ]),
                 ],
@@ -398,7 +413,7 @@ class ElevesForm extends AbstractType
                         'maxMessage' => 'Le niveau ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                         'message' => 'Le niveau doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                     ]),
                 ],
@@ -432,7 +447,7 @@ class ElevesForm extends AbstractType
                         'maxMessage' => 'La classe ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
                         'message' => 'La classe doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                     ]),
                 ],
@@ -460,8 +475,8 @@ class ElevesForm extends AbstractType
                         'message' => 'La scolarité ne peut pas être vide.',
                     ]),
                     new Length([
-                        'min' => 2,
-                        'max' => 60,
+                        'min' => 1,
+                        'max' => 2,
                         'minMessage' => 'La scolarité doit comporter au moins {{ limit }} caractères.',
                         'maxMessage' => 'La scolarité ne peut pas dépasser {{ limit }} caractères.',
                     ]),
@@ -494,42 +509,8 @@ class ElevesForm extends AbstractType
                         'message' => 'La scolarité ne peut pas être vide.',
                     ]),
                     new Length([
-                        'min' => 2,
-                        'max' => 60,
-                        'minMessage' => 'La scolarité doit comporter au moins {{ limit }} caractères.',
-                        'maxMessage' => 'La scolarité ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
-                    new Regex([
-                        'pattern' => "/^\d+$/",
-                        'message' => 'La scolarité doit contenir uniquement des chiffres.',
-                    ]),
-                ],
-                'required' => false,
-                'error_bubbling' => false,
-            ])
-            ->add('scolarite3', EntityType::class, [
-                'class' => Scolarites3::class,
-                'placeholder' => 'Sélectionnez ou Choisir une scolarité',
-                'choice_label' => 'scolarite',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('s')
-                        ->orderBy('s.scolarite', 'ASC');
-                },
-                'attr' => [
-                    'class' => 'form-control tomselect-scolarite3',
-                    //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
-                    //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
-                    'data-search-url' => '/scolarites3/search',
-                    'data-create-url' => '/scolarites3/create',
-                    'tabindex' => '3',    // 2ème champ focus
-                ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'La scolarité ne peut pas être vide.',
-                    ]),
-                    new Length([
-                        'min' => 2,
-                        'max' => 60,
+                        'min' => 1,
+                        'max' => 2,
                         'minMessage' => 'La scolarité doit comporter au moins {{ limit }} caractères.',
                         'maxMessage' => 'La scolarité ne peut pas dépasser {{ limit }} caractères.',
                     ]),

@@ -30,7 +30,7 @@ class Cycles
         maxMessage: 'La désignation ne peut pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        pattern: "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
         message: 'La désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.'
     )]
 
@@ -65,10 +65,31 @@ class Cycles
     #[ORM\OneToMany(targetEntity: Niveaux::class, mappedBy: 'cycle')]
     private Collection $niveauxes;
 
+    /**
+     * @var Collection<int, Redoublements1>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements1::class, mappedBy: 'cycle')]
+    private Collection $redoublements1s;
+
+    /**
+     * @var Collection<int, Redoublements2>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements2::class, mappedBy: 'cycle')]
+    private Collection $redoublements2s;
+
+    /**
+     * @var Collection<int, Redoublements3>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements3::class, mappedBy: 'cycle')]
+    private Collection $redoublements3s;
+
     public function __construct()
     {
         $this->enseignement = new ArrayCollection();
         $this->niveauxes = new ArrayCollection();
+        $this->redoublements1s = new ArrayCollection();
+        $this->redoublements2s = new ArrayCollection();
+        $this->redoublements3s = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -168,6 +189,96 @@ class Cycles
             // set the owning side to null (unless already changed)
             if ($niveaux->getCycle() === $this) {
                 $niveaux->setCycle(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements1>
+     */
+    public function getRedoublements1s(): Collection
+    {
+        return $this->redoublements1s;
+    }
+
+    public function addRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if (!$this->redoublements1s->contains($redoublements1)) {
+            $this->redoublements1s->add($redoublements1);
+            $redoublements1->setCycle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if ($this->redoublements1s->removeElement($redoublements1)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements1->getCycle() === $this) {
+                $redoublements1->setCycle(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements2>
+     */
+    public function getRedoublements2s(): Collection
+    {
+        return $this->redoublements2s;
+    }
+
+    public function addRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if (!$this->redoublements2s->contains($redoublements2)) {
+            $this->redoublements2s->add($redoublements2);
+            $redoublements2->setCycle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if ($this->redoublements2s->removeElement($redoublements2)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements2->getCycle() === $this) {
+                $redoublements2->setCycle(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements3>
+     */
+    public function getRedoublements3s(): Collection
+    {
+        return $this->redoublements3s;
+    }
+
+    public function addRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if (!$this->redoublements3s->contains($redoublements3)) {
+            $this->redoublements3s->add($redoublements3);
+            $redoublements3->setCycle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if ($this->redoublements3s->removeElement($redoublements3)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements3->getCycle() === $this) {
+                $redoublements3->setCycle(null);
             }
         }
 

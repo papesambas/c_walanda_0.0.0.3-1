@@ -144,14 +144,7 @@ class ElevesFixtures extends Fixture implements DependentFixtureInterface
             '6ème Année',
             '7ème Année',
             '8ème Année',
-            '9ème Année',
-            '10ème Année',
-            '11ème Année',
-            '12ème Année',
-            '1ère Année Technique',
-            '2ème Année Technique',
-            '3ème Année Technique',
-            '4ème Année Technique'
+            '9ème Année'
         ];
     }
 

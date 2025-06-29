@@ -87,9 +87,6 @@ class Eleves
     #[ORM\JoinColumn(nullable: true)]
     private ?Scolarites2 $scolarite2 = null;
 
-    #[ORM\ManyToOne(inversedBy: 'eleves')]
-    private ?Scolarites3 $Scolarite3 = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -346,18 +343,6 @@ class Eleves
     public function setScolarite2(?Scolarites2 $scolarite2): static
     {
         $this->scolarite2 = $scolarite2;
-
-        return $this;
-    }
-
-    public function getScolarite3(): ?Scolarites3
-    {
-        return $this->Scolarite3;
-    }
-
-    public function setScolarite3(?Scolarites3 $Scolarite3): static
-    {
-        $this->Scolarite3 = $Scolarite3;
 
         return $this;
     }

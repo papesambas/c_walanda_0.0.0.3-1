@@ -36,7 +36,7 @@ class RegionsForm extends AbstractType
                     ]),
                     new Regex(
                         [
-                            'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+                            'pattern' => "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
                             'message' => 'La designation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
                         ]
                     ),

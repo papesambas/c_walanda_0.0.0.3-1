@@ -34,7 +34,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tomselect-scolarite1').forEach(initScolarite1Select);
     document.querySelectorAll('.tomselect-scolarite2').forEach(initScolarite2Select);
 
-
+    // Écouteur pour les changements de date de naissance
+    document.querySelectorAll('input[name*="dateNaissance"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const form = this.closest('form');
+            const niveauSelect = form.querySelector('.tomselect-niveau');
+            if (niveauSelect && niveauSelect.tomselect) {
+                niveauSelect.tomselect.clear();
+                niveauSelect.tomselect.clearOptions();
+                
+                const cycleSelect = form.querySelector('.tomselect-cycle');
+                if (cycleSelect?.value) {
+                    niveauSelect.tomselect.load('', (options) => {
+                        niveauSelect.tomselect.addOptions(options);
+                        niveauSelect.tomselect.refreshOptions();
+                        
+                        if (options.length === 1) {
+                            niveauSelect.tomselect.setValue(options[0].id);
+                        }
+                    });
+                }
+            }
+        });
+    });
 
 
 });
@@ -42,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initRegionSelect(selectElement) {
     if (selectElement.tomselect) return;
 
-    const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
+    const nameRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -107,9 +129,9 @@ function initCercleSelect(cercleSelect) {
     if (cercleSelect.tomselect) return;
 
     const regionSelect = cercleSelect.closest('form')?.querySelector('.tomselect-region');
-    const cercleRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const cercleRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(cercleSelect, {
+    const tsInstance = new TomSelect(cercleSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -203,9 +225,9 @@ function initCommuneSelect(communeSelect) {
     if (communeSelect.tomselect) return;
 
     const cercleSelect = communeSelect.closest('form')?.querySelector('.tomselect-cercle');
-    const communeRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const communeRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(communeSelect, {
+    const tsInstance = new TomSelect(communeSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -299,9 +321,9 @@ function initLieuNaissanceSelect(LieuNaissanceSelect) {
     if (LieuNaissanceSelect.tomselect) return;
 
     const communeSelect = LieuNaissanceSelect.closest('form')?.querySelector('.tomselect-commune');
-    const lieuRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const lieuRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(LieuNaissanceSelect, {
+    const tsInstance = new TomSelect(LieuNaissanceSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -396,7 +418,7 @@ function initEnseignementSelect(selectElement) {
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -459,9 +481,9 @@ function initEtablissementSelect(etablissementSelect) {
     if (etablissementSelect.tomselect) return;
 
     const enseignementSelect = etablissementSelect.closest('form')?.querySelector('.tomselect-enseignement');
-    const etablissementRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const etablissementRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(etablissementSelect, {
+    const tsInstance = new TomSelect(etablissementSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -542,9 +564,9 @@ function initCycleSelect(cycleSelect) {
     if (cycleSelect.tomselect) return;
 
     const enseignementSelect = cycleSelect.closest('form')?.querySelector('.tomselect-enseignement');
-    const cycleRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const cycleRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(cycleSelect, {
+    const tsInstance = new TomSelect(cycleSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -625,9 +647,10 @@ function initNiveauSelect(niveauSelect) {
     if (niveauSelect.tomselect) return;
 
     const cycleSelect = niveauSelect.closest('form')?.querySelector('.tomselect-cycle');
-    const niveauRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const dateNaissanceInput = niveauSelect.closest('form')?.querySelector('[name*="dateNaissance"]');
+    const niveauRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(niveauSelect, {
+    const tsInstance = new TomSelect(niveauSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -642,13 +665,15 @@ function initNiveauSelect(niveauSelect) {
                 return callback([]);
             }
 
-            const url = `/niveaux/search?term=${encodeURIComponent(query)}&cycle_id=${encodeURIComponent(cycleId)}`;
+            // Ajout du paramètre date_naissance
+            const dateNaissance = dateNaissanceInput?.value;
+            const url = `/niveaux/search?term=${encodeURIComponent(query)}&cycle_id=${cycleId}&date_naissance=${dateNaissance || ''}`;
+
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(res => res.ok ? res.json() : [])
                 .then(callback)
                 .catch(() => callback([]));
         },
-
         create(input, callback) {
             const cleanedInput = String(input ?? '').trim();
             const cycleId = cycleSelect?.value;
@@ -702,15 +727,51 @@ function initNiveauSelect(niveauSelect) {
             });
         }
     });
+    // Écouteur pour la date de naissance
+    if (dateNaissanceInput) {
+        dateNaissanceInput.addEventListener('change', () => {
+            if (cycleSelect.value) {
+                tsInstance.clearOptions();
+                tsInstance.load('', (options) => {
+                    tsInstance.addOptions(options);
+                    tsInstance.refreshOptions();
+                    
+                    // Sélection automatique si une seule option
+                    if (options.length === 1) {
+                        tsInstance.setValue(options[0].id);
+                    }
+                });
+            }
+        });
+    }
+
+    // Même écouteur pour le cycle
+    if (cycleSelect) {
+        cycleSelect.addEventListener('change', () => {
+            tsInstance.clear();
+            tsInstance.clearOptions();
+            
+            if (cycleSelect.value && dateNaissanceInput?.value) {
+                tsInstance.load('', (options) => {
+                    tsInstance.addOptions(options);
+                    tsInstance.refreshOptions();
+                    
+                    if (options.length === 1) {
+                        tsInstance.setValue(options[0].id);
+                    }
+                });
+            }
+        });
+    }
 }
 
 function initClasseSelect(classeSelect) {
     if (classeSelect.tomselect) return;
 
     const niveauSelect = classeSelect.closest('form')?.querySelector('.tomselect-niveau');
-    const classeRegex = /^\p{L}+(?:[ \-']\p{L}+)*$/u;
+    const classeRegex = /^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u;
 
-    new TomSelect(classeSelect, {
+    const tsInstance = new TomSelect(classeSelect, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -792,7 +853,7 @@ function initNomSelect(selectElement) {
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -856,7 +917,7 @@ function initPrenomSelect(selectElement) {
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -920,7 +981,7 @@ function initProfessionSelect(selectElement) {
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -984,7 +1045,7 @@ function initTelephone1Select(selectElement) {
 
     const nameRegex = /^(?:(?:\+223|00223)[2567]\d{7}|(?:(?:\+(?!223)|00(?!223))\d{1,3}\d{6,12}))$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -1048,7 +1109,7 @@ function initTelephone2Select(selectElement) {
 
     const nameRegex = /^(?:(?:\+223|00223)[2567]\d{7}|(?:(?:\+(?!223)|00(?!223))\d{1,3}\d{6,12}))$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -1112,7 +1173,7 @@ function initNinaSelect(selectElement) {
 
     const nameRegex = /^[a-zA-ZÀ-ÿ\s\-']+$/;
 
-    new TomSelect(selectElement, {
+    const tsInstance = new TomSelect(selectElement, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -1177,7 +1238,7 @@ function initScolarite1Select(scolarite1Select) {
     const niveauSelect = scolarite1Select.closest('form')?.querySelector('.tomselect-niveau');
     const scolarite1Regex = /^\d+$/;
 
-    new TomSelect(scolarite1Select, {
+    const tsInstance = new TomSelect(scolarite1Select, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -1262,7 +1323,7 @@ function initScolarite2Select(scolarite2Select) {
     const scolarite1Select = form?.querySelector('.tomselect-scolarite1'); // Nouveau sélecteur parent
     const scolarite2Regex = /^\d+$/; // Adaptez la regex selon vos besoins
 
-    new TomSelect(scolarite2Select, {
+    const tsInstance = new TomSelect(scolarite2Select, {
         plugins: ['remove_button'],
         maxItems: 1,
         valueField: 'id',
@@ -1355,3 +1416,4 @@ function initScolarite2Select(scolarite2Select) {
         }
     });
 }
+

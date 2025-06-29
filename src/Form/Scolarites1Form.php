@@ -37,21 +37,6 @@ class Scolarites1Form extends AbstractType
                     'data-create-url' => '/niveaux/create',
                     'tabindex' => '3',    // 2ème champ focus
                 ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Le niveau ne peut pas être vide.',
-                    ]),
-                    new Length([
-                        'min' => 2,
-                        'max' => 60,
-                        'minMessage' => 'Le niveau doit comporter au moins {{ limit }} caractères.',
-                        'maxMessage' => 'Le niveau ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
-                    new Regex([
-                        'pattern' => "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
-                        'message' => 'Le niveau doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.',
-                    ]),
-                ],
                 'required' => false,
                 'error_bubbling' => false,
             ])

@@ -31,29 +31,18 @@ class Scolarites1Fixtures extends Fixture implements DependentFixtureInterface, 
                 'Grande Section'   => ['0'],
             ],
             '1er Cycle'       => [
-                '1ère Année'       => ['1', '2'],
-                '2ème Année'       => ['2', '3', '4'],
-                '3ème Année'       => ['3', '4', '5'],
-                '4ème Année'       => ['4', '5', '6'],
-                '5ème Année'       => ['5', '6', '7'],
-                '6ème Année'       => ['6', '7', '8'],
+                '1ère Année'       => ['1', '2', '3'],
+                '2ème Année'       => ['2', '3', '4', '5'],
+                '3ème Année'       => ['3', '4', '5', '6'],
+                '4ème Année'       => ['4', '5', '6', '7'],
+                '5ème Année'       => ['5', '6', '7', '8'],
+                '6ème Année'       => ['6', '7', '8', '9'],
             ],
             '2ème Cycle'      => [
                 '7ème Année'       => ['6', '7', '8'],
                 '8ème Année'       => ['6', '7', '8'],
                 '9ème Année'       => ['6', '7', '8'],
-            ],
-            'Cycle Secondaire' => [
-                '10ème Année'      => ['0', '6', '7', '8'],
-                '11ème Année'      => ['0', '6', '7', '8'],
-                '12ème Année'      => ['0', '6', '7', '8'],
-            ],
-            'Technique'       => [
-                '1ère Année Technique' => ['0', '6', '7', '8'],
-                '2ème Année Technique' => ['0', '6', '7', '8'],
-                '3ème Année Technique' => ['0', '6', '7', '8'],
-                '4ème Année Technique' => ['0', '6', '7', '8'],
-            ],
+            ]
         ];
 
         foreach ($data as $cycleName => $niveaux) {

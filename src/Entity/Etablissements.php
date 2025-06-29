@@ -32,7 +32,7 @@ class Etablissements
         maxMessage: 'La désignation ne doit pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9\s\-]+$/',
+        pattern: "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
         message: 'La désignation ne doit contenir que des lettres, des chiffres, des espaces et des tirets.'
     )]
     private ?string $designation = null;

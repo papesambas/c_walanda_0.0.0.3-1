@@ -33,7 +33,7 @@ class Cercles
         maxMessage: 'La désignation ne peut pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: "/^[a-zA-ZÀ-ÿ\s\-']+$/",
+        pattern: "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
         message: 'La désignation ne doit contenir que des lettres, des espaces, des apostrophes ou des tirets.'
     )]
     private ?string $designation = null;

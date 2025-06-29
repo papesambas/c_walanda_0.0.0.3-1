@@ -15,8 +15,6 @@ class CyclesFixtures extends Fixture implements DependentFixtureInterface
             'Préscolaire',
             '1er Cycle',
             '2ème Cycle',
-            'Cycle Secondaire',
-            'Technique',
         ];
 
         foreach ($cycles as $cycleName) {

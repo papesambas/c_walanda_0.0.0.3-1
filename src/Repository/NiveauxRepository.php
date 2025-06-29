@@ -65,6 +65,28 @@ class NiveauxRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+        public function findByCycleDesignationAndAge(int $cycleId, ?string $term = null, ?int $age = null): array
+    {
+        $qb = $this->createQueryBuilder('n')
+            ->andWhere('n.cycle = :cycleId')
+            ->setParameter('cycleId', $cycleId)
+            ->orderBy('n.designation', 'ASC');
+
+        if ($term) {
+            $qb->andWhere('n.designation LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        if ($age !== null) {
+            $qb->andWhere(':age BETWEEN n.ageMin AND n.ageMax')
+                ->setParameter('age', $age);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+
+
     //    /**
     //     * @return Niveaux[] Returns an array of Niveaux objects
     //     */

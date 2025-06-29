@@ -37,32 +37,17 @@ class CyclesForm extends AbstractType
                         'maxMessage' => 'La designation ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                     new Regex([
-                        'pattern' => "/^[\p{L}\d\s\-']+$/u",
+                        'pattern' => "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
                         'message' => 'Caractères autorisés : lettres, chiffres, espaces, tirets et apostrophes.',
                     ]),
                 ],
                 'error_bubbling' => false,
             ])
             ->add('effectif')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('slug')
             ->add('enseignement', EntityType::class, [
                 'class' => Enseignements::class,
                 'choice_label' => 'id',
                 'multiple' => true,
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
-            ->add('updatedBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
             ])
         ;
     }

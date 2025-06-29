@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Redoublements3{% endblock %}
+
+{% block body %}
+    <h1>Edit Redoublements3</h1>
+
+    {{ include('redoublements3/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_redoublements3_index') }}">back to list</a>
+
+    {{ include('redoublements3/_delete_form.html.twig') }}
+{% endblock %}

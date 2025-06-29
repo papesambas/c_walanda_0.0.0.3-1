@@ -15,6 +15,7 @@ use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\EntityTrackingTrait;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PeresRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -51,9 +52,29 @@ class Peres
     private ?Ninas $nina = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email(
+        message: "L'adresse email '{{ value }}' n'est pas valide.",
+        mode: 'strict'
+    )]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "L'adresse email ne peut excéder {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",
+        message: "Format d'email invalide. Utilisez le format : utilisateur@domaine.ext"
+    )]
+    #[Assert\Type(
+        type: 'string',
+        message: "L'email doit être une chaîne de caractères."
+    )]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max:255,
+        maxMessage:"le Nom complet ne peut excéder {{ limit }} caractères."
+    )]
     private ?string $fullname = null;
 
     /**
@@ -68,7 +89,7 @@ class Peres
     #[ORM\OneToMany(targetEntity: Users::class, mappedBy: 'pere')]
     private Collection $users;
 
-    #[ORM\ManyToOne(inversedBy: 'peres', cascade: ['persist'])] 
+    #[ORM\ManyToOne(inversedBy: 'peres', cascade: ['persist'])]
     private ?Telephones2 $telephone2 = null;
 
     public function __construct()

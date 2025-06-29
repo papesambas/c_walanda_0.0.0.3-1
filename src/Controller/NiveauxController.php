@@ -98,26 +98,39 @@ final class NiveauxController extends AbstractController
     #[Route('/search', name: 'api_niveaux_search', methods: ['GET'])]
     public function searchNiveaux(Request $request, NiveauxRepository $niveauxRepository): JsonResponse
     {
-        $user = $user = $this->security->getUser();
-        if ($user instanceof Users) {
-            $etablissement = $user->getEtablissement();
-        } else {
-            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
-        }
-
         $term = $request->query->get('term', '');
         $cycleId = $request->query->get('cycle_id');
+        $dateNaissance = $request->query->get('date_naissance'); // Nouveau paramètre
 
         if (!$cycleId) {
             return new JsonResponse([]);
         }
 
-        $niveaux = $niveauxRepository->findByCycleAndDesignation($cycleId, $term);
+        // Calculer l'âge si la date de naissance est fournie
+        $age = null;
+        if ($dateNaissance) {
+            try {
+                $birthDate = new \DateTime($dateNaissance);
+                $today = new \DateTime();
+                $interval = $today->diff($birthDate);
+                $age = $interval->y;
+            } catch (\Exception $e) {
+                // Gérer l'erreur si nécessaire
+            }
+        }
+
+        $niveaux = $niveauxRepository->findByCycleDesignationAndAge(
+            $cycleId,
+            $term,
+            $age
+        );
 
         $results = array_map(function ($niveau) {
             return [
                 'id' => $niveau->getId(),
-                'text' => $niveau->getDesignation()
+                'text' => $niveau->getDesignation(),
+                'age_min' => $niveau->getAgeMin(), // Optionnel
+                'age_max' => $niveau->getAgeMax()  // Optionnel
             ];
         }, $niveaux);
 

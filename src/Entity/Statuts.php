@@ -29,7 +29,7 @@ class Statuts
         maxMessage: 'La désignation ne peut pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        pattern: "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
         message: 'The designation must contain only letters, spaces, apostrophes or hyphens.'
     )]
     private ?string $designation = null;

@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\Scolarites3;
+use App\Entity\Redoublements2;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Scolarites3>
+ * @extends ServiceEntityRepository<Redoublements2>
  */
-class Scolarites3Repository extends ServiceEntityRepository
+class Redoublements2Repository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Scolarites3::class);
+        parent::__construct($registry, Redoublements2::class);
     }
 
     //    /**
-    //     * @return Scolarites3[] Returns an array of Scolarites3 objects
+    //     * @return Redoublements2[] Returns an array of Redoublements2 objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
+    //            ->orderBy('r.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Scolarites3
+    //    public function findOneBySomeField($value): ?Redoublements2
     //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

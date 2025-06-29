@@ -29,7 +29,7 @@ class Niveaux
         maxMessage: 'La désignation ne peut pas dépasser {{ limit }} caractères.'
     )]
     #[Assert\Regex(
-        pattern: "/^\p{L}+(?:[ \-']\p{L}+)*$/u",
+        pattern: "/^[\p{L}0-9]+(?:[ \-'][\p{L}0-9]+)*$/u",
         message: 'La désignation doit contenir uniquement des lettres, des espaces, des apostrophes ou des tirets.'
     )]
     #[Assert\NotNull(message: 'La désignation ne peut pas être nulle.')]
@@ -61,18 +61,38 @@ class Niveaux
     #[ORM\OneToMany(targetEntity: Scolarites2::class, mappedBy: 'niveau', orphanRemoval: true)]
     private Collection $scolarites2s;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $ageMin = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $ageMax = null;
+
     /**
-     * @var Collection<int, Scolarites3>
+     * @var Collection<int, Redoublements1>
      */
-    #[ORM\OneToMany(targetEntity: Scolarites3::class, mappedBy: 'niveau', orphanRemoval: true)]
-    private Collection $scolarites3s;
+    #[ORM\OneToMany(targetEntity: Redoublements1::class, mappedBy: 'niveau')]
+    private Collection $redoublements1s;
+
+    /**
+     * @var Collection<int, Redoublements2>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements2::class, mappedBy: 'niveau')]
+    private Collection $redoublements2s;
+
+    /**
+     * @var Collection<int, Redoublements3>
+     */
+    #[ORM\OneToMany(targetEntity: Redoublements3::class, mappedBy: 'niveau')]
+    private Collection $redoublements3s;
 
     public function __construct()
     {
         $this->classes = new ArrayCollection();
         $this->scolarites1s = new ArrayCollection();
         $this->scolarites2s = new ArrayCollection();
-        $this->scolarites3s = new ArrayCollection();
+        $this->redoublements1s = new ArrayCollection();
+        $this->redoublements2s = new ArrayCollection();
+        $this->redoublements3s = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -226,30 +246,114 @@ class Niveaux
         return $this;
     }
 
-    /**
-     * @return Collection<int, Scolarites3>
-     */
-    public function getScolarites3s(): Collection
+    public function getAgeMin(): ?int
     {
-        return $this->scolarites3s;
+        return $this->ageMin;
     }
 
-    public function addScolarites3(Scolarites3 $scolarites3): static
+    public function setAgeMin(?int $ageMin): static
     {
-        if (!$this->scolarites3s->contains($scolarites3)) {
-            $this->scolarites3s->add($scolarites3);
-            $scolarites3->setNiveau($this);
+        $this->ageMin = $ageMin;
+
+        return $this;
+    }
+
+    public function getAgeMax(): ?int
+    {
+        return $this->ageMax;
+    }
+
+    public function setAgeMax(?int $ageMax): static
+    {
+        $this->ageMax = $ageMax;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements1>
+     */
+    public function getRedoublements1s(): Collection
+    {
+        return $this->redoublements1s;
+    }
+
+    public function addRedoublements1(Redoublements1 $redoublements1): static
+    {
+        if (!$this->redoublements1s->contains($redoublements1)) {
+            $this->redoublements1s->add($redoublements1);
+            $redoublements1->setNiveau($this);
         }
 
         return $this;
     }
 
-    public function removeScolarites3(Scolarites3 $scolarites3): static
+    public function removeRedoublements1(Redoublements1 $redoublements1): static
     {
-        if ($this->scolarites3s->removeElement($scolarites3)) {
+        if ($this->redoublements1s->removeElement($redoublements1)) {
             // set the owning side to null (unless already changed)
-            if ($scolarites3->getNiveau() === $this) {
-                $scolarites3->setNiveau(null);
+            if ($redoublements1->getNiveau() === $this) {
+                $redoublements1->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements2>
+     */
+    public function getRedoublements2s(): Collection
+    {
+        return $this->redoublements2s;
+    }
+
+    public function addRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if (!$this->redoublements2s->contains($redoublements2)) {
+            $this->redoublements2s->add($redoublements2);
+            $redoublements2->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements2(Redoublements2 $redoublements2): static
+    {
+        if ($this->redoublements2s->removeElement($redoublements2)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements2->getNiveau() === $this) {
+                $redoublements2->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Redoublements3>
+     */
+    public function getRedoublements3s(): Collection
+    {
+        return $this->redoublements3s;
+    }
+
+    public function addRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if (!$this->redoublements3s->contains($redoublements3)) {
+            $this->redoublements3s->add($redoublements3);
+            $redoublements3->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRedoublements3(Redoublements3 $redoublements3): static
+    {
+        if ($this->redoublements3s->removeElement($redoublements3)) {
+            // set the owning side to null (unless already changed)
+            if ($redoublements3->getNiveau() === $this) {
+                $redoublements3->setNiveau(null);
             }
         }
 

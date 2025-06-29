@@ -12,6 +12,7 @@
         "doctrine/doctrine-bundle": "^2.14",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.3",
+        "egulias/email-validator": "^4.0",
         "fakerphp/faker": "^1.24",
         "friendsofsymfony/ckeditor-bundle": "^2.6",
         "helios-ag/fm-elfinder-bundle": "^12.7",
