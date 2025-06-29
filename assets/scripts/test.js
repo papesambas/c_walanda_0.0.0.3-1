@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.tomselect-scolarite1').forEach(initScolarite1Select);
     document.querySelectorAll('.tomselect-scolarite2').forEach(initScolarite2Select);
+    document.querySelectorAll('.tomselect-redoublement1').forEach(initRedoublement1Select);
+    document.querySelectorAll('.tomselect-redoublement2').forEach(initRedoublement2Select);
+    document.querySelectorAll('.tomselect-redoublement3').forEach(initRedoublement3Select);
 
     // Écouteur pour les changements de date de naissance
     document.querySelectorAll('input[name*="dateNaissance"]').forEach(input => {
@@ -1417,3 +1420,330 @@ function initScolarite2Select(scolarite2Select) {
     });
 }
 
+function initRedoublement1Select(redoublement1Select) {
+    if (redoublement1Select.tomselect) return;
+
+    const form = redoublement1Select.closest('form');
+    const niveauSelect = form?.querySelector('.tomselect-niveau');
+    const scolarite1Select = form?.querySelector('.tomselect-scolarite1'); // Nouveau sélecteur parent
+    const scolarite2Select = form?.querySelector('.tomselect-scolarite2'); // Nouveau sélecteur parent
+
+    const tsInstance = new TomSelect(redoublement1Select, {
+        plugins: ['remove_button'],
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'text',
+        searchField: 'text',
+        delimiter: ',',
+
+        load(query, callback) {
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id) {
+                this.clearOptions();
+                return callback([]);
+            }
+
+            // Modification de l'URL avec les deux paramètres
+            const url = `/redoublements1/search?term=${encodeURIComponent(query)}&niveau_id=${niveauId}&scolarite1_id=${scolarite1Id}&scolarite2_id=${scolarite2Id}`;
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.ok ? res.json() : [])
+                .then(callback)
+                .catch(() => callback([]));
+        },
+
+        create(input, callback) {
+            const cleanedInput = String(input ?? '').trim();
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+
+            // Validation des entrées
+            if (!cleanedInput) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Nom invalide");
+                return;
+            }
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Sélectionnez d'abord un niveau, une scolarité1 et une scolarité2");
+                return;
+            }
+
+            // Modification du payload avec les deux parents
+            fetch(`/redoublements1/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    designation: cleanedInput,
+                    niveau_id: niveauId,
+                    scolarite1_id: scolarite1Id,
+                    scolarite2_id: scolarite2Id
+                })
+            })
+                .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
+                .then(data => {
+                    callback({ id: data.id, text: data.text });
+                    this.wrapper.classList.remove('invalid');
+                    clearError(this.control);
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.wrapper.classList.add('invalid');
+                    showError(this.control, "Échec de création: " + err);
+                });
+        },
+
+        onInitialize() {
+            if (!niveauSelect || !scolarite1Select || !scolarite2Select) return;
+
+            // Gestion des changements sur les deux parents
+            const parentChangeHandler = () => {
+                this.clear();
+                this.clearOptions();
+
+                if (niveauSelect.value && scolarite1Select.value && scolarite2Select.value) {
+                    this.load('', (options) => {
+                        this.addOptions(options);
+                        this.refreshOptions();
+                    });
+                }
+            };
+
+            niveauSelect.addEventListener('change', parentChangeHandler);
+            scolarite1Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+            scolarite2Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+        }
+    });
+}
+
+function initRedoublement2Select(redoublement2Select) {
+    if (redoublement2Select.tomselect) return;
+
+    const form = redoublement2Select.closest('form');
+    const niveauSelect = form?.querySelector('.tomselect-niveau');
+    const scolarite1Select = form?.querySelector('.tomselect-scolarite1'); // Nouveau sélecteur parent
+    const scolarite2Select = form?.querySelector('.tomselect-scolarite2'); // Nouveau sélecteur parent
+    const redoublement1Select = form?.querySelector('.tomselect-redoublement1'); // Nouveau sélecteur parent
+
+    const tsInstance = new TomSelect(redoublement2Select, {
+        plugins: ['remove_button'],
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'text',
+        searchField: 'text',
+        delimiter: ',',
+
+        load(query, callback) {
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+            const redoublement1Id = redoublement1Select?.value; // Récupération du parent
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id || !redoublement1Id) {
+                this.clearOptions();
+                return callback([]);
+            }
+
+            // Modification de l'URL avec les deux paramètres
+            const url = `/redoublements2/search?term=${encodeURIComponent(query)}&niveau_id=${niveauId}&scolarite1_id=${scolarite1Id}&scolarite2_id=${scolarite2Id}&redoublement1_id=${redoublement1Id}`;
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.ok ? res.json() : [])
+                .then(callback)
+                .catch(() => callback([]));
+        },
+
+        create(input, callback) {
+            const cleanedInput = String(input ?? '').trim();
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+            const redoublement1Id = redoublement1Select?.value; // Récupération du parent
+
+            // Validation des entrées
+            if (!cleanedInput) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Nom invalide");
+                return;
+            }
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id || !redoublement1Id) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Sélectionnez d'abord un niveau, une scolarité1, une scolarité2 et un redoublement1");
+                return;
+            }
+
+            // Modification du payload avec les deux parents
+            fetch(`/redoublements2/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    designation: cleanedInput,
+                    niveau_id: niveauId,
+                    scolarite1_id: scolarite1Id,
+                    scolarite2_id: scolarite2Id,
+                    redoublement1_id: redoublement1Id
+                })
+            })
+                .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
+                .then(data => {
+                    callback({ id: data.id, text: data.text });
+                    this.wrapper.classList.remove('invalid');
+                    clearError(this.control);
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.wrapper.classList.add('invalid');
+                    showError(this.control, "Échec de création: " + err);
+                });
+        },
+
+        onInitialize() {
+            if (!niveauSelect || !scolarite1Select || !scolarite2Select || !redoublement1Select) return;
+
+            // Gestion des changements sur les deux parents
+            const parentChangeHandler = () => {
+                this.clear();
+                this.clearOptions();
+
+                if (niveauSelect.value && scolarite1Select.value && scolarite2Select.value && redoublement1Select.value) {
+                    this.load('', (options) => {
+                        this.addOptions(options);
+                        this.refreshOptions();
+                    });
+                }
+            };
+
+            niveauSelect.addEventListener('change', parentChangeHandler);
+            scolarite1Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+            scolarite2Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+            redoublement1Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+        }
+    });
+}
+
+function initRedoublement3Select(redoublement3Select) {
+    if (redoublement3Select.tomselect) return;
+
+    const form = redoublement3Select.closest('form');
+    const niveauSelect = form?.querySelector('.tomselect-niveau');
+    const scolarite1Select = form?.querySelector('.tomselect-scolarite1'); // Nouveau sélecteur parent
+    const scolarite2Select = form?.querySelector('.tomselect-scolarite2'); // Nouveau sélecteur parent
+    const redoublement2Select = form?.querySelector('.tomselect-redoublement2'); // Nouveau sélecteur parent
+
+    const tsInstance = new TomSelect(redoublement3Select, {
+        plugins: ['remove_button'],
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'text',
+        searchField: 'text',
+        delimiter: ',',
+
+        load(query, callback) {
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+            const redoublement2Id = redoublement2Select?.value; // Récupération du parent
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id || !redoublement2Id) {
+                this.clearOptions();
+                return callback([]);
+            }
+
+            // Modification de l'URL avec les deux paramètres
+            const url = `/redoublements3/search?term=${encodeURIComponent(query)}&niveau_id=${niveauId}&scolarite1_id=${scolarite1Id}&scolarite2_id=${scolarite2Id}&redoublement2_id=${redoublement2Id}`;
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.ok ? res.json() : [])
+                .then(callback)
+                .catch(() => callback([]));
+        },
+
+        create(input, callback) {
+            const cleanedInput = String(input ?? '').trim();
+            const niveauId = niveauSelect?.value;
+            const scolarite1Id = scolarite1Select?.value; // Récupération du parent
+            const scolarite2Id = scolarite2Select?.value; // Récupération du parent
+            const redoublement2Id = redoublement2Select?.value; // Récupération du parent
+
+            // Validation des entrées
+            if (!cleanedInput) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Nom invalide");
+                return;
+            }
+
+            // Vérification des deux dépendances
+            if (!niveauId || !scolarite1Id || !scolarite2Id || !redoublement2Id) {
+                this.wrapper.classList.add('invalid');
+                showError(this.control, "Sélectionnez d'abord un niveau, une scolarité1, une scolarité2 et un redoublement2");
+                return;
+            }
+
+            // Modification du payload avec les deux parents
+            fetch(`/redoublements3/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    designation: cleanedInput,
+                    niveau_id: niveauId,
+                    scolarite1_id: scolarite1Id,
+                    scolarite2_id: scolarite2Id,
+                    redoublement2_id: redoublement2Id
+                })
+            })
+                .then(res => res.ok ? res.json() : Promise.reject('Erreur réseau'))
+                .then(data => {
+                    callback({ id: data.id, text: data.text });
+                    this.wrapper.classList.remove('invalid');
+                    clearError(this.control);
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.wrapper.classList.add('invalid');
+                    showError(this.control, "Échec de création: " + err);
+                });
+        },
+
+        onInitialize() {
+            if (!niveauSelect || !scolarite1Select || !scolarite2Select || !redoublement2Select) return;
+
+            // Gestion des changements sur les deux parents
+            const parentChangeHandler = () => {
+                this.clear();
+                this.clearOptions();
+
+                if (niveauSelect.value && scolarite1Select.value && scolarite2Select.value && redoublement2Select.value) {
+                    this.load('', (options) => {
+                        this.addOptions(options);
+                        this.refreshOptions();
+                    });
+                }
+            };
+
+            niveauSelect.addEventListener('change', parentChangeHandler);
+            scolarite1Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+            scolarite2Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+            redoublement2Select.addEventListener('change', parentChangeHandler); // Nouvel écouteur
+        }
+    });
+}

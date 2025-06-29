@@ -2,18 +2,28 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
+use Psr\Log\LoggerInterface;
 use App\Entity\Redoublements1;
 use App\Form\Redoublements1Form;
-use App\Repository\Redoublements1Repository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use App\Repository\Redoublements1Repository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/redoublements1')]
 final class Redoublements1Controller extends AbstractController
 {
+        public function __construct(private Security $security, private LoggerInterface $logger)
+    {
+        $this->security = $security;
+        $this->logger = $logger;
+    }
+
     #[Route(name: 'app_redoublements1_index', methods: ['GET'])]
     public function index(Redoublements1Repository $redoublements1Repository): Response
     {
@@ -40,6 +50,37 @@ final class Redoublements1Controller extends AbstractController
             'redoublements1' => $redoublements1,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/search', name: 'api_redoublements1_search', methods: ['GET'])]
+    public function searchRedoublement1(Request $request, Redoublements1Repository $redoublements1Repository): JsonResponse
+    {
+        $user = $user = $this->security->getUser();
+        if ($user instanceof Users) {
+            $etablissement = $user->getEtablissement();
+        } else {
+            $etablissement = null; // ou gérer le cas où l'utilisateur n'est pas connecté
+        }
+
+        $term = $request->query->get('term', '');
+        $niveauId = $request->query->get('niveau_id');
+        $scolarite1Id = $request->query->get('scolarite1_id');
+        $scolarite2Id = $request->query->get('scolarite2_id');
+
+        if (!$niveauId) {
+            return new JsonResponse([]);
+        }
+
+        $redoublement1 = $redoublements1Repository->findByNiveauAndScolarite1AndScolarite2($niveauId, $scolarite1Id, $scolarite2Id);
+
+        $results = array_map(function ($redoublement1) {
+            return [
+                'id' => $redoublement1->getId(),
+                'text' => $redoublement1->getDesignation()
+            ];
+        }, $redoublement1);
+
+        return new JsonResponse($results);
     }
 
     #[Route('/{id}', name: 'app_redoublements1_show', methods: ['GET'])]

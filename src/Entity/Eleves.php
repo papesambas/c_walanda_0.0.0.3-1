@@ -2,14 +2,19 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use App\Entity\Trait\SlugTrait;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Repository\ElevesRepository;
 use App\Entity\Trait\EntityTrackingTrait;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ElevesRepository::class)]
+#[Vich\Uploadable]
 class Eleves
 {
     use CreatedAtTrait;
@@ -19,6 +24,13 @@ class Eleves
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    // NOTE: This is not a mapped field of entity metadata, just a simple property.
+    #[Vich\UploadableField(mapping: 'eleves_images', fileNameProperty: 'imageName')]
+    private ?File $imageFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $imageName = null;
 
     #[ORM\ManyToOne(inversedBy: 'eleves')]
     #[ORM\JoinColumn(nullable: false)]
@@ -86,6 +98,61 @@ class Eleves
     #[ORM\ManyToOne(inversedBy: 'eleves')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Scolarites2 $scolarite2 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Redoublements1 $redoublement1 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Redoublements2 $redoublement2 = null;
+
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Redoublements3 $redoublement3 = null;
+
+    /**
+     * @var Collection<int, DossierEleves>
+     */
+    #[ORM\OneToMany(targetEntity: DossierEleves::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $dossierEleves;
+
+    /**
+     * @var Collection<int, Departs>
+     */
+    #[ORM\OneToMany(targetEntity: Departs::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $departs;
+
+    /**
+     * @var Collection<int, Santes>
+     */
+    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $santes;
+
+    #[ORM\Column]
+    private ?bool $isHandicap = false;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $natureHandicap = null;
+
+    #[ORM\Column(length: 8)]
+    private ?string $statutFinance = "Privé";
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $dateInscription = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateRecrutement = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $matricule = null;
+
+    public function __construct()
+    {
+        $this->dossierEleves = new ArrayCollection();
+        $this->departs = new ArrayCollection();
+        $this->santes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -347,4 +414,236 @@ class Eleves
         return $this;
     }
 
+    public function getRedoublement1(): ?Redoublements1
+    {
+        return $this->redoublement1;
+    }
+
+    public function setRedoublement1(?Redoublements1 $redoublement1): static
+    {
+        $this->redoublement1 = $redoublement1;
+
+        return $this;
+    }
+
+    public function getRedoublement2(): ?Redoublements2
+    {
+        return $this->redoublement2;
+    }
+
+    public function setRedoublement2(?Redoublements2 $redoublement2): static
+    {
+        $this->redoublement2 = $redoublement2;
+
+        return $this;
+    }
+
+    public function getRedoublement3(): ?Redoublements3
+    {
+        return $this->redoublement3;
+    }
+
+    public function setRedoublement3(?Redoublements3 $redoublement3): static
+    {
+        $this->redoublement3 = $redoublement3;
+
+        return $this;
+    }
+
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $imageFile
+     */
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    /**
+     * @return Collection<int, DossierEleves>
+     */
+    public function getDossierEleves(): Collection
+    {
+        return $this->dossierEleves;
+    }
+
+    public function addDossierElefe(DossierEleves $dossierElefe): static
+    {
+        if (!$this->dossierEleves->contains($dossierElefe)) {
+            $this->dossierEleves->add($dossierElefe);
+            $dossierElefe->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDossierElefe(DossierEleves $dossierElefe): static
+    {
+        if ($this->dossierEleves->removeElement($dossierElefe)) {
+            // set the owning side to null (unless already changed)
+            if ($dossierElefe->getEleve() === $this) {
+                $dossierElefe->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Departs>
+     */
+    public function getDeparts(): Collection
+    {
+        return $this->departs;
+    }
+
+    public function addDepart(Departs $depart): static
+    {
+        if (!$this->departs->contains($depart)) {
+            $this->departs->add($depart);
+            $depart->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepart(Departs $depart): static
+    {
+        if ($this->departs->removeElement($depart)) {
+            // set the owning side to null (unless already changed)
+            if ($depart->getEleve() === $this) {
+                $depart->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Santes>
+     */
+    public function getSantes(): Collection
+    {
+        return $this->santes;
+    }
+
+    public function addSante(Santes $sante): static
+    {
+        if (!$this->santes->contains($sante)) {
+            $this->santes->add($sante);
+            $sante->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSante(Santes $sante): static
+    {
+        if ($this->santes->removeElement($sante)) {
+            // set the owning side to null (unless already changed)
+            if ($sante->getEleve() === $this) {
+                $sante->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isHandicap(): ?bool
+    {
+        return $this->isHandicap;
+    }
+
+    public function setIsHandicap(bool $isHandicap): static
+    {
+        $this->isHandicap = $isHandicap;
+
+        return $this;
+    }
+
+    public function getNatureHandicap(): ?string
+    {
+        return $this->natureHandicap;
+    }
+
+    public function setNatureHandicap(?string $natureHandicap): static
+    {
+        $this->natureHandicap = $natureHandicap;
+
+        return $this;
+    }
+
+    public function getStatutFinance(): ?string
+    {
+        return $this->statutFinance;
+    }
+
+    public function setStatutFinance(string $statutFinance): static
+    {
+        $this->statutFinance = $statutFinance;
+
+        return $this;
+    }
+
+    public function getDateInscription(): ?\DateTimeImmutable
+    {
+        return $this->dateInscription;
+    }
+
+    public function setDateInscription(?\DateTimeImmutable $dateInscription): static
+    {
+        $this->dateInscription = $dateInscription;
+
+        return $this;
+    }
+
+    public function getDateRecrutement(): ?\DateTimeImmutable
+    {
+        return $this->dateRecrutement;
+    }
+
+    public function setDateRecrutement(\DateTimeImmutable $dateRecrutement): static
+    {
+        $this->dateRecrutement = $dateRecrutement;
+
+        return $this;
+    }
+
+    public function getMatricule(): ?string
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(?string $matricule): static
+    {
+        $this->matricule = $matricule;
+
+        return $this;
+    }
 }

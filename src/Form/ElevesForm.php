@@ -18,11 +18,15 @@ use App\Entity\Scolarites2;
 use App\Entity\Enseignements;
 use App\Entity\Etablissements;
 use App\Entity\LieuNaissances;
+use App\Entity\Redoublements1;
+use App\Entity\Redoublements2;
+use App\Entity\Redoublements3;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\FormBuilderInterface;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -34,6 +38,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+
 
 class ElevesForm extends AbstractType
 {
@@ -49,6 +57,50 @@ class ElevesForm extends AbstractType
         }
 
         $builder
+            ->add('imageFile', VichImageType::class, [
+                'label' => "Photo d'identité",
+                //'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/jpg',
+                            'image/gif',
+                            'image/png',
+                        ]
+                    ])
+                ],
+                'allow_delete' => true,
+                'delete_label' => 'supprimer',
+                'download_uri' => true,
+                'download_label' => 'Télécharger',
+                'image_uri'         => false,
+                'asset_helper' => true,
+            ])
+            ->add('document', FileType::class, [
+                'label' => 'Télécharger Documents (Fichier PDF/Word)',
+                'mapped' => false,
+                'required' => false,
+                'multiple' => true,
+                'constraints' => [
+                    new All([
+                        'constraints' => [
+                            new File([
+                                'maxSize' => '2048k',
+                                'mimeTypes' => [
+                                    'application/pdf',
+                                    'application/x-pdf',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                ],
+                                'mimeTypesMessage' => 'Format valid valid PDF ou word',
+                            ])
+                        ]
+                    ]),
+                ]
+            ])
             ->add('nom', EntityType::class, [
                 'label' => 'Nom',
                 'class' => Noms::class,
@@ -168,7 +220,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_regions_create'),
                     'data-search-url' => '/regions/search',
                     'data-create-url' => '/regions/create',
-                    'tabindex' => '1',    // 1er champ focus
+                    'tabindex' => '3',    // 1er champ focus
                 ],
                 'required' => false,
                 'error_bubbling' => false,
@@ -188,7 +240,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_regions_create'),
                     'data-search-url' => '/cercles/search',
                     'data-create-url' => '/cercles/create',
-                    'tabindex' => '1',    // 1er champ focus
+                    'tabindex' => '4',    // 1er champ focus
                 ],
                 'required' => false,
                 'error_bubbling' => false,
@@ -208,7 +260,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_regions_create'),
                     'data-search-url' => '/communes/search',
                     'data-create-url' => '/communes/create',
-                    'tabindex' => '1',    // 1er champ focus
+                    'tabindex' => '5',    // 1er champ focus
                 ],
                 'required' => false,
                 'error_bubbling' => false,
@@ -228,7 +280,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/lieu/naissances/search',
                     'data-create-url' => '/lieu/naissances/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '6',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -330,7 +382,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/enseignements/search',
                     'data-create-url' => '/enseignements/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '8',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -365,7 +417,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/cycles/search',
                     'data-create-url' => '/cycles/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '9',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -400,7 +452,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/niveaux/search',
                     'data-create-url' => '/niveaux/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '10',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -434,7 +486,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/classes/search',
                     'data-create-url' => '/classes/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '11',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -468,7 +520,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/scolarites1/search',
                     'data-create-url' => '/scolarites1/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '12',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -502,7 +554,7 @@ class ElevesForm extends AbstractType
                     //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
                     'data-search-url' => '/scolarites2/search',
                     'data-create-url' => '/scolarites2/create',
-                    'tabindex' => '3',    // 2ème champ focus
+                    'tabindex' => '13',    // 2ème champ focus
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -520,6 +572,78 @@ class ElevesForm extends AbstractType
                     ]),
                 ],
                 'required' => false,
+                'error_bubbling' => false,
+            ])
+            ->add('redoublement1', EntityType::class, [
+                'class' => Redoublements1::class,
+                'placeholder' => 'Sélectionnez le redoublement',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('r1')
+                        ->orderBy('r1.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'form-control tomselect-redoublement1',
+                    //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
+                    //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
+                    'data-search-url' => '/redoublements1/search',
+                    'data-create-url' => '/redoublements1/create',
+                    'tabindex' => '14',    // 2ème champ focus
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Le redoublement ne peut pas être vide.',
+                    ]),
+                ],
+                'required' => true,
+                'error_bubbling' => false,
+            ])
+            ->add('redoublement2', EntityType::class, [
+                'class' => Redoublements2::class,
+                'placeholder' => 'Sélectionnez le redoublement',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('r2')
+                        ->orderBy('r2.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'form-control tomselect-redoublement2',
+                    //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
+                    //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
+                    'data-search-url' => '/redoublements2/search',
+                    'data-create-url' => '/redoublements2/create',
+                    'tabindex' => '15',    // 2ème champ focus
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Le redoublement ne peut pas être vide.',
+                    ]),
+                ],
+                'required' => true,
+                'error_bubbling' => false,
+            ])
+            ->add('redoublement3', EntityType::class, [
+                'class' => Redoublements3::class,
+                'placeholder' => 'Sélectionnez le redoublement',
+                'choice_label' => 'designation',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('r3')
+                        ->orderBy('r3.designation', 'ASC');
+                },
+                'attr' => [
+                    'class' => 'form-control tomselect-redoublement3',
+                    //'data-search-url'  => $this->urlGenerator->generate('app_noms_search'),
+                    //'data-create-url'  => $this->urlGenerator->generate('app_noms_create'),
+                    'data-search-url' => '/redoublements3/search',
+                    'data-create-url' => '/redoublements3/create',
+                    'tabindex' => '16',    // 2ème champ focus
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Le redoublement ne peut pas être vide.',
+                    ]),
+                ],
+                'required' => true,
                 'error_bubbling' => false,
             ])
         ;

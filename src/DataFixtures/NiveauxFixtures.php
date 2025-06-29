@@ -20,17 +20,17 @@ class NiveauxFixtures extends Fixture implements DependentFixtureInterface
                 ['Grande Section', 5, 6]
             ],
             '1er Cycle' => [
-                ['1ère Année', 5, 8],
-                ['2ème Année', 6, 9],
-                ['3ème Année', 7, 10],
-                ['4ème Année', 8, 11],
-                ['5ème Année', 9, 12],
-                ['6ème Année', 10, 13]
+                ['1ère Année', 5, 9],
+                ['2ème Année', 6, 10],
+                ['3ème Année', 7, 11],
+                ['4ème Année', 8, 12],
+                ['5ème Année', 9, 13],
+                ['6ème Année', 10, 14]
             ],
             '2ème Cycle' => [
-                ['7ème Année', 11, 14],
-                ['8ème Année', 12, 15],
-                ['9ème Année', 13, 16],
+                ['7ème Année', 11, 16],
+                ['8ème Année', 12, 17],
+                ['9ème Année', 13, 25],
             ]
 
             // Ajoutez les autres régions et leurs niveaux ici...
