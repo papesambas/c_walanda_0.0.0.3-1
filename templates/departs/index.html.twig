@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Departs index{% endblock %}
+
+{% block body %}
+    <h1>Departs index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateDepart</th>
+                <th>Motif</th>
+                <th>EcoleDestinataire</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for depart in departs %}
+            <tr>
+                <td>{{ depart.id }}</td>
+                <td>{{ depart.dateDepart ? depart.dateDepart|date('Y-m-d') : '' }}</td>
+                <td>{{ depart.motif }}</td>
+                <td>{{ depart.ecoleDestinataire }}</td>
+                <td>{{ depart.createdAt ? depart.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ depart.updatedAt ? depart.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ depart.slug }}</td>
+                <td>
+                    <a href="{{ path('app_departs_show', {'id': depart.id}) }}">show</a>
+                    <a href="{{ path('app_departs_edit', {'id': depart.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_departs_new') }}">Create new</a>
+{% endblock %}

@@ -41,7 +41,7 @@ class Eleves
     private ?Prenoms $prenom = null;
 
     #[ORM\Column(length: 1)]
-    private ?string $sexe = null;
+    private ?string $sexe = 'M';
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $dateNaissance = null;

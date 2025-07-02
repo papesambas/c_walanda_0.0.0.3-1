@@ -91,18 +91,20 @@
         min-width: 180px;
         flex-grow: 1;
     }
-    
+
     .btn-group .btn {
         flex-shrink: 0;
     }
-    
+
     @media (max-width: 768px) {
         .filter-group {
             min-width: 100%;
         }
+
         .btn-group {
             width: 100%;
         }
+
         .btn-group .btn {
             width: 50%;
         }
@@ -133,12 +135,12 @@
                 <div class="stat-number">
                     {% set totalCapacite = 0 %}
                     {% for item in classes %}
-                        {% if item is iterable %}
-                            {% set classe = item[0] %}
-                        {% else %}
-                            {% set classe = item %}
-                        {% endif %}
-                        {% set totalCapacite = totalCapacite + classe.capacite %}
+                    {% if item is iterable %}
+                    {% set classe = item[0] %}
+                    {% else %}
+                    {% set classe = item %}
+                    {% endif %}
+                    {% set totalCapacite = totalCapacite + classe.capacite %}
                     {% endfor %}
                     {{ totalCapacite }}
                 </div>
@@ -150,12 +152,12 @@
                 <div class="stat-number">
                     {% set totalEffectif = 0 %}
                     {% for item in classes %}
-                        {% if item is iterable %}
-                            {% set classe = item[0] %}
-                        {% else %}
-                            {% set classe = item %}
-                        {% endif %}
-                        {% set totalEffectif = totalEffectif + classe.effectif %}
+                    {% if item is iterable %}
+                    {% set classe = item[0] %}
+                    {% else %}
+                    {% set classe = item %}
+                    {% endif %}
+                    {% set totalEffectif = totalEffectif + classe.effectif %}
                     {% endfor %}
                     {{ totalEffectif }}
                 </div>
@@ -166,9 +168,9 @@
                 <h6 class="text-muted">Taux de Remplissage</h6>
                 <div class="stat-number">
                     {% if totalCapacite > 0 %}
-                        {{ ((totalEffectif / totalCapacite) * 100)|round(1) }}%
+                    {{ ((totalEffectif / totalCapacite) * 100)|round(1) }}%
                     {% else %}
-                        0%
+                    0%
                     {% endif %}
                 </div>
             </div>
@@ -179,45 +181,49 @@
         <div class="card-header bg-white">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h5 class="mb-0"><i class="bi bi-list me-2"></i>Liste des Classes</h5>
-                
+
                 <!-- Formulaire de recherche combinée -->
                 <form method="get" class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
                     <div class="filter-group">
                         <input type="text" name="designation" class="form-control heigt" style="height: 40px;"
-                               placeholder="Désignation" value="{{ app.request.query.get('designation') }}">
+                            placeholder="Désignation" value="{{ app.request.query.get('designation') }}">
                     </div>
-                    
+
                     <div class="filter-group">
                         <select name="etablissement" class="form-select ">
                             <option value="">Tous établissements</option>
                             {% for etab in etablissements %}
-                                <option value="{{ etab.id }}" {{ app.request.query.get('etablissement') == etab.id ? 'selected' }}>
-                                    {{ etab.designation }}
-                                </option>
+                            <option value="{{ etab.id }}" {{ app.request.query.get('etablissement')==etab.id
+                                ? 'selected' }}>
+                                {{ etab.designation }}
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
-                    
+
                     <div class="filter-group">
                         <select name="niveau" class="form-select">
                             <option value="">Tous niveaux</option>
                             {% for niv in niveaux %}
-                                <option value="{{ niv.id }}" {{ app.request.query.get('niveau') == niv.id ? 'selected' }}>
-                                    {{ niv.designation }}
-                                </option>
+                            <option value="{{ niv.id }}" {{ app.request.query.get('niveau')==niv.id ? 'selected' }}>
+                                {{ niv.designation }}
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
-                    
+
                     <div class="filter-group">
                         <select name="taux" class="form-select">
                             <option value="">Taux de remplissage</option>
-                            <option value="low" {{ app.request.query.get('taux') == 'low' ? 'selected' }}>Moins de 50%</option>
-                            <option value="medium" {{ app.request.query.get('taux') == 'medium' ? 'selected' }}>50% - 80%</option>
-                            <option value="high" {{ app.request.query.get('taux') == 'high' ? 'selected' }}>Plus de 80%</option>
+                            <option value="low" {{ app.request.query.get('taux')=='low' ? 'selected' }}>Moins de 50%
+                            </option>
+                            <option value="medium" {{ app.request.query.get('taux')=='medium' ? 'selected' }}>50% - 80%
+                            </option>
+                            <option value="high" {{ app.request.query.get('taux')=='high' ? 'selected' }}>Plus de 80%
+                            </option>
                         </select>
                     </div>
-                    
+
                     <div class="btn-group">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-funnel"></i> Filtrer
@@ -234,11 +240,12 @@
             {% if classes is not empty %}
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
-                    <thead  class="table-dark">
+                    <thead class="table-dark">
                         <tr>
                             <th>ID</th>
                             <th>Désignation</th>
                             <th>Établissement</th>
+                            <th>Cycle</th>
                             <th>Niveau</th>
                             <th>Capacité</th>
                             <th>Effectif</th>
@@ -248,72 +255,87 @@
                     </thead>
                     <tbody>
                         {% for item in classes %}
-                            {% if item is iterable %}
-                                {% set classe = item[0] %}
-                                {% set taux_remplissage = item.taux_remplissage %}
-                            {% else %}
-                                {% set classe = item %}
-                                {% set taux_remplissage = (classe.capacite > 0) ? (classe.effectif / classe.capacite * 100) : 0 %}
-                            {% endif %}
-                            
-                            <tr>
-                                <td class="fw-bold">#{{ classe.id }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar me-2">
-                                            {{ classe.designation|slice(0, 2)|upper }}
-                                        </div>
-                                        <div>
-                                            <strong>{{ classe.designation }}</strong>
-                                        </div>
+                        {% if item is iterable %}
+                        {% set classe = item[0] %}
+                        {% set taux_remplissage = item.taux_remplissage %}
+                        {% else %}
+                        {% set classe = item %}
+                        {% set taux_remplissage = (classe.capacite > 0) ? (classe.effectif / classe.capacite * 100) : 0
+                        %}
+                        {% endif %}
+
+                        <tr>
+                            <td class="fw-bold">#{{ classe.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-2">
+                                        {{ classe.designation|slice(0, 2)|upper }}
                                     </div>
-                                </td>
-                                <td>
-                                    {% if classe.etablissement %}
-                                    <span class="badge bg-primary">
-                                        {{ classe.etablissement.designation|u.truncate(40, '...') }}
-                                    </span>
-                                    {% else %}
-                                    <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if classe.niveau %}
-                                    <span class="badge bg-info">
-                                        {{ classe.niveau.designation }}
-                                    </span>
-                                    {% else %}
-                                    <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ classe.capacite }}</td>
-                                <td>{{ classe.effectif }}</td>
-                                <td>
-                                    {{ taux_remplissage|round(1) }}%
-                                    <div class="progress-container">
-                                        <div class="progress-bar" style="width: {{ min(100, taux_remplissage) }}%"></div>
+                                    <div>
+                                        <strong>{{ classe.designation }}</strong>
                                     </div>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ path('app_classes_show', {'id': classe.id}) }}"
-                                        class="btn btn-sm btn-outline-primary me-1" title="Voir">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_classes_edit', {'id': classe.id}) }}"
-                                        class="btn btn-sm btn-outline-success me-1" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form method="post"
-                                        action="{{ path('app_classes_delete', {'id': classe.id}) }}"
-                                        class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
-                                        <input type="hidden" name="_token"
-                                            value="{{ csrf_token('delete' ~ classe.id) }}">
-                                        <button class="btn btn-sm btn-outline-danger" title="Supprimer">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+                            <td>
+                                {% if classe.etablissement %}
+                                <span class="badge bg-primary">
+                                    {{ classe.etablissement.designation|u.truncate(40, '...') }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if classe.niveau.cycle %}
+                                <span class="badge bg-primary">
+
+                                <a href="{{ path('app_cycles_show', {'id': classe.niveau.cycle.id}) }}"
+                                    class="text-decoration-none text-dark text-sm"
+                                    title="{{ classe.niveau.cycle.designation }}">
+                                    {{ classe.niveau.cycle.designation|u.truncate(15, '...') }}
+                                </a>
+                                </span>
+
+
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if classe.niveau %}
+                                <span class="badge bg-info">
+                                    {{ classe.niveau.designation }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ classe.capacite }}</td>
+                            <td>{{ classe.effectif }}</td>
+                            <td>
+                                {{ taux_remplissage|round(1) }}%
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: {{ min(100, taux_remplissage) }}%"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ path('app_classes_show', {'id': classe.id}) }}"
+                                    class="btn btn-sm btn-outline-primary me-1" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_classes_edit', {'id': classe.id}) }}"
+                                    class="btn btn-sm btn-outline-success me-1" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{{ path('app_classes_delete', {'id': classe.id}) }}"
+                                    class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ classe.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -342,7 +364,7 @@
         const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
-    
+
         // Fonction de recherche
         const searchInput = document.getElementById('searchInput')
         if (searchInput) {

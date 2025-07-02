@@ -226,7 +226,7 @@
                             <th>Nom complet</th>
                             <th>Date Naiss.</th>
                             <th>Né(e) à :</th>
-                            <th>Etablissement</th>
+                            <th>Niveau</th>
                             <th>Enseignement</th>
                             <th>Statut</th>
                             <th>Actif</th>
@@ -266,11 +266,11 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if eleve.etablissement %}
-                                <a href="{{ path('app_etablissements_show', {'id': eleve.etablissement.id}) }}"
+                                {% if eleve.classe.niveau %}
+                                <a href="{{ path('app_niveaux_show', {'id': eleve.classe.niveau.id}) }}"
                                     class="text-decoration-none text-dark text-sm"
-                                    title="{{ eleve.etablissement.designation }}">
-                                    {{ eleve.etablissement.designation|u.truncate(15, '...') }}
+                                    title="{{ eleve.classe.niveau.designation }}">
+                                    {{ eleve.classe.niveau.designation|u.truncate(15, '...') }}
                                 </a>
                                 {% else %}
                                 <span class="text-muted">—</span>

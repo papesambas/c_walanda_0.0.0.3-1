@@ -11,9 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
         .ts-dropdown { 
             z-index: 1050 !important; 
         }
-    `;
+    `; // Correction: ajout du backtick manquant
     document.head.appendChild(style);
 
+    // Initialisation des sélecteurs
     document.querySelectorAll('.tomselect-region').forEach(initRegionSelect);
     document.querySelectorAll('.tomselect-cercle').forEach(initCercleSelect);
     document.querySelectorAll('.tomselect-commune').forEach(initCommuneSelect);
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tomselect-enseignement').forEach(initEnseignementSelect);
     document.querySelectorAll('.tomselect-etablissement').forEach(initEtablissementSelect);
     document.querySelectorAll('.tomselect-cycle').forEach(initCycleSelect);
-    document.querySelectorAll('.tomselect-niveau').forEach(initNiveauSelect);
+    document.querySelectorAll('.tomselect-niveau').forEach(initNiveauSelect); // Initialisation avec gestion des dates
     document.querySelectorAll('.tomselect-classe').forEach(initClasseSelect);
 
     document.querySelectorAll('.tomselect-nom').forEach(initNomSelect);
@@ -36,22 +37,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tomselect-redoublement1').forEach(initRedoublement1Select);
     document.querySelectorAll('.tomselect-redoublement2').forEach(initRedoublement2Select);
     document.querySelectorAll('.tomselect-redoublement3').forEach(initRedoublement3Select);
+    document.querySelectorAll('.tomselect-statut').forEach(initStatutSelect);
 
     // Écouteur pour les changements de date de naissance
     document.querySelectorAll('input[name*="dateNaissance"]').forEach(input => {
-        input.addEventListener('change', function() {
+        input.addEventListener('change', function () {
             const form = this.closest('form');
             const niveauSelect = form.querySelector('.tomselect-niveau');
             if (niveauSelect && niveauSelect.tomselect) {
                 niveauSelect.tomselect.clear();
                 niveauSelect.tomselect.clearOptions();
-                
+
                 const cycleSelect = form.querySelector('.tomselect-cycle');
                 if (cycleSelect?.value) {
                     niveauSelect.tomselect.load('', (options) => {
                         niveauSelect.tomselect.addOptions(options);
                         niveauSelect.tomselect.refreshOptions();
-                        
+
                         if (options.length === 1) {
                             niveauSelect.tomselect.setValue(options[0].id);
                         }
@@ -60,8 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-
 });
 
 function initRegionSelect(selectElement) {
@@ -730,6 +730,7 @@ function initNiveauSelect(niveauSelect) {
             });
         }
     });
+
     // Écouteur pour la date de naissance
     if (dateNaissanceInput) {
         dateNaissanceInput.addEventListener('change', () => {
@@ -738,7 +739,7 @@ function initNiveauSelect(niveauSelect) {
                 tsInstance.load('', (options) => {
                     tsInstance.addOptions(options);
                     tsInstance.refreshOptions();
-                    
+
                     // Sélection automatique si une seule option
                     if (options.length === 1) {
                         tsInstance.setValue(options[0].id);
@@ -753,12 +754,12 @@ function initNiveauSelect(niveauSelect) {
         cycleSelect.addEventListener('change', () => {
             tsInstance.clear();
             tsInstance.clearOptions();
-            
+
             if (cycleSelect.value && dateNaissanceInput?.value) {
                 tsInstance.load('', (options) => {
                     tsInstance.addOptions(options);
                     tsInstance.refreshOptions();
-                    
+
                     if (options.length === 1) {
                         tsInstance.setValue(options[0].id);
                     }
@@ -766,6 +767,49 @@ function initNiveauSelect(niveauSelect) {
             }
         });
     }
+
+    tsInstance.on('change', function () {
+        const niveauDesignation = this.options[this.getValue()]?.text || '';
+        const dateField = niveauSelect.closest('form')?.querySelector('[name*="dateRecrutement"]');
+
+        if (!dateField) return;
+
+        const today = new Date();
+
+        const constraints = {
+            'Maternelle': [1, 1],
+            'Petite Section': [1, 1],
+            'Moyenne Section': [1, 1],
+            'Grande Section': [1, 1],
+            '1ère Année': [2, 1],
+            '2ème Année': [4, 2],
+            '3ème Année': [5, 3],
+            '4ème Année': [6, 4],
+            '5ème Année': [7, 5],
+            '6ème Année': [8, 6],
+            '7ème Année': [9, 7],
+            '8ème Année': [10, 8],
+            '9ème Année': [11, 9],
+        };
+
+        if (niveauDesignation in constraints) {
+            const [maxYears, minYears] = constraints[niveauDesignation];
+
+            const minDate = new Date(today);
+            minDate.setFullYear(today.getFullYear() - maxYears);
+
+            const maxDate = new Date(today);
+            maxDate.setFullYear(today.getFullYear() - minYears);
+
+            dateField.min = minDate.toISOString().split('T')[0];
+            dateField.max = maxDate.toISOString().split('T')[0];
+        } else {
+            // Niveau non reconnu → aucune restriction
+            dateField.min = '';
+            dateField.max = '';
+        }
+    });
+    // ======= FIN DE LA CORRECTION =======
 }
 
 function initClasseSelect(classeSelect) {
@@ -1747,3 +1791,177 @@ function initRedoublement3Select(redoublement3Select) {
         }
     });
 }
+
+function initStatutSelect(statutSelect) {
+    if (statutSelect.tomselect) return;
+
+    const form = statutSelect.closest('form');
+    const enseignementSelect = form.querySelector('.tomselect-enseignement');
+
+    // Utilise la même regex que le serveur pour la cohérence
+    const statutRegex = /^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u;
+
+    const tsInstance = new TomSelect(statutSelect, {
+        plugins: ['remove_button', 'clear_button'],
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'text',
+        searchField: 'text',
+        delimiter: ',',
+        loadingClass: 'loading',
+        placeholder: 'Sélectionnez un statut',
+        hidePlaceholder: true,
+
+        // Ajout d'un indicateur de chargement
+        loading: true,
+
+        load: function (query, callback) {
+            const enseignementId = enseignementSelect?.value;
+
+            if (!enseignementId) {
+                this.clearOptions();
+                this.clear();
+                this.setMessage('no_results', 'Sélectionnez d\'abord un enseignement');
+                return callback([]);
+            }
+
+            const url = `/statuts/search?term=${encodeURIComponent(query)}&enseignement_id=${enseignementId}`;
+
+            // Afficher l'indicateur de chargement
+            this.showLoading();
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Erreur réseau');
+                    return response.json();
+                })
+                .then(data => {
+                    this.hideLoading();
+                    callback(data);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    this.hideLoading();
+                    this.setMessage('no_results', 'Erreur de chargement');
+                    callback([]);
+                });
+        },
+
+        create: function (input, callback) {
+            const cleanedInput = input.trim();
+            const enseignementId = enseignementSelect?.value;
+
+            // Validation
+            if (!cleanedInput) {
+                this.setMessage('no_results', 'Le nom ne peut pas être vide');
+                return;
+            }
+
+            if (!statutRegex.test(cleanedInput)) {
+                this.setMessage('no_results', 'Caractères invalides. Utilisez lettres, chiffres, espaces, apostrophes ou tirets.');
+                return;
+            }
+
+            if (!enseignementId) {
+                this.setMessage('no_results', 'Sélectionnez d\'abord un enseignement');
+                return;
+            }
+
+            fetch(`/statuts/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-Token': form.querySelector('input[name="_token"]')?.value
+                },
+                body: JSON.stringify({
+                    designation: cleanedInput,
+                    enseignement_id: enseignementId
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Erreur création statut');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        callback({ id: data.id, text: data.designation });
+                        this.clearMessage();
+                    } else {
+                        throw new Error(data.message || 'Erreur inconnue');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur création:', error);
+                    this.setMessage('no_results', 'Échec création: ' + error.message);
+                });
+        },
+
+        onInitialize: function () {
+            if (!enseignementSelect) return;
+
+            // Chargement initial si enseignement déjà sélectionné
+            if (enseignementSelect.value) {
+                this.load('', (options) => {
+                    this.addOptions(options);
+                    this.refreshOptions();
+                });
+            }
+
+            // Gestion du changement d'enseignement
+            enseignementSelect.addEventListener('change', () => {
+                this.clear();
+                this.clearOptions();
+                this.clearMessage();
+
+                if (enseignementSelect.value) {
+                    this.load('', (options) => {
+                        this.addOptions(options);
+                        this.refreshOptions();
+                    });
+                } else {
+                    this.setMessage('no_results', 'Sélectionnez un enseignement');
+                }
+            });
+        },
+
+        // Messages personnalisés
+        render: {
+            no_results: function (data, escape) {
+                return `<div class="no-results">${escape(this.inputValue)} - ${this.options.noResultsText}</div>`;
+            }
+        }
+    });
+}
+
+document.querySelector('[name="niveau"]').addEventListener('change', function () {
+    const niveau = this.value;
+    const dateField = document.querySelector('[name="dateRecrutement"]');
+    const today = new Date();
+
+    const constraints = {
+        'Maternelle': { min: 0, max: 1 },
+        'Petite Section': { min: 0, max: 1 },
+        'Moyenne Section': { min: 0, max: 1 },
+        'Grande Section': { min: 0, max: 1 },
+        '1ère Année': { min: 1, max: 2 },
+        '2ème Année': { min: 2, max: 4 },
+        // ... autres niveaux
+    };
+
+    if (constraints[niveau]) {
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - constraints[niveau].max);
+
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() - constraints[niveau].min);
+
+        dateField.min = minDate.toISOString().split('T')[0];
+        dateField.max = maxDate.toISOString().split('T')[0];
+    }
+})
