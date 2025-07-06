@@ -15,30 +15,8 @@ class DepartsForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('dateDepart', null, [
-                'widget' => 'single_text',
-            ])
             ->add('motif')
             ->add('ecoleDestinataire')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('slug')
-            ->add('eleve', EntityType::class, [
-                'class' => Eleves::class,
-                'choice_label' => 'id',
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
-            ->add('updatedBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 

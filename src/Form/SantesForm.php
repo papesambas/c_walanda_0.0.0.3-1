@@ -19,25 +19,6 @@ class SantesForm extends AbstractType
             ->add('medecin')
             ->add('numeroUrgence')
             ->add('centreSante')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('updatedAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('slug')
-            ->add('eleve', EntityType::class, [
-                'class' => Eleves::class,
-                'choice_label' => 'id',
-            ])
-            ->add('createdBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
-            ->add('updatedBy', EntityType::class, [
-                'class' => Users::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 

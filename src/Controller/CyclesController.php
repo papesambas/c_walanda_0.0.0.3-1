@@ -158,7 +158,6 @@ final class CyclesController extends AbstractController
 
         // Appliquer les filtres
         $eleves = $elevesRepository->findByFiltersAndCycle($fullname, $cycle, $etablissements, $niveauId, $statutId);
-        dump($cycle, $etablissements);
 
         return $this->render('cycles/show.html.twig', [
             'cycle' => $cycle, // Ajouté pour avoir le contexte dans le template

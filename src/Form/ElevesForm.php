@@ -24,6 +24,8 @@ use App\Entity\Redoublements1;
 use App\Entity\Redoublements2;
 use App\Entity\Redoublements3;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -63,6 +65,53 @@ class ElevesForm extends AbstractType
         $this->addBirthInfoFields($builder);
         $this->addAcademicFields($builder, $etablissement, $enseignement);
         $this->addHealthDepartureFields($builder);
+
+        // Ajoutez l'écouteur POST_SET_DATA
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            $eleve = $event->getData();
+
+            if (!$eleve) {
+                return;
+            }
+
+            // Pré-remplir les champs région/cercle/commune
+            $this->preFillLocationFields($eleve, $form);
+
+            // Pré-remplir les champs académiques
+            $this->preFillAcademicFields($eleve, $form);
+        });
+    }
+
+    private function preFillLocationFields(Eleves $eleve, $form): void
+    {
+        $lieuNaissance = $eleve->getLieuNaissance();
+
+        if ($lieuNaissance) {
+            $commune = $lieuNaissance->getCommune();
+            $cercle = $commune ? $commune->getCercle() : null;
+            $region = $cercle ? $cercle->getRegion() : null;
+
+            $form->get('region')->setData($region);
+            $form->get('cercle')->setData($cercle);
+            $form->get('commune')->setData($commune);
+        }
+    }
+
+    private function preFillAcademicFields(Eleves $eleve, $form): void
+    {
+        $classe = $eleve->getClasse();
+
+        // Vérifier si la classe existe avant d'accéder à ses propriétés
+        if ($classe) {
+            $niveau = $classe->getNiveau();
+
+            // Vérifier si le niveau existe
+            if ($niveau) {
+                $form->get('cycle')->setData($niveau->getCycle());
+                $form->get('niveau')->setData($niveau);
+            }
+        }
     }
 
     private function addMediaFields(FormBuilderInterface $builder): void
@@ -79,6 +128,7 @@ class ElevesForm extends AbstractType
                             'image/jpg',
                             'image/gif',
                             'image/png',
+                            'image/webp',
                         ]
                     ])
                 ],
@@ -168,6 +218,7 @@ class ElevesForm extends AbstractType
         $builder
             ->add('santes', CollectionType::class, [
                 'entry_type' => SantesForm::class,
+                'label' => false,
                 'entry_options' => ['label' => false],
                 'by_reference' => false,
                 'allow_add' => true,
@@ -176,6 +227,7 @@ class ElevesForm extends AbstractType
             ])
             ->add('departs', CollectionType::class, [
                 'entry_type' => DepartsForm::class,
+                'label' => false,
                 'entry_options' => ['label' => false],
                 'by_reference' => false,
                 'allow_add' => true,
@@ -415,9 +467,22 @@ class ElevesForm extends AbstractType
                     'value' => 'today',
                     'message' => 'La date de l\'acte ne peut pas être postérieure à aujourd\'hui.'
                 ]),
+                new Callback(function ($dateActe, ExecutionContextInterface $context) {
+                    $form = $context->getRoot();
+                    $dateNaissance = $form->get('dateNaissance')?->getData();
+
+                    if ($dateActe instanceof \DateTimeInterface && $dateNaissance instanceof \DateTimeInterface) {
+                        if ($dateActe < $dateNaissance) {
+                            $context->buildViolation("La date de l'acte ne peut pas être antérieure à la date de naissance.")
+                                ->atPath('dateActe')
+                                ->addViolation();
+                        }
+                    }
+                }),
             ],
         ];
     }
+
 
     private function getNumeroActeConfig(): array
     {
@@ -434,7 +499,7 @@ class ElevesForm extends AbstractType
                 new NotBlank(['message' => 'Ce numéro ne peut pas être vide.']),
                 new NotNull(['message' => 'Ce numéro ne peut pas être nul.']),
                 new Regex([
-                    'pattern' => "/^[\p{L}0-9]+(?:[ \-'\/][\p{L}0-9]+)*$/u",
+                    'pattern' => "/^[\p{L}0-9]+(?:[ \-\.'\/][\p{L}0-9]+)*$/u",
                     'message' => 'Le numéro fiscal ne doit contenir que des lettres, des chiffres, des espaces et des tirets.',
                 ]),
             ],
@@ -592,6 +657,7 @@ class ElevesForm extends AbstractType
             ],
             'required' => false,
             'error_bubbling' => false,
+            'mapped' => false,
         ];
     }
 
@@ -731,7 +797,8 @@ class ElevesForm extends AbstractType
                     }
 
                     // Calcul de l'âge à la date de recrutement
-                    $age = $dateRecrutement->diff($dateNaissance)->y;
+                    $today = new \DateTimeImmutable();
+                    $age = $dateNaissance->diff($today)->y;
                     $agemin = $niveau->getAgemin();
                     $agemax = $niveau->getAgemax();
 
@@ -845,6 +912,9 @@ class ElevesForm extends AbstractType
                 'data-search-url' => '/scolarites2/search',
                 'data-create-url' => '/scolarites2/create',
                 'tabindex' => '13',
+                // Ajout des attributs pour le script
+                'data-duration-field' => 'eleves_form_dateRecrutement',
+                'data-scolarite1-field' => 'eleves_form_scolarite1',
             ],
             'constraints' => [
                 new NotBlank(['message' => 'La scolarité ne peut pas être vide.']),
@@ -857,6 +927,39 @@ class ElevesForm extends AbstractType
                 new Regex([
                     'pattern' => "/^\d+$/",
                     'message' => 'La scolarité doit contenir uniquement des chiffres.',
+                ]),
+                new Callback([
+                    'callback' => function ($scolarite2Entity, ExecutionContextInterface $context) {
+                        $form = $context->getRoot();
+                        $scolarite1Entity = $form->get('scolarite1')->getData();
+                        $dateRecrutement = $form->get('dateRecrutement')->getData();
+
+                        if (
+                            !$scolarite1Entity instanceof Scolarites1 ||
+                            !$scolarite2Entity instanceof Scolarites2 ||
+                            !$dateRecrutement instanceof \DateTimeInterface
+                        ) {
+                            return;
+                        }
+
+                        $scolarite1Value = $scolarite1Entity->getScolarite();
+                        $scolarite2Value = $scolarite2Entity->getScolarite();
+                        $totalScolarite = $scolarite1Value + $scolarite2Value;
+
+                        $now = new \DateTime();
+                        $interval = $dateRecrutement->diff($now);
+                        $dureePrecise = $interval->y + ($interval->m / 12) + ($interval->d / 365);
+
+                        $tolerance = 0.5;
+                        $difference = abs($totalScolarite - $dureePrecise);
+
+                        if ($difference > $tolerance) {
+                            $context->buildViolation('La somme des scolarités ({{ total }}) doit correspondre à la durée de service ({{ duree }} ans) - écart maximum: 6 mois')
+                                ->setParameter('{{ total }}', $totalScolarite)
+                                ->setParameter('{{ duree }}', number_format($dureePrecise, 1, ',', ' '))
+                                ->addViolation();
+                        }
+                    },
                 ]),
             ],
             'required' => false,

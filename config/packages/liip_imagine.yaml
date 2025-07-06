@@ -43,15 +43,33 @@ liip_imagine:
 
         photo_identite :
             # adjust the image quality to 75%
-            quality : 85
+            quality : 95
             # list of transformations to apply (the "filters")
             filters :
                 # create a thumbnail: set size to 120x90 and use the "outbound" mode
                 # to crop the image when the size ratio of the input differs
-                thumbnail  : { size : [400, 500], mode : outbound, allow_upscale: true }
+                thumbnail  : { size : [200, 225], mode : outbound, allow_upscale: true }
                 # create a 2px black border: center the thumbnail on a black background
                 # 4px larger to create a 2px border around the final image
-                background : { size : [401, 501], position : center, color : '#000000' }
+                background: 
+                    size: [204, 229]
+                    position: center
+                    color: '#fafafa'
+                #border: 
+                #    size: 20
+                #    color: '#ffffff'
+                #canvas: 
+                #    size: [434, 539]
+                #    position: center
+                #    color: '#eeeeee'
+                #enhance: ~
+                #contrast: { brightness: 1.02, contrast: 1.02 }
+                #padding: 
+                #    top: 8
+                #    right: 8
+                #    bottom: 25
+                #    left: 8
+                #    color: '#f0f0f0'
 
         photo_identite_gr_format :
             # adjust the image quality to 75%

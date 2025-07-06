@@ -157,11 +157,18 @@ services:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Departs'}
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Departs'}    # add more service definitions when explicit configuration is needed
+                - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Departs'}    # add more service definitions when explicit configuration is needed
+                - { name: 'doctrine.event_listener', event: 'postFlush' } 
 
     App\EventListener\SantesEntityListener:
             tags:
                 - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Santes'}
                 - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Santes'}    # add more service definitions when explicit configuration is needed
+    App\EventListener\RecupHistDepartsEntityListener:
+            tags:
+                - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\RecupHistDeparts'}
+                - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\RecupHistDeparts'}    # add more service definitions when explicit configuration is needed
+
 
 
     # add more service definitions when explicit configuration is needed

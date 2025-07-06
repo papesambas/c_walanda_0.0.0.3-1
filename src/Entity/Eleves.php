@@ -73,10 +73,10 @@ class Eleves
     private ?string $niveau = null;
 
     #[ORM\Column]
-    private ?bool $isActif = true;
+    private ?bool $isActif = false;
 
     #[ORM\Column]
-    private ?bool $isAdmis = false;
+    private ?bool $isAdmis = true;
 
     #[ORM\Column]
     private ?bool $isAllowed = false;
@@ -114,19 +114,19 @@ class Eleves
     /**
      * @var Collection<int, DossierEleves>
      */
-    #[ORM\OneToMany(targetEntity: DossierEleves::class, mappedBy: 'eleve', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: DossierEleves::class, mappedBy: 'eleve', orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $dossierEleves;
 
     /**
      * @var Collection<int, Departs>
      */
-    #[ORM\OneToMany(targetEntity: Departs::class, mappedBy: 'eleve', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Departs::class, mappedBy: 'eleve', orphanRemoval: true, cascade: ['persist'])]
     private Collection $departs;
 
     /**
      * @var Collection<int, Santes>
      */
-    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Santes::class, mappedBy: 'eleve', orphanRemoval: true, cascade: ['persist'] )]
     private Collection $santes;
 
     #[ORM\Column]
@@ -147,11 +147,18 @@ class Eleves
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $matricule = null;
 
+    /**
+     * @var Collection<int, RecupHistDeparts>
+     */
+    #[ORM\OneToMany(targetEntity: RecupHistDeparts::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $recupHistDeparts;
+
     public function __construct()
     {
         $this->dossierEleves = new ArrayCollection();
         $this->departs = new ArrayCollection();
         $this->santes = new ArrayCollection();
+        $this->recupHistDeparts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -643,6 +650,36 @@ class Eleves
     public function setMatricule(?string $matricule): static
     {
         $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RecupHistDeparts>
+     */
+    public function getRecupHistDeparts(): Collection
+    {
+        return $this->recupHistDeparts;
+    }
+
+    public function addRecupHistDepart(RecupHistDeparts $recupHistDepart): static
+    {
+        if (!$this->recupHistDeparts->contains($recupHistDepart)) {
+            $this->recupHistDeparts->add($recupHistDepart);
+            $recupHistDepart->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecupHistDepart(RecupHistDeparts $recupHistDepart): static
+    {
+        if ($this->recupHistDeparts->removeElement($recupHistDepart)) {
+            // set the owning side to null (unless already changed)
+            if ($recupHistDepart->getEleve() === $this) {
+                $recupHistDepart->setEleve(null);
+            }
+        }
 
         return $this;
     }
