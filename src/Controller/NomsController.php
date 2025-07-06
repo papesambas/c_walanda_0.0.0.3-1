@@ -45,6 +45,37 @@ final class NomsController extends AbstractController
         ]);
     }
 
+        #[Route('/create/{label}', name: 'app_noms_create', methods: ['POST'])]
+    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $nom = new Noms();
+        $nom->setDesignation(trim(strip_tags($label)));
+        $entityManager->persist($nom);
+        $entityManager->flush();
+        //on récupère l'Id qui a été créé
+        $id = $nom->getId();
+
+        return new JsonResponse(['id' => $id]);
+    }
+
+    #[Route('/search', name: 'api_noms_search', methods: ['GET'])]
+    public function searchNoms(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $term = $request->query->get('term');
+        $results = $em->getRepository(Noms::class)
+            ->createQueryBuilder('n')
+            ->where('n.designation LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        return $this->json(array_map(fn($n) => [
+            'id' => $n->getId(),
+            'text' => $n->getDesignation()
+        ], $results));
+    }
+    
     #[Route('/{id}', name: 'app_noms_show', methods: ['GET'])]
     public function show(Noms $nom): Response
     {
@@ -82,34 +113,4 @@ final class NomsController extends AbstractController
         return $this->redirectToRoute('app_noms_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/create/{label}', name: 'app_noms_create', methods: ['POST'])]
-    public function ajoutAjax(string $label, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $nom = new Noms();
-        $nom->setDesignation(trim(strip_tags($label)));
-        $entityManager->persist($nom);
-        $entityManager->flush();
-        //on récupère l'Id qui a été créé
-        $id = $nom->getId();
-
-        return new JsonResponse(['id' => $id]);
-    }
-
-    #[Route('/search', name: 'api_noms_search', methods: ['GET'])]
-    public function searchNoms(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $term = $request->query->get('term');
-        $results = $em->getRepository(Noms::class)
-            ->createQueryBuilder('n')
-            ->where('n.designation LIKE :term')
-            ->setParameter('term', '%'.$term.'%')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
-
-        return $this->json(array_map(fn($n) => [
-            'id' => $n->getId(),
-            'text' => $n->getDesignation()
-        ], $results));
-    }
 }
